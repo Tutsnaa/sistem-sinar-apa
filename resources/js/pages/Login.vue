@@ -72,14 +72,14 @@ export default {
                 });
 
                 if (response.data.success) {
-                    // simpan role di localStorage agar dashboard bisa membaca
+                    // simpan role di localStorage agar beranda bisa membaca
                     localStorage.setItem("role", response.data.role);
 
-                    // redirect ke dashboard sesuai role
+                    // redirect ke beranda sesuai role
                     if (response.data.role === "pemilik_toko") {
-                        this.$router.push("/dashboard-pemilik");
+                        this.$router.push("/beranda-pemilik");
                     } else if (response.data.role === "karyawan") {
-                        this.$router.push("/dashboard-karyawan");
+                        this.$router.push("/beranda-karyawan");
                     }
                 }
             } catch (error) {

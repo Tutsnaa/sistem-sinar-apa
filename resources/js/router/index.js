@@ -1,21 +1,21 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 import Login from "../pages/Login.vue";
-import DashboardPemilik from "../pages/DashboardPemilik.vue";
-import DashboardKaryawan from "../pages/DashboardKaryawan.vue";
+import BerandaPemilik from "../pages/BerandaPemilik.vue";
+import BerandaKaryawan from "../pages/BerandaKaryawan.vue";
 
 const routes = [
     { path: "/", redirect: "/login" }, // ⬅ tambahkan ini
     { path: "/login", name: "login", component: Login },
     {
-        path: "/dashboard-pemilik",
-        name: "dashboardPemilik",
-        component: DashboardPemilik,
+        path: "/beranda-pemilik",
+        name: "berandaPemilik",
+        component: BerandaPemilik,
     },
     {
-        path: "/dashboard-karyawan",
-        name: "dashboardKaryawan",
-        component: DashboardKaryawan,
+        path: "/beranda-karyawan",
+        name: "berandadKaryawan",
+        component: BerandaKaryawan,
     },
 ];
 
