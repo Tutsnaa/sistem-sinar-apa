@@ -43,6 +43,7 @@
 </template>
 
 <script>
+import axios from "axios";
 import ButtonPrimary from "../components/ButtonPrimary.vue";
 import FormInput from "../components/FormInput.vue";
 import FormInputPassword from "../components/FormInputPassword.vue";
@@ -54,14 +55,37 @@ export default {
         return {
             namapengguna: "",
             katasandi: "",
-            logo: "/assets/img/Logo-Toko.png", // path dari public
+            logo: "/assets/img/Logo-Toko.png",
         };
     },
     methods: {
-        login() {
-            alert(
-                `Login ditekan!\nNama Pengguna: ${this.namapengguna}\nKata Sandi: ${this.katasandi}`
-            );
+        async login() {
+            if (!this.namapengguna || !this.katasandi) {
+                alert("Nama pengguna dan kata sandi wajib diisi!");
+                return;
+            }
+
+            try {
+                const response = await axios.post("/login", {
+                    nama_pengguna: this.namapengguna,
+                    kata_sandi: this.katasandi,
+                });
+
+                if (response.data.success) {
+                    // simpan role di localStorage agar dashboard bisa membaca
+                    localStorage.setItem("role", response.data.role);
+
+                    // redirect ke dashboard sesuai role
+                    if (response.data.role === "pemilik_toko") {
+                        this.$router.push("/dashboard-pemilik");
+                    } else if (response.data.role === "karyawan") {
+                        this.$router.push("/dashboard-karyawan");
+                    }
+                }
+            } catch (error) {
+                const pesan = error.response?.data?.message || "Login gagal!";
+                alert(pesan);
+            }
         },
     },
 };
