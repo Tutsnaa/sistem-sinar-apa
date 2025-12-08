@@ -1,7 +1,5 @@
 import "./bootstrap";
 import { createApp } from "vue";
-import ExampleComponent from "./components/ExampleComponent.vue";
+import Login from "./pages/Login.vue"; // pastikan path sesuai
 
-const app = createApp({});
-app.component("example-component", ExampleComponent);
-app.mount("#app");
+createApp(Login).mount("#app");
