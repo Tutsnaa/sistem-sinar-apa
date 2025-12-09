@@ -74,6 +74,7 @@ export default {
                 if (response.data.success) {
                     // simpan role di localStorage agar beranda bisa membaca
                     localStorage.setItem("role", response.data.role);
+                    localStorage.setItem("nama", response.data.nama);
 
                     // redirect ke beranda sesuai role
                     if (response.data.role === "pemilik_toko") {

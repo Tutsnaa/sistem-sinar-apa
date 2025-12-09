@@ -38,12 +38,13 @@ class PenggunaController extends Controller
         return response()->json([
             'success' => true,
             'role' => $user->role,
+            'nama' => $user->nama_lengkap,
         ]);
     }
 
     public function logout()
     {
         Session::flush();
-        return redirect()->route('login');
+        return redirect('/login');
     }
 }
