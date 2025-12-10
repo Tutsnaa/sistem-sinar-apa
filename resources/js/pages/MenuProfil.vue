@@ -13,15 +13,15 @@
                 >Kembali
             </h1>
             <h1 class="text-xl font-semibold">PROFIL</h1>
-            <div class="flex items-center gap-4">
-                <!-- <span>{{ nama }}</span> -->
-                <!-- <button
+            <!-- <div class="flex items-center gap-4">
+                <span>{{ nama }}</span>
+                <button
                     @click="goBack"
                     class="bg-white text-[#3674B5] px-3 py-1 rounded hover:bg-gray-200 text-sm transition"
                 >
                     Kembali
-                </button> -->
-            </div>
+                </button>
+            </div> -->
         </nav>
         <!-- <h1
             class="text-[#6C6565] text-xl font-semibold flex mt-5 items-center gap-3 mx-10 cursor-pointer hover:text-[#3674B5]"

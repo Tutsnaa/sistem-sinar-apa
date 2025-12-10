@@ -33,11 +33,48 @@
         >
             Penjualan
         </h1> -->
+        <!-- Konten utama -->
+        <div class="px-8 mt-6 flex flex-wrap gap-4">
+            <FormOutput
+                class="w-80 rounded-10px"
+                label="Pengguna"
+                :value="namapengguna"
+            />
+            <FormOutput
+                class="w-40 rounded-10px"
+                label="Tanggal"
+                :value="tanggal"
+            />
+            <FormInput
+                class="w-80 rounded-10px"
+                label="Pelanggan"
+                v-model="namapelanggan"
+            />
+        </div>
+        <div class="px-8 mt-6 flex flex-row gap-4 items-start">
+            <!-- Tambah Pembelian di kiri -->
+            <FormTambahPembelian
+                @tambah-barang="tambahBarangKeDaftar"
+                class="w-80"
+            />
+
+            <!-- Daftar Pembelian di kanan -->
+            <DaftarPembelian
+                :daftarPembelian="daftarPembelian"
+                class="flex-1 max-w-290"
+            />
+        </div>
     </div>
 </template>
 
 <script>
+import FormInput from "../components/FormInput.vue";
+import FormOutput from "../components/FormOutput.vue";
+import DaftarPembelian from "../components/DaftarPembelian.vue";
+import FormTambahPembelian from "../components/FormTambahPembelian.vue";
+
 export default {
+    components: { FormInput, FormOutput, DaftarPembelian, FormTambahPembelian },
     data() {
         return {
             nama: "",
