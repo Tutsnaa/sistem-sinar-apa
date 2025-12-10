@@ -11,6 +11,7 @@ class PenggunaSeeder extends Seeder
     public function run(): void
     {
         Pengguna::create([
+            'foto' => 'foto-profil.jpg',
             'nama_lengkap' => 'Pemilik Utama',
             'email' => 'pemilik@example.com',
             'no_telepon' => '081234567890',
@@ -20,6 +21,7 @@ class PenggunaSeeder extends Seeder
         ]);
 
         Pengguna::create([
+            'foto' => 'foto-profil.jpg',
             'nama_lengkap' => 'Karyawan 1',
             'email' => 'karyawan@example.com',
             'no_telepon' => '081212121212',
@@ -29,6 +31,7 @@ class PenggunaSeeder extends Seeder
         ]);
 
         Pengguna::create([
+            'foto' => 'foto-profil.jpg',
             'nama_lengkap' => 'I Ketut Sujana',
             'email' => 'sujanaiketut@google.com',
             'no_telepon' => '081234567890',

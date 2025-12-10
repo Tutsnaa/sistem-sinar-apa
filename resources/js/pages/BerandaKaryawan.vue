@@ -2,11 +2,16 @@
     <div class="min-h-screen bg-gray-100">
         <!-- Navbar -->
         <nav
-            class="bg-[#3674B5] text-white px-6 py-4 flex justify-between items-center shadow"
+            class="bg-[#3674B5] text-white px-6 py-6 flex justify-between items-center shadow"
         >
             <h1 class="text-xl font-semibold">SISTEM SINAR APA</h1>
             <div class="flex items-center gap-4">
-                <span>Halo, {{ nama }}</span>
+                <img
+                    v-if="foto"
+                    :src="`/storage/foto_pengguna/${foto}`"
+                    class="w-10 h-10 rounded-full object-cover border-2 border-white"
+                />
+                <span>{{ nama }}</span>
                 <button
                     @click="logout"
                     class="bg-white text-[#3674B5] px-3 py-1 rounded hover:bg-gray-200 text-sm transition"
@@ -81,12 +86,14 @@ export default {
     data() {
         return {
             nama: "",
+            foto: "",
         };
     },
 
     mounted() {
         const nama = localStorage.getItem("nama");
         const role = localStorage.getItem("role");
+        const foto = localStorage.getItem("foto");
 
         if (!nama || !role) {
             this.$router.push("/login");
@@ -94,6 +101,7 @@ export default {
         }
 
         this.nama = nama;
+        this.foto = foto;
     },
 
     methods: {

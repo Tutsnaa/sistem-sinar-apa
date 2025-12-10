@@ -9,6 +9,7 @@ class Pengguna extends Model
     protected $table = 'Pengguna';
 
     protected $fillable = [
+        'foto',
         'nama_lengkap',
         'email',
         'no_telepon',

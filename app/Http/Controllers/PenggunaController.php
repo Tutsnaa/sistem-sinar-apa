@@ -34,11 +34,13 @@ class PenggunaController extends Controller
         Session::put('loginId', $user->id);
         Session::put('nama', $user->nama_lengkap);
         Session::put('role', $user->role);
+        Session::put('foto', $user->foto); 
 
         return response()->json([
             'success' => true,
             'role' => $user->role,
             'nama' => $user->nama_lengkap,
+            'foto' => $user->foto,
         ]);
     }
 
