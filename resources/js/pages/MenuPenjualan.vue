@@ -10,9 +10,12 @@
             >
                 <span class="material-icons" style="font-size: 25px"
                     >arrow_back</span
-                >Kembali
+                >
+                Kembali
             </h1>
+
             <h1 class="text-xl font-semibold">PENJUALAN</h1>
+
             <div class="flex items-center gap-4">
                 <img
                     v-if="foto"
@@ -20,45 +23,40 @@
                     class="w-10 h-10 rounded-full object-cover border-2 border-white"
                 />
                 <span>{{ nama }}</span>
-                <!-- <button
-                    @click="goBack"
-                    class="bg-white text-[#3674B5] px-3 py-1 rounded hover:bg-gray-200 text-sm transition"
-                >
-                    Kembali
-                </button> -->
             </div>
         </nav>
-        <!-- <h1
-            class="text-[#6C6565] text-xl font-semibold flex mt-5 items-center gap-3 mx-10"
-        >
-            Penjualan
-        </h1> -->
-        <!-- Konten utama -->
+
+        <!-- Konten Utama -->
         <div class="px-8 mt-6 flex flex-wrap gap-4">
             <FormOutput
                 class="w-80 rounded-10px"
                 label="Pengguna"
-                :value="namapengguna"
+                :value="nama"
             />
+
             <FormOutput
                 class="w-40 rounded-10px"
                 label="Tanggal"
                 :value="tanggal"
             />
+
             <FormInput
+                id="namaPelanggan"
                 class="w-80 rounded-10px"
                 label="Pelanggan"
                 v-model="namapelanggan"
             />
         </div>
+
         <div class="px-8 mt-6 flex flex-row gap-4 items-start">
-            <!-- Tambah Pembelian di kiri -->
+            <!-- Tambah Pembelian -->
             <FormTambahPembelian
+                :barang="barang"
                 @tambah-barang="tambahBarangKeDaftar"
                 class="w-80"
             />
 
-            <!-- Daftar Pembelian di kanan -->
+            <!-- Daftar Pembelian -->
             <DaftarPembelian
                 :daftarPembelian="daftarPembelian"
                 class="flex-1 max-w-290"
@@ -74,18 +72,42 @@ import DaftarPembelian from "../components/DaftarPembelian.vue";
 import FormTambahPembelian from "../components/FormTambahPembelian.vue";
 
 export default {
-    components: { FormInput, FormOutput, DaftarPembelian, FormTambahPembelian },
+    props: {
+        barang: {
+            type: Array,
+            default: () => [], // ← supaya tidak undefined
+        },
+    },
+
+    components: {
+        FormInput,
+        FormOutput,
+        DaftarPembelian,
+        FormTambahPembelian,
+    },
+
     data() {
         return {
             nama: "",
             foto: "",
+            tanggal: "",
+            namapelanggan: "",
+            daftarPembelian: [],
         };
     },
 
     mounted() {
+        console.log("DATA BARANG MASUK dari Inertia:", this.barang);
+
         const nama = localStorage.getItem("nama");
         const role = localStorage.getItem("role");
         const foto = localStorage.getItem("foto");
+
+        const t = new Date();
+        const hari = String(t.getDate()).padStart(2, "0");
+        const bulan = String(t.getMonth() + 1).padStart(2, "0");
+        const tahun = t.getFullYear();
+        this.tanggal = `${hari}-${bulan}-${tahun}`;
 
         if (!nama || !role) {
             this.$router.push("/login");
@@ -95,18 +117,19 @@ export default {
         this.nama = nama;
         this.foto = foto;
     },
+
     methods: {
         goBack() {
             const role = localStorage.getItem("role");
 
-            if (role === "pemilik_toko") {
-                this.$router.push("/beranda-pemilik");
-            } else if (role === "karyawan") {
+            if (role === "pemilik_toko") this.$router.push("/beranda-pemilik");
+            else if (role === "karyawan")
                 this.$router.push("/beranda-karyawan");
-            } else {
-                // jika role tidak ditemukan (misal session hilang)
-                this.$router.push("/login");
-            }
+            else this.$router.push("/login");
+        },
+
+        tambahBarangKeDaftar(barang) {
+            this.daftarPembelian.push(barang);
         },
     },
 };
