@@ -35,7 +35,7 @@
                         placeholder="Masukkan Kata Sandi"
                     />
 
-                    <ButtonPrimary @click="login">MASUK</ButtonPrimary>
+                    <ButtonPrimary>MASUK</ButtonPrimary>
                 </form>
             </div>
         </div>
@@ -66,27 +66,29 @@ export default {
             }
 
             try {
-                const response = await axios.post("/login", {
+                const response = await axios.post("api/login", {
                     nama_pengguna: this.namapengguna,
                     kata_sandi: this.katasandi,
                 });
 
                 if (response.data.success) {
-                    // simpan role di localStorage agar beranda bisa membaca
-                    localStorage.setItem("role", response.data.role);
-                    localStorage.setItem("nama", response.data.nama);
-                    localStorage.setItem("foto", response.data.foto);
+                    const user = response.data.data;
 
-                    // redirect ke beranda sesuai role
-                    if (response.data.role === "pemilik_toko") {
+                    localStorage.setItem("role", user.role);
+                    localStorage.setItem("nama", user.nama);
+                    localStorage.setItem("foto", user.foto);
+
+                    if (user.role === "pemilik_toko") {
                         this.$router.push("/beranda-pemilik");
-                    } else if (response.data.role === "karyawan") {
+                    } else if (user.role === "karyawan") {
                         this.$router.push("/beranda-karyawan");
                     }
                 }
+                console.log(response.data);
             } catch (error) {
                 const pesan = error.response?.data?.message || "Login gagal!";
                 alert(pesan);
+                console.log(error.response?.data);
             }
         },
     },

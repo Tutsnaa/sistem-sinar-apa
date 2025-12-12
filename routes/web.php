@@ -6,7 +6,7 @@ use App\Http\Controllers\BarangController;
 use App\Http\Controllers\PenjualanController;
 
 // POST login menuju Laravel
-Route::post('/login', [PenggunaController::class, 'login'])->name('login.process');
+// Route::post('/login', [PenggunaController::class, 'login'])->name('login.process');
 
 // Logout
 Route::get('/logout', [PenggunaController::class, 'logout'])->name('logout');

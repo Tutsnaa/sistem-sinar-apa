@@ -107,7 +107,7 @@ export default {
     methods: {
         logout() {
             localStorage.clear(); // opsional, reset auth di frontend
-            window.location.href = "/logout";
+            this.$router.push("/login");
         },
     },
 };
