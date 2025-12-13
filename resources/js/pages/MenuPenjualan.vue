@@ -52,14 +52,14 @@
             <!-- Tambah Pembelian -->
             <FormTambahPembelian
                 :barang="barang"
-                @tambah-barang="tambahBarangKeDaftar"
+                @tambah-barang="tambahBarang"
                 class="w-80"
             />
 
             <!-- Daftar Pembelian -->
             <DaftarPembelian
                 :daftarPembelian="daftarPembelian"
-                class="flex-1 max-w-290"
+                @simpan-penjualan="simpanPenjualan"
             />
         </div>
     </div>
@@ -72,13 +72,6 @@ import DaftarPembelian from "../components/DaftarPembelian.vue";
 import FormTambahPembelian from "../components/FormTambahPembelian.vue";
 
 export default {
-    props: {
-        barang: {
-            type: Array,
-            default: () => [], // ← supaya tidak undefined
-        },
-    },
-
     components: {
         FormInput,
         FormOutput,
@@ -92,13 +85,12 @@ export default {
             foto: "",
             tanggal: "",
             namapelanggan: "",
+            barang: [],
             daftarPembelian: [],
         };
     },
 
     mounted() {
-        console.log("DATA BARANG MASUK dari Inertia:", this.barang);
-
         const nama = localStorage.getItem("nama");
         const role = localStorage.getItem("role");
         const foto = localStorage.getItem("foto");
@@ -116,6 +108,7 @@ export default {
 
         this.nama = nama;
         this.foto = foto;
+        this.getBarang();
     },
 
     methods: {
@@ -128,8 +121,57 @@ export default {
             else this.$router.push("/login");
         },
 
-        tambahBarangKeDaftar(barang) {
-            this.daftarPembelian.push(barang);
+        async getBarang() {
+            try {
+                const res = await fetch("http://localhost:8000/api/barang");
+                this.barang = await res.json();
+                console.log(this.barang);
+            } catch (error) {
+                console.error("Gagal ambil data barang", error);
+            }
+        },
+        tambahBarang(data) {
+            const index = this.daftarPembelian.findIndex(
+                (item) => item.nama === data.nama
+            );
+
+            if (index !== -1) {
+                // jika barang sudah ada → tambah jumlah
+                this.daftarPembelian[index].jumlah += data.jumlah;
+            } else {
+                // jika belum → push baru
+                this.daftarPembelian.push({
+                    id_barang: data.id_barang,
+                    nama: data.nama,
+                    harga: data.harga,
+                    jumlah: data.jumlah,
+                });
+            }
+            console.log(this.daftarPembelian);
+        },
+
+        async simpanPenjualan(payloadChild) {
+            const payload = {
+                id_pengguna: Number(localStorage.getItem("id_pengguna")),
+                nama_pelanggan: this.namapelanggan,
+                bayar: payloadChild.bayar,
+                items: this.daftarPembelian.map((item) => ({
+                    id_barang: item.id_barang,
+                    harga: item.harga,
+                    jumlah: item.jumlah,
+                })),
+            };
+
+            console.log("PAYLOAD", payload);
+
+            const res = await fetch("http://localhost:8000/api/penjualan", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            });
+
+            const data = await res.json();
+            console.log("RESPON", data);
         },
     },
 };

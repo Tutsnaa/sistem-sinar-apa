@@ -24,14 +24,13 @@
                         <td class="px-4 py-2">{{ index + 1 }}</td>
                         <td class="px-4 py-2">{{ item.nama }}</td>
                         <td class="px-4 py-2">{{ item.jumlah }}</td>
-                        <td class="px-4 py-2">{{ item.harga }}</td>
                         <td class="px-4 py-2">
-                            {{
-                                formatRupiah(
-                                    item.jumlah * parseHarga(item.harga)
-                                )
-                            }}
+                            {{ formatRupiah(item.harga) }}
                         </td>
+                        <td class="px-4 py-2">
+                            {{ formatRupiah(item.harga * item.jumlah) }}
+                        </td>
+
                         <td class="px-4 py-2">
                             <button
                                 @click="hapusItem(index)"
@@ -98,6 +97,7 @@
 
 <script>
 export default {
+    emits: ["simpan-penjualan"],
     name: "DaftarPembelian",
     props: {
         daftarPembelian: {
@@ -105,6 +105,7 @@ export default {
             default: () => [],
         },
     },
+
     data() {
         return {
             bayar: 0,
@@ -113,11 +114,11 @@ export default {
     computed: {
         totalHarga() {
             return this.daftarPembelian.reduce(
-                (total, item) =>
-                    total + this.parseHarga(item.harga) * item.jumlah,
+                (total, item) => total + item.harga * item.jumlah,
                 0
             );
         },
+
         kembalian() {
             return this.bayar - this.totalHarga;
         },
@@ -135,12 +136,10 @@ export default {
                 alert("Jumlah bayar kurang!");
                 return;
             }
-            alert(
-                `Pembelian berhasil!\nKembalian: ${this.formatRupiah(
-                    this.kembalian
-                )}`
-            );
-            this.batal(); // reset setelah simpan
+
+            this.$emit("simpan-penjualan", {
+                bayar: this.bayar,
+            });
         },
         /*************  ✨ Windsurf Command ⭐  *************/
         /**
@@ -149,10 +148,7 @@ export default {
          * @returns {number}
          */
         /*******  e05a46b6-637c-4360-93aa-b733c3a0bcc3  *******/
-        parseHarga(hargaStr) {
-            // konversi string "Rp 15.000" ke number 15000
-            return Number(hargaStr.replace(/[^0-9]/g, ""));
-        },
+
         formatRupiah(number) {
             return new Intl.NumberFormat("id-ID", {
                 style: "currency",

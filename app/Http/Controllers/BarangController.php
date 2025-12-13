@@ -4,75 +4,95 @@ namespace App\Http\Controllers;
 
 use App\Models\Barang;
 use Illuminate\Http\Request;
-use Inertia\Inertia; // <-- WAJIB ADA, JANGAN SALAH
 
 class BarangController extends Controller
 {
-    public function index()
+    /**
+     * Tampilkan semua barang
+     */
+    public function view()
     {
-        $barang = Barang::all();
-
-        return Inertia::render('Barang/Index', [
-            'barang' => $barang
-        ]);
+        return response()->json(
+            Barang::with('kategori')->get()
+        );
     }
 
-    public function create()
-    {
-        return Inertia::render('Barang/Create');
-    }
-
-    public function store(Request $request)
+    /**
+     * Simpan barang baru
+     */
+    public function create(Request $request)
     {
         $request->validate([
-            'nama_barang' => 'required|string',
-            'stok' => 'required|integer',
-            'harga' => 'required|integer',
+            'id_kategori' => 'required|exists:kategori,id',
+            'nama_barang' => 'required|string|max:100',
+            'harga_beli' => 'required|numeric',
+            'harga_jual' => 'required|numeric',
+            'jumlah' => 'required|integer|min:0',
         ]);
 
-        Barang::create($request->all());
+        $barang = Barang::create([
+            'id_kategori' => $request->id_kategori,
+            'nama_barang' => $request->nama_barang,
+            'harga_beli' => $request->harga_beli,
+            'harga_jual' => $request->harga_jual,
+            'jumlah' => $request->jumlah,
+            // STATUS TIDAK PERLU DIISI
+        ]);
 
-        return redirect()->route('barang.index')->with('success', 'Barang berhasil ditambahkan');
+        return response()->json([
+            'message' => 'Barang berhasil ditambahkan',
+            'data' => $barang
+        ], 201);
     }
 
-    public function edit($id)
+    /**
+     * Detail barang
+     */
+    public function show($id)
     {
-        $barang = Barang::findOrFail($id);
-
-        return Inertia::render('Barang/Edit', [
-            'barang' => $barang
-        ]);
+        return response()->json(
+            Barang::with('kategori')->findOrFail($id)
+        );
     }
 
+    /**
+     * Update barang
+     */
     public function update(Request $request, $id)
     {
+        $barang = Barang::findOrFail($id);
+
         $request->validate([
-            'nama_barang' => 'required|string',
-            'stok' => 'required|integer',
-            'harga' => 'required|integer',
+            'id_kategori' => 'required|exists:kategori,id',
+            'nama_barang' => 'required|string|max:100',
+            'harga_beli' => 'required|numeric',
+            'harga_jual' => 'required|numeric',
+            'jumlah' => 'required|integer|min:0',
         ]);
 
-        $barang = Barang::findOrFail($id);
-        $barang->update($request->all());
+        $barang->update([
+            'id_kategori' => $request->id_kategori,
+            'nama_barang' => $request->nama_barang,
+            'harga_beli' => $request->harga_beli,
+            'harga_jual' => $request->harga_jual,
+            'jumlah' => $request->jumlah,
+        ]);
 
-        return redirect()->route('barang.index')->with('success', 'Barang berhasil diperbarui');
+        return response()->json([
+            'message' => 'Barang berhasil diperbarui',
+            'data' => $barang
+        ]);
     }
 
-    public function destroy($id)
+    /**
+     * Hapus barang
+     */
+    public function delete($id)
     {
-        $barang = Barang::findOrFail($id);
-        $barang->delete();
+        Barang::findOrFail($id)->delete();
 
-        return redirect()->route('barang.index')->with('success', 'Barang berhasil dihapus');
+        return response()->json([
+            'message' => 'Barang berhasil dihapus'
+        ]);
     }
-
-    public function penjualan()
-{
-    $barang = Barang::select('id', 'nama_barang', 'harga_jual')->get();
-
-    return Inertia::render('Penjualan/Index', [
-        'barang' => $barang
-    ]);
-}
-
 }

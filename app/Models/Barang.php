@@ -18,11 +18,21 @@ class Barang extends Model
     ];
 
     /**
-     * Relasi ke Penjualan (detail_penjualan -> penjualan)
+     * AUTO SET STATUS BERDASARKAN JUMLAH
      */
-    public function Kategori()
+    protected static function booted()
     {
-        return $this->belongsTo(Penjualan::class, 'id_kategori');
+        static::saving(function ($barang) {
+            $barang->status = $barang->jumlah == 0 ? 'habis' : 'tersedia';
+        });
+    }
+
+    /**
+     * Relasi ke kategori
+     */
+    public function kategori()
+    {
+        return $this->belongsTo(Kategori::class, 'id_kategori');
     }
 
 

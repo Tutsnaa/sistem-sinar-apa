@@ -66,14 +66,18 @@ export default {
             }
 
             try {
-                const response = await axios.post("api/login", {
-                    nama_pengguna: this.namapengguna,
-                    kata_sandi: this.katasandi,
-                });
+                const response = await axios.post(
+                    "http://127.0.0.1:8000/api/login",
+                    {
+                        nama_pengguna: this.namapengguna,
+                        kata_sandi: this.katasandi,
+                    }
+                );
 
                 if (response.data.success) {
                     const user = response.data.data;
 
+                    localStorage.setItem("id_pengguna", user.id);
                     localStorage.setItem("role", user.role);
                     localStorage.setItem("nama", user.nama);
                     localStorage.setItem("foto", user.foto);

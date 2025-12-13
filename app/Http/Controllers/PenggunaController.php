@@ -49,7 +49,7 @@ class PenggunaController extends Controller
     // ============================
     // CREATE
     // ============================
-    public function store(Request $request)
+    public function create(Request $request)
     {
         $request->validate([
             'nama_lengkap' => 'required|max:100',
@@ -79,27 +79,30 @@ class PenggunaController extends Controller
     // ============================
     // READ ALL
     // ============================
-    public function index()
+    public function view()
     {
         return response()->json(Pengguna::all());
     }
 
     // ============================
-    // READ BY ID
+    // READ BY NAME
     // ============================
-    public function show($id)
+    public function show($namaLengkap)
     {
-        $pengguna = Pengguna::find($id);
+    $pengguna = Pengguna::where('nama_lengkap', 'like', "%$namaLengkap%")->get();
 
-        if (!$pengguna) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Pengguna tidak ditemukan'
-            ], 404);
-        }
-
-        return response()->json($pengguna);
+    if ($pengguna->isEmpty()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Pengguna tidak ditemukan'
+        ], 404);
     }
+
+    return response()->json([
+        'success' => true,
+        'data' => $pengguna
+    ]);
+}
 
     // ============================
     // UPDATE
@@ -132,7 +135,7 @@ class PenggunaController extends Controller
     // ============================
     // DELETE
     // ============================
-    public function destroy($id)
+    public function delete($id)
     {
         $pengguna = Pengguna::find($id);
 
