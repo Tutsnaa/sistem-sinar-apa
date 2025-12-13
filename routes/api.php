@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PenggunaController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\PenjualanController;
+use App\Http\Controllers\KategoriController;
 
 // Login API
 Route::post('/login', [PenggunaController::class, 'login']);
@@ -31,3 +32,10 @@ Route::get('/penjualan/{id}', [PenjualanController::class, 'show']);
 Route::put('/penjualan/{id}', [PenjualanController::class, 'update']);
 Route::patch('/penjualan/{id}', [PenjualanController::class, 'update']);
 Route::delete('/penjualan/{id}', [PenjualanController::class, 'delete']);
+
+//CRUD Kategori
+Route::get('/kategori', [KategoriController::class, 'view']);        
+Route::post('/kategori', [KategoriController::class, 'create']);     
+Route::get('/kategori/{param}', [KategoriController::class, 'show']);
+Route::put('/kategori/{id}', [KategoriController::class, 'update']); 
+Route::delete('/kategori/{id}', [KategoriController::class, 'delete']); 
