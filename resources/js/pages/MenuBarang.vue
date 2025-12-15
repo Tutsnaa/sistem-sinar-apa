@@ -8,9 +8,10 @@
                 @click="goBack"
                 class="flex items-center gap-3 text-xl font-semibold hover:text-gray-200 cursor-pointer"
             >
-                <span class="material-icons" style="font-size: 25px"
-                    >arrow_back</span
-                >Kembali
+                <span class="material-icons" style="font-size: 25px">
+                    arrow_back
+                </span>
+                Kembali
             </h1>
             <h1 class="text-xl font-semibold">BARANG</h1>
             <div class="flex items-center gap-4">
@@ -20,29 +21,186 @@
                     class="w-10 h-10 rounded-full object-cover border-2 border-white"
                 />
                 <span>{{ nama }}</span>
-                <!-- <button
-                    @click="goBack"
-                    class="bg-white text-[#3674B5] px-3 py-1 rounded hover:bg-gray-200 text-sm transition"
-                >
-                    Kembali
-                </button> -->
             </div>
         </nav>
-        <!-- <h1
-            class="text-[#6C6565] text-xl font-semibold flex mt-5 items-center gap-3 mx-10"
-        >
-            Penjualan
-        </h1> -->
+
+        <!-- ===== KONTEN ===== -->
+        <div class="p-6">
+            <div class="bg-white rounded-lg shadow p-4">
+                <!-- Bar atas: tombol + pencarian -->
+                <div
+                    class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4"
+                >
+                    <!-- Tombol Tambah -->
+                    <button
+                        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-fit"
+                        @click="showForm = true"
+                    >
+                        + Tambah Barang
+                    </button>
+
+                    <FormTambahBarang
+                        v-if="showForm"
+                        :kategori="kategori"
+                        @close="showForm = false"
+                        @success="getBarang"
+                    />
+
+                    <!-- Pencarian -->
+                    <input
+                        v-model="cari"
+                        type="text"
+                        placeholder="Cari nama barang..."
+                        class="border border-gray-300 rounded px-3 py-2 w-full md:max-w-xs"
+                    />
+                </div>
+
+                <!-- Tabel Barang -->
+                <div class="overflow-x-auto">
+                    <table class="w-full border border-gray-300 rounded-lg">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-4 py-2 text-center">No</th>
+                                <th class="px-4 py-2 text-left">Nama Barang</th>
+                                <th class="px-4 py-2 text-left">Kategori</th>
+                                <th class="px-4 py-2 text-right">Harga Beli</th>
+                                <th class="px-4 py-2 text-right">Harga Jual</th>
+                                <th class="px-4 py-2 text-center">Jumlah</th>
+                                <th class="px-4 py-2 text-center">Status</th>
+                                <th class="pr-20 py-2 text-right">Aksi</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr
+                                v-for="barang in filteredBarang"
+                                :key="barang.id"
+                                class="border-b hover:bg-gray-50"
+                            >
+                                <td class="px-4 py-2 text-center">
+                                    {{ filteredBarang.indexOf(barang) + 1 }}
+                                </td>
+                                <td class="px-4 py-2">
+                                    {{ barang.nama_barang }}
+                                </td>
+                                <td class="px-4 py-2">
+                                    {{ barang.kategori?.nama_kategori }}
+                                </td>
+                                <td class="px-4 py-2 text-right">
+                                    Rp
+                                    {{
+                                        Number(
+                                            barang.harga_beli
+                                        ).toLocaleString("id-ID")
+                                    }}
+                                </td>
+                                <td class="px-4 py-2 text-right">
+                                    Rp
+                                    {{
+                                        Number(
+                                            barang.harga_jual
+                                        ).toLocaleString("id-ID")
+                                    }}
+                                </td>
+                                <td class="px-4 py-2 text-center">
+                                    {{ barang.jumlah }}
+                                </td>
+                                <td class="px-4 py-2 text-center">
+                                    <span
+                                        :class="
+                                            barang.status === 'tersedia'
+                                                ? 'text-green-600'
+                                                : 'text-red-600'
+                                        "
+                                    >
+                                        {{
+                                            barang.status
+                                                .charAt(0)
+                                                .toUpperCase() +
+                                            barang.status.slice(1)
+                                        }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-2">
+                                    <div class="flex justify-end gap-2">
+                                        <button
+                                            class="bg-yellow-500 text-white px-3 py-1 rounded"
+                                            @click="
+                                                barangDipilih = barang;
+                                                showEdit = true;
+                                            "
+                                        >
+                                            Ubah
+                                        </button>
+                                        <button
+                                            class="bg-red-500 text-white px-3 py-1 rounded"
+                                        >
+                                            Hapus
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr v-if="!filteredBarang.length">
+                                <td colspan="8" class="text-center py-4">
+                                    Data barang belum ada
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <FormUbahBarang
+                v-if="showEdit"
+                :barang="barangDipilih"
+                :kategori="kategori"
+                @close="showEdit = false"
+                @success="getBarang"
+            />
+        </div>
     </div>
 </template>
 
 <script>
+import axios from "axios";
+import FormTambahBarang from "@/components/FormTambahBarang.vue";
+import FormUbahBarang from "@/components/FormUbahBarang.vue";
+
 export default {
+    components: { FormTambahBarang, FormUbahBarang },
     data() {
         return {
             nama: "",
             foto: "",
+            daftarBarang: [],
+            cari: "",
+            showForm: false,
+            kategori: [],
+            showEdit: false,
+            barangDipilih: null,
         };
+    },
+
+    computed: {
+        filteredBarang() {
+            let data = [...this.daftarBarang]; // copy array agar tidak rusak
+
+            // 🔍 filter pencarian
+            if (this.cari) {
+                data = data.filter((b) =>
+                    b.nama_barang
+                        .toLowerCase()
+                        .includes(this.cari.toLowerCase())
+                );
+            }
+
+            // 🔼 sorting: status HABIS di atas
+            return data.sort((a, b) => {
+                if (a.status === "habis" && b.status !== "habis") return -1;
+                if (a.status !== "habis" && b.status === "habis") return 1;
+                return 0;
+            });
+        },
     },
 
     mounted() {
@@ -57,19 +215,47 @@ export default {
 
         this.nama = nama;
         this.foto = foto;
+        this.getBarang();
+        this.getKategori();
     },
+
     methods: {
         goBack() {
             const role = localStorage.getItem("role");
-
-            if (role === "pemilik_toko") {
-                this.$router.push("/beranda-pemilik");
-            } else if (role === "karyawan") {
+            if (role === "pemilik_toko") this.$router.push("/beranda-pemilik");
+            else if (role === "karyawan")
                 this.$router.push("/beranda-karyawan");
-            } else {
-                // jika role tidak ditemukan (misal session hilang)
-                this.$router.push("/login");
+            else this.$router.push("/login");
+        },
+
+        async getBarang() {
+            try {
+                const res = await axios.get("http://127.0.0.1:8000/api/barang");
+
+                console.log(res.data);
+
+                this.daftarBarang = res.data.data ?? res.data ?? [];
+            } catch (error) {
+                console.error(error);
+                this.daftarBarang = [];
             }
+        },
+
+        async getKategori() {
+            const res = await axios.get("/api/kategori");
+            this.kategori = res.data.data;
+        },
+
+        formatRupiah(number) {
+            return new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR",
+            }).format(number);
+        },
+        formatRupiah(number) {
+            if (number === null || number === undefined) return "Rp 0";
+
+            return "Rp " + Number(number).toLocaleString("id-ID");
         },
     },
 };

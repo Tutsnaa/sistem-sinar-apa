@@ -39,7 +39,7 @@
 
         <FormOutput
             label="Harga Barang"
-            :value="hargaBarang"
+            :value="formatRupiah(hargaBarang)"
             class="mb-4 w-full"
         />
 
@@ -153,6 +153,12 @@ export default {
             this.hargaBarang = "";
             this.jumlahBarang = 0;
             this.jumlah = null;
+        },
+
+        formatRupiah(number) {
+            if (number === null || number === undefined) return "Rp 0";
+
+            return "Rp " + Number(number).toLocaleString("id-ID");
         },
     },
 };

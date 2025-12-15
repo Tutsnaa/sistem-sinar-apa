@@ -62,8 +62,9 @@
                 <div class="flex flex-col">
                     <label class="font-bold">Bayar</label>
                     <input
-                        type="number"
-                        v-model.number="bayar"
+                        type="text"
+                        :value="formatRupiah(bayar)"
+                        @input="onInputBayar"
                         class="border px-2 py-1 rounded w-32"
                         placeholder="Jumlah bayar"
                     />
@@ -149,16 +150,17 @@ export default {
          */
         /*******  e05a46b6-637c-4360-93aa-b733c3a0bcc3  *******/
 
+        onInputBayar(e) {
+            // Ambil angka saja (hapus Rp, titik, spasi)
+            const raw = e.target.value.replace(/[^0-9]/g, "");
+            this.bayar = raw ? Number(raw) : 0;
+        },
+
+        // ✅ FORMAT SESUAI PERMINTAAN
         formatRupiah(number) {
-            return new Intl.NumberFormat("id-ID", {
-                style: "currency",
-                currency: "IDR",
-            }).format(number);
+            if (!number) return "Rp 0";
+            return "Rp " + Number(number).toLocaleString("id-ID");
         },
     },
 };
 </script>
-
-<style scoped>
-/* Opsional styling tambahan */
-</style>

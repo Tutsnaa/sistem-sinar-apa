@@ -33,7 +33,11 @@
                 >
                     <!-- Form Tambah Kategori -->
                     <FormTambahKategori
+                        :isEdit="isEdit"
+                        :dataEdit="kategoriEdit"
                         @tambah-kategori="tambahKategoriKeDaftar"
+                        @update-kategori="updateKategori"
+                        @batal-edit="batalEdit"
                         class="flex-1 max-w-sm"
                     />
 
@@ -42,7 +46,7 @@
                         type="text"
                         v-model="cari"
                         placeholder="Cari kategori..."
-                        class="flex-1 max-w-xs border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        class="flex-1 max-w-xs mt-9 border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                     />
                 </div>
 
@@ -50,6 +54,7 @@
                 <DaftarKategori
                     :kategoriList="filteredKategori"
                     @hapus="hapusKategori"
+                    @ubah="setEditKategori"
                 />
             </div>
         </div>
@@ -70,6 +75,8 @@ export default {
             foto: "",
             daftarKategori: [],
             cari: "",
+            isEdit: false,
+            kategoriEdit: null,
         };
     },
     computed: {
@@ -97,6 +104,7 @@ export default {
                 this.$router.push("/beranda-karyawan");
             else this.$router.push("/login");
         },
+
         async getKategori() {
             try {
                 const response = await axios.get("api/kategori");
@@ -110,6 +118,7 @@ export default {
                 const response = await axios.post("api/kategori", kategoriBaru);
                 if (response.data.success)
                     this.daftarKategori.push(response.data.data);
+                console.log(response.data);
             } catch (error) {
                 const pesan = error.response?.data?.errors?.nama_kategori
                     ? error.response.data.errors.nama_kategori[0]
@@ -118,6 +127,40 @@ export default {
                 alert(pesan);
             }
         },
+
+        // klik tombol Ubah
+        setEditKategori(kategori) {
+            this.isEdit = true;
+            this.kategoriEdit = { ...kategori };
+        },
+
+        // update kategori (PUT)
+        async updateKategori(data) {
+            try {
+                const response = await axios.put(`api/kategori/${data.id}`, {
+                    nama_kategori: data.nama_kategori,
+                });
+
+                if (response.data.success) {
+                    const index = this.daftarKategori.findIndex(
+                        (k) => k.id === data.id
+                    );
+                    this.daftarKategori[index] = response.data.data;
+                    this.batalEdit();
+                }
+                console.log(response.data);
+            } catch (error) {
+                alert(
+                    error.response?.data?.message || "Gagal mengubah kategori!"
+                );
+            }
+        },
+
+        batalEdit() {
+            this.isEdit = false;
+            this.kategoriEdit = null;
+        },
+
         async hapusKategori(id) {
             if (!confirm("Apakah yakin ingin menghapus kategori ini?")) return;
             try {
@@ -126,6 +169,8 @@ export default {
                     this.daftarKategori = this.daftarKategori.filter(
                         (k) => k.id !== id
                     );
+
+                console.log(response.data);
             } catch (error) {
                 alert(
                     error.response?.data?.message || "Gagal menghapus kategori!"

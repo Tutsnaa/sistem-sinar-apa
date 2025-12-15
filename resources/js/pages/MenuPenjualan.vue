@@ -58,6 +58,7 @@
 
             <!-- Daftar Pembelian -->
             <DaftarPembelian
+                :key="resetKey"
                 :daftarPembelian="daftarPembelian"
                 @simpan-penjualan="simpanPenjualan"
             />
@@ -87,6 +88,8 @@ export default {
             namapelanggan: "",
             barang: [],
             daftarPembelian: [],
+            daftarBarang: [],
+            resetKey: 0,
         };
     },
 
@@ -124,12 +127,14 @@ export default {
         async getBarang() {
             try {
                 const res = await fetch("http://localhost:8000/api/barang");
-                this.barang = await res.json();
+                const json = await res.json();
+                this.barang = json.data; // 🔥 PENTING
                 console.log(this.barang);
             } catch (error) {
                 console.error("Gagal ambil data barang", error);
             }
         },
+
         tambahBarang(data) {
             const index = this.daftarPembelian.findIndex(
                 (item) => item.nama === data.nama
@@ -162,16 +167,26 @@ export default {
                 })),
             };
 
-            console.log("PAYLOAD", payload);
+            try {
+                const res = await fetch("http://localhost:8000/api/penjualan", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
+                });
 
-            const res = await fetch("http://localhost:8000/api/penjualan", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-            });
+                const data = await res.json();
+                console.log("RESPON", data);
 
-            const data = await res.json();
-            console.log("RESPON", data);
+                // ✅ RESET DATA SETELAH BERHASIL
+                this.daftarPembelian = [];
+                this.namapelanggan = "";
+                this.resetKey++;
+
+                alert("Penjualan berhasil disimpan ✅");
+            } catch (error) {
+                console.error("Gagal simpan penjualan", error);
+                alert("Gagal menyimpan penjualan ❌");
+            }
         },
     },
 };

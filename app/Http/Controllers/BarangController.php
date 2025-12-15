@@ -12,8 +12,8 @@ class BarangController extends Controller
      */
     public function view()
     {
-        return response()->json(
-            Barang::with('kategori')->get()
+        return response()->json([
+            'data' => Barang::with('kategori')->get()]
         );
     }
 
