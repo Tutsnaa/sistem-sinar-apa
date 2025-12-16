@@ -6,6 +6,7 @@ use App\Http\Controllers\PenggunaController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\PenjualanController;
 use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\BarangMasukController;
 
 // Login API
 Route::post('/login', [PenggunaController::class, 'login']);
@@ -38,4 +39,11 @@ Route::get('/kategori', [KategoriController::class, 'view']);
 Route::post('/kategori', [KategoriController::class, 'create']);     
 Route::get('/kategori/{param}', [KategoriController::class, 'show']);
 Route::put('/kategori/{id}', [KategoriController::class, 'update']); 
-Route::delete('/kategori/{id}', [KategoriController::class, 'delete']); 
+Route::delete('/kategori/{id}', [KategoriController::class, 'delete']);
+
+//CRUD Barang Masuk
+Route::get('/barang-masuk', [BarangMasukController::class, 'view']);
+Route::post('/barang-masuk', [BarangMasukController::class, 'create']);
+Route::get('/barang-masuk/{id}', [BarangMasukController::class, 'show']);
+Route::put('/barang-masuk/{id}', [BarangMasukController::class, 'update']);
+Route::delete('/barang-masuk/{id}', [BarangMasukController::class, 'delete']);
