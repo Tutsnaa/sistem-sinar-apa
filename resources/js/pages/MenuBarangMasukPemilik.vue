@@ -24,17 +24,12 @@
         </nav>
 
         <div class="p-6 bg-gray-100 min-h-screen">
-            <TambahBarangMasuk
-                :editData="editItem"
-                @refresh="refreshBarangMasuk"
-                @resetEdit="editItem = null"
-            />
             <DaftarBarangMasuk
                 :barangMasuk="barangMasuk"
-                @edit="onEditBarang"
-                @delete="hapusBarang"
                 :role="role"
                 @update-status="updateStatusBarang"
+                @edit="onEditBarang"
+                @delete="hapusBarang"
             />
         </div>
     </div>
@@ -54,7 +49,7 @@ export default {
         return {
             nama: "",
             foto: "",
-            role: "",
+            role: "", // <-- ini penting
             barangMasuk: [],
             editItem: null,
         };
@@ -64,6 +59,7 @@ export default {
         const nama = localStorage.getItem("nama");
         const role = localStorage.getItem("role");
         const foto = localStorage.getItem("foto");
+        console.log(role);
 
         if (!nama || !role) {
             this.$router.push("/login");
@@ -76,41 +72,54 @@ export default {
         this.getBarangMasuk();
     },
     methods: {
-        sortBarangMasuk() {
-            const priority = {
-                Ditolak: 0,
-                Menunggu: 1,
-                Diterima: 2,
-            };
-
-            this.barangMasuk.sort((a, b) => {
-                if (priority[a.status] !== priority[b.status]) {
-                    return priority[a.status] - priority[b.status];
+        refreshBarangMasuk(updatedItem) {
+            if (!updatedItem) {
+                // fetch ulang semua data
+                this.getBarangMasuk();
+            } else {
+                // update item lama di array
+                const index = this.barangMasuk.findIndex(
+                    (item) => item.id === updatedItem.id
+                );
+                if (index !== -1) {
+                    this.barangMasuk.splice(index, 1, updatedItem); // ganti item lama dengan yang baru
+                } else {
+                    // kalau item baru, push
+                    this.barangMasuk.push(updatedItem);
                 }
-                return new Date(b.created_at) - new Date(a.created_at);
-            });
+            }
+        },
+        onEditBarang(item) {
+            this.editItem = item;
+        },
+        hapusBarang(item) {
+            // method hapus
+        },
+        updateStatusBarang({ item, status }) {
+            axios
+                .put(`/api/barang-masuk/${item.id}`, { ...item, status })
+                .then((res) => {
+                    // update data lokal agar tabel langsung berubah
+                    const index = this.barangMasuk.findIndex(
+                        (b) => b.id === item.id
+                    );
+                    if (index !== -1) {
+                        this.barangMasuk.splice(index, 1, res.data.data);
+                    }
+                    alert(
+                        `Status barang "${item.barang?.nama_barang}" berhasil diubah menjadi ${status}`
+                    );
+                })
+                .catch((err) => {
+                    console.error(err);
+                    alert("Gagal mengubah status, cek console");
+                });
         },
         getBarangMasuk() {
             axios.get("/api/barang-masuk").then((res) => {
                 console.log("DATA BARANG MASUK:", res.data.data);
                 this.barangMasuk = res.data.data ?? [];
             });
-        },
-
-        refreshBarangMasuk(dataBaru) {
-            const index = this.barangMasuk.findIndex(
-                (item) => item.id === dataBaru.id
-            );
-
-            if (index !== -1) {
-                // replace item lama, tapi tetap ambil relasi barang lama supaya nama tampil
-                this.barangMasuk.splice(index, 1, {
-                    ...this.barangMasuk[index],
-                    ...dataBaru,
-                });
-            } else {
-                this.barangMasuk.push(dataBaru);
-            }
         },
 
         // refreshData() {
@@ -128,54 +137,7 @@ export default {
                 this.$router.push("/login");
             }
         },
-
-        onEditBarang(item) {
-            this.editItem = item;
-            console.log("Edit item:", item);
-        },
-
-        hapusBarang(item) {
-            if (!confirm(`Hapus barang "${item.barang?.nama_barang}"?`)) return;
-
-            axios
-                .delete(`/api/barang-masuk/${item.id}`)
-                .then(() => {
-                    console.log("Barang berhasil dihapus");
-                    alert("Barang berhasil dihapus");
-                    this.getBarangMasuk();
-                })
-                .catch((err) => {
-                    console.error(err.response?.data);
-                    alert("Gagal menghapus, cek console");
-                });
-        },
-        updateStatusBarang({ id, status }) {
-            axios
-                .put(`/api/barang-masuk/${id}/status`, { status })
-                .then((res) => {
-                    const index = this.barangMasuk.findIndex(
-                        (item) => item.id === id
-                    );
-
-                    if (index !== -1) {
-                        this.barangMasuk[index].status = status;
-                    }
-                })
-                .catch(() => {
-                    alert("Gagal update status");
-                });
-        },
-
-        goBack() {
-            const role = localStorage.getItem("role");
-            if (role === "pemilik_toko") {
-                this.$router.push("/beranda-pemilik");
-            } else {
-                this.$router.push("/beranda-karyawan");
-            }
-        },
     },
-
     //Atur urutan barang
     watch: {
         barangMasuk: {

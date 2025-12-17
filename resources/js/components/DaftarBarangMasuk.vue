@@ -56,9 +56,13 @@
                             <span
                                 class="px-2 py-1 rounded text-xs font-semibold"
                                 :class="
-                                    item.status === 'selesai'
+                                    item.status === 'Diterima'
                                         ? 'bg-green-100 text-green-700'
-                                        : 'bg-yellow-100 text-yellow-700'
+                                        : item.status === 'Ditolak'
+                                        ? 'bg-red-100 text-red-700'
+                                        : item.status === 'Menunggu'
+                                        ? 'bg-yellow-100 text-yellow-700'
+                                        : 'bg-gray-100 text-gray-700'
                                 "
                             >
                                 {{ item.status }}
@@ -71,21 +75,62 @@
 
                         <td class="border px-3 py-2 text-center">
                             <div class="flex justify-center gap-2">
-                                <!-- Tombol Ubah -->
-                                <button
-                                    @click="$emit('edit', item)"
-                                    class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition-colors"
-                                >
-                                    Ubah
-                                </button>
+                                <!-- Untuk karyawan -->
+                                <template v-if="role === 'karyawan'">
+                                    <button
+                                        @click="$emit('edit', item)"
+                                        class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition-colors"
+                                    >
+                                        Ubah
+                                    </button>
+                                    <button
+                                        v-if="item.status !== 'Diterima'"
+                                        @click="$emit('delete', item)"
+                                        class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-colors"
+                                    >
+                                        Hapus
+                                    </button>
+                                    <span
+                                        v-if="item.status === 'Diterima'"
+                                        class="text-gray-500 italic"
+                                    >
+                                        Terkunci
+                                    </span>
+                                </template>
 
-                                <!-- Tombol Hapus -->
-                                <button
-                                    @click="$emit('delete', item)"
-                                    class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-colors"
-                                >
-                                    Hapus
-                                </button>
+                                <!-- Untuk pemilik_toko -->
+                                <template v-else-if="role === 'pemilik_toko'">
+                                    <button
+                                        v-if="item.status === 'Menunggu'"
+                                        @click="
+                                            $emit('update-status', {
+                                                item,
+                                                status: 'Diterima',
+                                            })
+                                        "
+                                        class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition-colors"
+                                    >
+                                        Terima
+                                    </button>
+                                    <button
+                                        v-if="item.status === 'Menunggu'"
+                                        @click="
+                                            $emit('update-status', {
+                                                item,
+                                                status: 'Ditolak',
+                                            })
+                                        "
+                                        class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-colors"
+                                    >
+                                        Tolak
+                                    </button>
+                                    <span
+                                        v-if="item.status !== 'Menunggu'"
+                                        class="text-gray-500 italic"
+                                    >
+                                        Terkunci
+                                    </span>
+                                </template>
                             </div>
                         </td>
                     </tr>
@@ -107,10 +152,21 @@ export default {
     props: {
         barangMasuk: {
             type: Array,
-
             default: () => [],
         },
+        role: {
+            type: String,
+            required: true,
+        },
     },
+
+    // props: {
+    //     barangMasuk: {
+    //         type: Array,
+
+    //         default: () => [],
+    //     },
+    // },
 
     methods: {
         formatRupiah(angka) {

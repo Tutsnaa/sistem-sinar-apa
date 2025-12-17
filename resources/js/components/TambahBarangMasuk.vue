@@ -48,7 +48,7 @@
                     v-model.number="form.jumlah"
                     min="1"
                     class="border border-gray-300 rounded px-3 py-2 w-full focus:ring-2 focus:ring-blue-300"
-                    :disabled="!form.id_barang"
+                    :disabled="!form.id_barang || isLocked"
                 />
             </div>
 
@@ -63,7 +63,7 @@
                     @input="onHargaBeliInput"
                     placeholder="Harga beli"
                     class="border border-gray-300 rounded px-3 py-2 w-full focus:ring-2 focus:ring-blue-300"
-                    :disabled="!form.id_barang"
+                    :disabled="!form.id_barang || isLocked"
                 />
             </div>
 
@@ -78,7 +78,7 @@
                     @input="onHargaJualInput"
                     placeholder="Harga jual"
                     class="border border-gray-300 rounded px-3 py-2 w-full focus:ring-2 focus:ring-blue-300"
-                    :disabled="!form.id_barang"
+                    :disabled="!form.id_barang || isLocked"
                 />
             </div>
 
@@ -99,10 +99,10 @@
             <div>
                 <button
                     @click="submit"
-                    :disabled="isSubmitting"
+                    :disabled="!form.id_barang || isLocked"
                     class="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50 transition-colors"
                 >
-                    {{ isSubmitting ? "Menyimpan..." : "Simpan" }}
+                    {{ isLocked ? "Terkunci" : "Simpan" }}
                 </button>
             </div>
         </div>
@@ -160,7 +160,7 @@ export default {
                 jumlah: parseInt(this.form.jumlah),
                 harga_beli: Number(this.form.harga_beli),
                 harga_jual: Number(this.form.harga_jual),
-                status: this.form.status || "menunggu",
+                status: this.form.status || "Menunggu",
             });
         } else {
             // Mode tambah → POST
@@ -170,7 +170,7 @@ export default {
                 jumlah: parseInt(this.form.jumlah),
                 harga_beli: Number(this.form.harga_beli),
                 harga_jual: Number(this.form.harga_jual),
-                status: "menunggu",
+                status: "Menunggu",
             });
         }
 
@@ -210,6 +210,10 @@ export default {
     },
 
     computed: {
+        isLocked() {
+            return this.editData?.status === "Diterima";
+        },
+
         filteredBarang() {
             const key = this.searchBarang.toLowerCase();
             return this.listBarang.filter((b) =>
@@ -285,7 +289,7 @@ export default {
                     jumlah: parseInt(this.form.jumlah),
                     harga_beli: Number(this.form.harga_beli),
                     harga_jual: Number(this.form.harga_jual),
-                    status: this.form.status || "menunggu",
+                    status: this.form.status || "Menunggu",
                 });
             } else {
                 // Mode Tambah
@@ -295,7 +299,7 @@ export default {
                     jumlah: parseInt(this.form.jumlah),
                     harga_beli: Number(this.form.harga_beli),
                     harga_jual: Number(this.form.harga_jual),
-                    status: "menunggu",
+                    status: "Menunggu",
                 });
             }
 

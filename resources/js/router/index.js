@@ -11,6 +11,7 @@ import MenuRiwayat from "../pages/MenuRiwayat.vue";
 import MenuLaporan from "../pages/MenuLaporan.vue";
 import MenuKelolaKaryawan from "../pages/MenuKelolaKaryawan.vue";
 import MenuProfil from "../pages/MenuProfil.vue";
+import MenuBarangMasukPemilik from "../pages/MenuBarangMasukPemilik.vue";
 
 const routes = [
     { path: "/", redirect: "/login" }, // ⬅ tambahkan ini
@@ -34,6 +35,11 @@ const routes = [
         path: "/menu-barang-masuk",
         name: "menubarangmasuk",
         component: MenuBarangMasuk,
+    },
+    {
+        path: "/menu-barang-masuk-pemilik",
+        name: "menubarangmasukpemilik",
+        component: MenuBarangMasukPemilik,
     },
     {
         path: "/menu-barang",

@@ -36,7 +36,7 @@
             </div>
 
             <div
-                @click="$router.push('/menu-barang-masuk')"
+                @click="$router.push('/menu-barang-masuk-pemilik')"
                 class="basis-1/3 flex justify-center mb-8"
             >
                 <MenuBeranda title="Barang Masuk" fontsize="text-3xl">
