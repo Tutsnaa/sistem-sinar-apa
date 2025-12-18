@@ -74,43 +74,43 @@ class BarangMasukController extends Controller
     }
 
     // PUT: update barang masuk
-    public function update(Request $request, $id)
+public function update(Request $request, $id)
 {
     $barangMasuk = BarangMasuk::findOrFail($id);
+
     if ($barangMasuk->status === 'Diterima') {
         return response()->json([
             'message' => 'Barang masuk yang sudah diterima tidak dapat diubah'
         ], 403);
     }
 
-
     $validated = $request->validate([
-        'id_barang' => 'required|exists:barang,id',
-        'jumlah' => 'required|numeric|min:1',
-        'harga_beli' => 'required|numeric',
-        'harga_jual' => 'required|numeric',
-        'status' => 'required|string',
+        'id_barang'   => 'required|exists:barang,id',
+        'jumlah'      => 'required|numeric|min:1',
+        'harga_beli'  => 'required|numeric',
+        'harga_jual'  => 'required|numeric',
+        'status'      => 'required|in:Menunggu,Diterima,Ditolak',
     ]);
 
     $previousStatus = $barangMasuk->status;
+
     $barangMasuk->update($validated);
 
-     // Jika status berubah menjadi 'Diterima' dan sebelumnya bukan 'Diterima'
+    // jika status jadi diterima
     if ($validated['status'] === 'Diterima' && $previousStatus !== 'Diterima') {
-        $barang = $barangMasuk->barang; // ambil relasi barang
-        $barang->jumlah += $barangMasuk->jumlah;
+        $barang = $barangMasuk->barang;
+        $barang->jumlah += $validated['jumlah'];
+$barang->harga_beli = $validated['harga_beli'];
+$barang->harga_jual = $validated['harga_jual'];
         $barang->save();
     }
-    
-
-    // Ambil ulang dengan relasi barang
-    $barangMasuk = BarangMasuk::with('barang')->find($barangMasuk->id);
 
     return response()->json([
         'message' => 'Barang masuk berhasil diperbarui',
-        'data' => $barangMasuk
+        'data' => BarangMasuk::with('barang')->find($id)
     ]);
 }
+
 
 
 

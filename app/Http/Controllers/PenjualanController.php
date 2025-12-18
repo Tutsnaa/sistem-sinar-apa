@@ -10,6 +10,48 @@ use Illuminate\Support\Facades\DB;
 
 class PenjualanController extends Controller
 {
+    /**
+     * 🔹 RIWAYAT PENJUALAN
+     */
+    // public function view(Request $request)
+    // {
+    //     $query = Penjualan::with([
+    //         'pengguna:id,nama',
+    //         'detailPenjualan:id_penjualan,harga,jumlah'
+    //     ])->orderBy('created_at', 'desc');
+
+    //     if ($request->periode_awal) {
+    //         $query->whereDate('created_at', '>=', $request->periode_awal);
+    //     }
+
+    //     if ($request->periode_akhir) {
+    //         $query->whereDate('created_at', '<=', $request->periode_akhir);
+    //     }
+
+    //     return response()->json([
+    //         'data' => $query->get()
+    //     ]);
+    // }
+    public function view(Request $request)
+{
+    $query = Penjualan::with('pengguna')->orderBy('created_at', 'desc');
+
+    if ($request->periode_awal && $request->periode_akhir) {
+        $query->whereBetween('created_at', [
+            $request->periode_awal . ' 00:00:00',
+            $request->periode_akhir . ' 23:59:59',
+        ]);
+    }
+
+    return response()->json([
+        'data' => $query->get()
+    ]);
+}
+
+
+    /**
+     * 🔹 SIMPAN PENJUALAN
+     */
     public function create(Request $request)
     {
         $request->validate([
@@ -25,29 +67,32 @@ class PenjualanController extends Controller
         DB::beginTransaction();
 
         try {
-            // 🔢 hitung total
             $total = collect($request->items)
                 ->sum(fn ($i) => $i['harga'] * $i['jumlah']);
 
-            $kembalian = $request->bayar - $total;
-
-            if ($kembalian < 0) {
+            if ($request->bayar < $total) {
                 return response()->json([
                     'message' => 'Uang bayar kurang'
                 ], 422);
             }
 
-            // 🧾 simpan penjualan
             $penjualan = Penjualan::create([
                 'id_pengguna' => $request->id_pengguna,
                 'nama_pelanggan' => $request->nama_pelanggan,
                 'total' => $total,
                 'bayar' => $request->bayar,
-                'kembalian' => $kembalian,
+                'kembalian' => $request->bayar - $total,
             ]);
 
-            // 📦 simpan detail penjualan
             foreach ($request->items as $item) {
+                $barang = Barang::lockForUpdate()->find($item['id_barang']);
+
+                if ($barang->jumlah < $item['jumlah']) {
+                    throw new \Exception(
+                        "Stok {$barang->nama_barang} tidak mencukupi"
+                    );
+                }
+
                 DetailPenjualan::create([
                     'id_penjualan' => $penjualan->id,
                     'id_barang' => $item['id_barang'],
@@ -56,22 +101,52 @@ class PenjualanController extends Controller
                     'total' => $item['harga'] * $item['jumlah'],
                 ]);
 
-                // 🔽 kurangi stok barang
-                Barang::where('id', $item['id_barang'])
-                    ->decrement('jumlah', $item['jumlah']);
+                $barang->decrement('jumlah', $item['jumlah']);
             }
 
             DB::commit();
 
             return response()->json([
                 'message' => 'Penjualan berhasil',
-                'id_penjualan' => $penjualan->id
+                'data' => $penjualan
             ], 201);
 
         } catch (\Throwable $e) {
             DB::rollBack();
             return response()->json([
-                'error' => $e->getMessage()
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * 🔹 HAPUS PENJUALAN
+     */
+    public function delete($id)
+    {
+        DB::beginTransaction();
+
+        try {
+            $penjualan = Penjualan::with('detailPenjualan')->findOrFail($id);
+
+            // kembalikan stok
+            foreach ($penjualan->detailPenjualan as $detail) {
+                Barang::where('id', $detail->id_barang)
+                    ->increment('jumlah', $detail->jumlah);
+            }
+
+            $penjualan->detailPenjualan()->delete();
+            $penjualan->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Penjualan berhasil dihapus'
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => $e->getMessage()
             ], 500);
         }
     }

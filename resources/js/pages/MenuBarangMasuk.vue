@@ -2,7 +2,7 @@
     <div class="min-h-screen bg-gray-100">
         <!-- Navbar -->
         <nav
-            class="bg-[#3674B5] text-white px-6 py-6 flex justify-between items-center shadow"
+            class="bg-[#3674B5] text-white px-6 py-6 flex justify-between items-center shadow fixed top-0 left-0 w-full z-50"
         >
             <h1
                 @click="goBack"
@@ -31,12 +31,13 @@
                 <option value="Ditolak">Ditolak</option>
             </select>
         </div> -->
-        <div class="p-6 bg-gray-100 min-h-screen">
+        <div class="p-6 bg-gray-100 min-h-screen pt-28">
             <TambahBarangMasuk
                 :editData="editItem"
                 @refresh="refreshBarangMasuk"
                 @resetEdit="editItem = null"
             />
+
             <DaftarBarangMasuk
                 :barangMasuk="barangMasukBulanIniFiltered"
                 @edit="onEditBarang"

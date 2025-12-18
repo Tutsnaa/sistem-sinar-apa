@@ -3,9 +3,11 @@
         <h2 class="text-xl font-bold mb-4">Daftar Pembelian</h2>
 
         <!-- Tabel pembelian -->
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border border-gray-300 rounded-lg">
-                <thead class="bg-gray-100">
+        <div
+            class="max-h-[325px] overflow-y-auto border border-gray-300 rounded"
+        >
+            <table class="min-w-full border-collapse">
+                <thead class="bg-gray-100 sticky top-0 z-10">
                     <tr>
                         <th class="px-4 py-2 border-b">No</th>
                         <th class="px-4 py-2 border-b">Nama Barang</th>
@@ -23,7 +25,22 @@
                     >
                         <td class="px-4 py-2">{{ index + 1 }}</td>
                         <td class="px-4 py-2">{{ item.nama }}</td>
-                        <td class="px-4 py-2">{{ item.jumlah }}</td>
+                        <td class="px-4 py-2">
+                            <!-- MODE VIEW -->
+                            <span v-if="editIndex !== index">
+                                {{ item.jumlah }}
+                            </span>
+
+                            <!-- MODE EDIT -->
+                            <input
+                                v-else
+                                type="number"
+                                min="1"
+                                v-model.number="item.jumlah"
+                                class="border px-2 py-1 rounded w-20"
+                            />
+                        </td>
+
                         <td class="px-4 py-2">
                             {{ formatRupiah(item.harga) }}
                         </td>
@@ -31,7 +48,24 @@
                             {{ formatRupiah(item.harga * item.jumlah) }}
                         </td>
 
-                        <td class="px-4 py-2">
+                        <td class="px-4 py-2 flex gap-2">
+                            <!-- TOMBOL UBAH -->
+                            <button
+                                v-if="editIndex !== index"
+                                @click="editIndex = index"
+                                class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
+                            >
+                                Ubah
+                            </button>
+                            <button
+                                v-else
+                                @click="selesaiEdit"
+                                class="bg-green-500 text-white px-2 py-1 rounded"
+                            >
+                                Simpan
+                            </button>
+
+                            <!-- TOMBOL HAPUS -->
                             <button
                                 @click="hapusItem(index)"
                                 class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
@@ -64,6 +98,7 @@
                     <input
                         type="text"
                         :value="formatRupiah(bayar)"
+                        @keydown="onlyNumber"
                         @input="onInputBayar"
                         class="border px-2 py-1 rounded w-32"
                         placeholder="Jumlah bayar"
@@ -98,7 +133,7 @@
 
 <script>
 export default {
-    emits: ["simpan-penjualan"],
+    emits: ["simpan-penjualan", "edit"],
     name: "DaftarPembelian",
     props: {
         daftarPembelian: {
@@ -110,6 +145,7 @@ export default {
     data() {
         return {
             bayar: 0,
+            editIndex: null,
         };
     },
     computed: {
@@ -125,6 +161,30 @@ export default {
         },
     },
     methods: {
+        onlyNumber(e) {
+            // izinkan: angka, backspace, delete, panah
+            if (
+                !/[0-9]/.test(e.key) &&
+                ![
+                    "Backspace",
+                    "Delete",
+                    "ArrowLeft",
+                    "ArrowRight",
+                    "Tab",
+                ].includes(e.key)
+            ) {
+                e.preventDefault(); //BLOKIR HURUF
+            }
+        },
+        selesaiEdit() {
+            this.editIndex = null;
+            this.bayar = 0; // ⬅️ WAJIB RESET
+            console.log(this.daftarPembelian);
+        },
+        ubahItem(item) {
+            this.$emit("edit", item);
+            console.log(item);
+        },
         hapusItem(index) {
             this.daftarPembelian.splice(index, 1);
         },
@@ -132,6 +192,7 @@ export default {
             this.daftarPembelian.splice(0);
             this.bayar = 0;
         },
+
         simpan() {
             if (this.bayar < this.totalHarga) {
                 alert("Jumlah bayar kurang!");

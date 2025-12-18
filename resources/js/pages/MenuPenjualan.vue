@@ -2,7 +2,7 @@
     <div class="min-h-screen bg-gray-100">
         <!-- Navbar -->
         <nav
-            class="bg-[#3674B5] text-white px-6 py-6 flex justify-between items-center shadow"
+            class="bg-[#3674B5] text-white px-6 py-6 flex justify-between items-center shadow fixed top-0 left-0 w-full z-50"
         >
             <h1
                 @click="goBack"
@@ -27,7 +27,7 @@
         </nav>
 
         <!-- Konten Utama -->
-        <div class="px-8 mt-6 flex flex-wrap gap-4">
+        <div class="px-8 mt-4 flex flex-wrap gap-4 pt-28">
             <FormOutput
                 class="w-80 rounded-10px"
                 label="Pengguna"
@@ -60,6 +60,7 @@
             <DaftarPembelian
                 :key="resetKey"
                 :daftarPembelian="daftarPembelian"
+                @edit="onEditPembelian"
                 @simpan-penjualan="simpanPenjualan"
             />
         </div>
@@ -126,7 +127,7 @@ export default {
 
         async getBarang() {
             try {
-                const res = await fetch("http://localhost:8000/api/barang");
+                const res = await fetch("/api/barang");
                 const json = await res.json();
                 this.barang = json.data; // 🔥 PENTING
                 console.log(this.barang);
@@ -168,7 +169,7 @@ export default {
             };
 
             try {
-                const res = await fetch("http://localhost:8000/api/penjualan", {
+                const res = await fetch("/api/penjualan", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload),
@@ -185,7 +186,7 @@ export default {
                 alert("Penjualan berhasil disimpan ✅");
             } catch (error) {
                 console.error("Gagal simpan penjualan", error);
-                alert("Gagal menyimpan penjualan ❌");
+                alert("Gagal menyimpan penjualan, lengkapi data");
             }
         },
     },

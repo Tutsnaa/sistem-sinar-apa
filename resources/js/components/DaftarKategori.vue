@@ -4,9 +4,11 @@
         <h2 class="text-xl font-bold mb-4 mt-2">Daftar Kategori</h2>
 
         <!-- Tabel Daftar Kategori -->
-        <div class="overflow-x-auto">
-            <table class="w-full border border-gray-300 rounded-lg table-auto">
-                <thead class="bg-gray-100">
+        <div
+            class="max-h-[400px] overflow-y-auto border border-gray-300 rounded"
+        >
+            <table class="min-w-full border-collapse">
+                <thead class="bg-gray-100 sticky top-0 z-10">
                     <tr>
                         <th class="px-4 py-2 border-b text-center">No</th>
                         <th class="px-4 py-2 border-b text-left">
@@ -15,16 +17,14 @@
                         <th class="px-20 py-2 border-b text-right">Aksi</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     <tr
                         v-for="(kategori, index) in kategoriList"
                         :key="kategori.id"
                         class="border-b hover:bg-gray-50"
                     >
-                        <td class="px-4 py-2 text-center">
-                            {{ index + 1 }}
-                        </td>
-
+                        <td class="px-4 py-2 text-center">{{ index + 1 }}</td>
                         <td class="px-4 py-2 text-left">
                             {{ kategori.nama_kategori }}
                         </td>
@@ -49,7 +49,6 @@
                         </td>
                     </tr>
 
-                    <!-- Jika kosong -->
                     <tr v-if="kategoriList.length === 0">
                         <td class="px-4 py-2 text-center" colspan="3">
                             Belum ada kategori

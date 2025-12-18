@@ -2,11 +2,19 @@
     <div class="bg-white rounded shadow p-4 mt-6">
         <!-- Judul -->
         <h2 class="text-lg font-bold mb-4">Daftar Barang Masuk</h2>
-
+        <div class="flex items-center gap-3 mb-4">
+            <label class="font-semibold">Filter Status:</label>
+            <select v-model="filterStatus" class="border rounded px-3 py-1">
+                <option value="Semua">Semua</option>
+                <option value="Menunggu">Menunggu</option>
+                <option value="Diterima">Diterima</option>
+                <option value="Ditolak">Ditolak</option>
+            </select>
+        </div>
         <!-- Tabel -->
-        <div class="overflow-x-auto">
+        <div class="max-h-[500px] overflow-y-auto border rounded">
             <table class="min-w-full border border-gray-200">
-                <thead class="bg-gray-100">
+                <thead class="bg-gray-100 sticky top-0 z-20">
                     <tr>
                         <th class="border px-3 py-2 text-center">No</th>
                         <th class="border px-3 py-2 text-center">
@@ -24,7 +32,7 @@
 
                 <tbody>
                     <tr
-                        v-for="(item, index) in barangMasuk"
+                        v-for="(item, index) in barangMasukFiltered"
                         :key="item.id"
                         class="hover:bg-gray-50"
                     >
@@ -161,13 +169,11 @@ export default {
         },
     },
 
-    // props: {
-    //     barangMasuk: {
-    //         type: Array,
-
-    //         default: () => [],
-    //     },
-    // },
+    data() {
+        return {
+            filterStatus: "Semua",
+        };
+    },
 
     methods: {
         formatRupiah(angka) {

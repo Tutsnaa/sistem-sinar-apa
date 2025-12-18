@@ -2,7 +2,7 @@
     <div class="min-h-screen bg-gray-100">
         <!-- Navbar -->
         <nav
-            class="bg-[#3674B5] text-white px-6 py-6 flex justify-between items-center shadow"
+            class="bg-[#3674B5] text-white px-6 py-6 flex justify-between items-center shadow fixed top-0 left-0 w-full z-50"
         >
             <h1
                 @click="goBack"
@@ -25,7 +25,7 @@
         </nav>
 
         <!-- Konten -->
-        <div class="p-6">
+        <div class="p-6 pt-28">
             <div class="bg-white rounded-lg shadow-md p-4">
                 <!-- Form Tambah & Pencarian dalam satu baris -->
                 <div
