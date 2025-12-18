@@ -2,7 +2,7 @@
     <div class="min-h-screen bg-gray-100">
         <!-- Navbar -->
         <nav
-            class="bg-[#3674B5] text-white px-6 py-6 flex justify-between items-center shadow"
+            class="bg-[#3674B5] text-white px-6 py-6 flex justify-between items-center shadow fixed top-0 left-0 w-full z-50"
         >
             <h1
                 @click="goBack"
@@ -23,9 +23,19 @@
             </div>
         </nav>
 
-        <div class="p-6 bg-gray-100 min-h-screen">
+        <div class="p-6 bg-gray-100 min-h-screen pt-28"">
+            <div class="flex items-center gap-3 mb-4">
+                <label class="font-semibold">Filter Status:</label>
+
+                <select v-model="filterStatus" class="border rounded px-3 py-1">
+                    <option value="Semua">Semua</option>
+                    <option value="Menunggu">Menunggu</option>
+                    <option value="Diterima">Diterima</option>
+                    <option value="Ditolak">Ditolak</option>
+                </select>
+            </div>
             <DaftarBarangMasuk
-                :barangMasuk="barangMasuk"
+                :barangMasuk="barangMasukBulanIniFiltered"
                 :role="role"
                 @update-status="updateStatusBarang"
                 @edit="onEditBarang"
@@ -51,6 +61,7 @@ export default {
             foto: "",
             role: "", // <-- ini penting
             barangMasuk: [],
+            filterStatus: "Menunggu",
             editItem: null,
         };
     },
@@ -156,6 +167,30 @@ export default {
                     return new Date(b.created_at) - new Date(a.created_at);
                 });
             },
+        },
+    },
+    computed: {
+        barangMasukBulanIniFiltered() {
+            const now = new Date();
+            const bulanSekarang = now.getMonth();
+            const tahunSekarang = now.getFullYear();
+
+            return (
+                this.barangMasuk
+                    // 1️⃣ Filter bulan & tahun
+                    .filter((item) => {
+                        const tgl = new Date(item.created_at);
+                        return (
+                            tgl.getMonth() === bulanSekarang &&
+                            tgl.getFullYear() === tahunSekarang
+                        );
+                    })
+                    // 2️⃣ Filter status
+                    .filter((item) => {
+                        if (this.filterStatus === "Semua") return true;
+                        return item.status === this.filterStatus;
+                    })
+            );
         },
     },
 };

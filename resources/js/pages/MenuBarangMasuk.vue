@@ -22,7 +22,15 @@
                 <span>{{ nama }}</span>
             </div>
         </nav>
-
+        <!-- <div class="mb-4">
+            <label class="font-semibold mr-2">Filter Status:</label>
+            <select v-model="filterStatus" class="border rounded px-3 py-1">
+                <option value="Semua">Semua</option>
+                <option value="Menunggu">Menunggu</option>
+                <option value="Diterima">Diterima</option>
+                <option value="Ditolak">Ditolak</option>
+            </select>
+        </div> -->
         <div class="p-6 bg-gray-100 min-h-screen">
             <TambahBarangMasuk
                 :editData="editItem"
@@ -30,7 +38,7 @@
                 @resetEdit="editItem = null"
             />
             <DaftarBarangMasuk
-                :barangMasuk="barangMasuk"
+                :barangMasuk="barangMasukBulanIniFiltered"
                 @edit="onEditBarang"
                 @delete="hapusBarang"
                 :role="role"
@@ -56,6 +64,7 @@ export default {
             foto: "",
             role: "",
             barangMasuk: [],
+            filterStatus: "Semua",
             editItem: null,
         };
     },
@@ -194,6 +203,30 @@ export default {
                     return new Date(b.created_at) - new Date(a.created_at);
                 });
             },
+        },
+    },
+    computed: {
+        barangMasukBulanIniFiltered() {
+            const now = new Date();
+            const bulanSekarang = now.getMonth();
+            const tahunSekarang = now.getFullYear();
+
+            return (
+                this.barangMasuk
+                    // 1️⃣ Filter bulan & tahun
+                    .filter((item) => {
+                        const tgl = new Date(item.created_at);
+                        return (
+                            tgl.getMonth() === bulanSekarang &&
+                            tgl.getFullYear() === tahunSekarang
+                        );
+                    })
+                    // 2️⃣ Filter status
+                    .filter((item) => {
+                        if (this.filterStatus === "Semua") return true;
+                        return item.status === this.filterStatus;
+                    })
+            );
         },
     },
 };
