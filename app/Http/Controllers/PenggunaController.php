@@ -85,6 +85,31 @@ class PenggunaController extends Controller
     }
 
     // ============================
+// READ KARYAWAN
+// ============================
+public function viewKaryawan(Request $request)
+{
+    $query = Pengguna::where('role', 'karyawan');
+
+    if ($request->has('search')) {
+        $search = $request->input('search');
+        $query->where(function ($q) use ($search) {
+            $q->where('nama_lengkap', 'like', "%$search%")
+              ->orWhere('email', 'like', "%$search%")
+              ->orWhere('nama_pengguna', 'like', "%$search%");
+        });
+    }
+
+    $karyawan = $query->orderBy('nama_lengkap', 'asc')->get();
+
+    return response()->json([
+        'success' => true,
+        'data' => $karyawan
+    ]);
+}
+
+
+    // ============================
     // READ BY NAME
     // ============================
     public function show($namaLengkap)
@@ -108,29 +133,35 @@ class PenggunaController extends Controller
     // UPDATE
     // ============================
     public function update(Request $request, $id)
-    {
-        $pengguna = Pengguna::find($id);
-
-        if (!$pengguna) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Pengguna tidak ditemukan'
-            ], 404);
-        }
-
-        $pengguna->update($request->except('kata_sandi'));
-
-        if ($request->kata_sandi) {
-            $pengguna->kata_sandi = Hash::make($request->kata_sandi);
-            $pengguna->save();
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Pengguna berhasil diperbarui',
-            'data' => $pengguna
-        ]);
+{
+    $pengguna = Pengguna::find($id);
+    if (!$pengguna) {
+        return response()->json(['success' => false, 'message' => 'Pengguna tidak ditemukan'], 404);
     }
+
+    // Validasi data yang akan diubah
+    $request->validate([
+        'nama_lengkap' => 'required|max:100',
+        'email' => 'required|email|unique:pengguna,email,'.$id,
+        'no_telepon' => 'required|max:15',
+        'nama_pengguna' => 'required|max:50|unique:pengguna,nama_pengguna,'.$id,
+        'kata_sandi' => 'nullable|min:6',
+    ]);
+
+    $pengguna->nama_lengkap = $request->nama_lengkap;
+    $pengguna->email = $request->email;
+    $pengguna->no_telepon = $request->no_telepon;
+    $pengguna->nama_pengguna = $request->nama_pengguna;
+
+   if ($request->kata_sandi) {
+    $pengguna->kata_sandi = Hash::make($request->kata_sandi);
+}
+
+    $pengguna->save();
+
+    return response()->json(['success' => true, 'message' => 'Karyawan berhasil diperbarui', 'data' => $pengguna]);
+}
+
 
     // ============================
     // DELETE

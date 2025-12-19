@@ -12,6 +12,7 @@ import MenuLaporan from "../pages/MenuLaporan.vue";
 import MenuKelolaKaryawan from "../pages/MenuKelolaKaryawan.vue";
 import MenuProfil from "../pages/MenuProfil.vue";
 import MenuBarangMasukPemilik from "../pages/MenuBarangMasukPemilik.vue";
+import TambahKaryawan from "../components/TambahKaryawan.vue";
 
 const routes = [
     { path: "/", redirect: "/login" }, // ⬅ tambahkan ini

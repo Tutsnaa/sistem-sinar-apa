@@ -12,11 +12,19 @@ use App\Http\Controllers\BarangMasukController;
 Route::post('/login', [PenggunaController::class, 'login']);
 
 // CRUD Pengguna
+
 Route::get('/pengguna', [PenggunaController::class, 'view']);
 Route::get('/pengguna/{id}', [PenggunaController::class, 'show']);
 Route::post('/pengguna', [PenggunaController::class, 'create']);
 Route::put('/pengguna/{id}', [PenggunaController::class, 'update']);
 Route::delete('/pengguna/{id}', [PenggunaController::class, 'delete']);
+
+// Karyawan
+Route::get('/karyawan', [PenggunaController::class, 'viewKaryawan']);
+Route::post('/karyawan', [PenggunaController::class, 'create']);
+Route::put('/karyawan/{id}', [PenggunaController::class, 'update']); // <-- ini ditambahkan
+Route::delete('/karyawan/{id}', [PenggunaController::class, 'delete']);
+
 
 //CRUD Barang
 Route::get('/barang', [BarangController::class, 'view']);
