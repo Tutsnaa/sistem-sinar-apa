@@ -66,6 +66,17 @@
                 </select>
             </div>
 
+            <!-- Upload Foto -->
+            <div class="mt-4">
+                <label class="block font-medium mb-1">Foto</label>
+                <input
+                    type="file"
+                    accept="image/*"
+                    @change="handleFileChange"
+                    class="border px-3 py-2 rounded"
+                />
+            </div>
+
             <!-- Tombol -->
             <div class="flex justify-end gap-2 mt-6">
                 <button
@@ -98,21 +109,48 @@ export default {
                 nama_pengguna: "",
                 kata_sandi: "",
                 role: "",
+                foto: "",
             },
         };
     },
     methods: {
         simpanKaryawan() {
+            const formData = new FormData();
+            formData.append("nama_lengkap", this.karyawan.nama_lengkap);
+            formData.append("email", this.karyawan.email);
+            formData.append("no_telepon", this.karyawan.no_telepon);
+            formData.append("nama_pengguna", this.karyawan.nama_pengguna);
+            formData.append("kata_sandi", this.karyawan.kata_sandi);
+            formData.append("role", this.karyawan.role);
+
+            if (this.karyawan.foto) {
+                formData.append("foto", this.karyawan.foto);
+            }
+
             axios
-                .post("/api/karyawan", this.karyawan)
+                .post("/api/pengguna", formData, {
+                    headers: {
+                        Accept: "application/json",
+                    },
+                })
+                .then((res) => {
+                    console.log(res);
+                })
                 .then(() => {
                     this.$emit("refresh");
                     this.$emit("close");
                 })
                 .catch((err) => {
-                    console.error(err);
-                    alert("Gagal menambahkan karyawan");
+                    console.error(err.response);
+                    alert(
+                        err.response?.data?.message ||
+                            "Gagal menambahkan karyawan"
+                    );
                 });
+        },
+
+        handleFileChange(e) {
+            this.karyawan.foto = e.target.files[0];
         },
     },
 };

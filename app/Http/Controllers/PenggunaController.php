@@ -57,6 +57,7 @@ class PenggunaController extends Controller
             'no_telepon' => 'required|max:15',
             'nama_pengguna' => 'required|max:50|unique:pengguna,nama_pengguna',
             'kata_sandi' => 'required|min:6',
+            'foto' => 'nullable|image|max:2048',
             'role' => 'required|in:pemilik_toko,karyawan',
         ]);
 
@@ -65,7 +66,8 @@ class PenggunaController extends Controller
             'email' => $request->email,
             'no_telepon' => $request->no_telepon,
             'nama_pengguna' => $request->nama_pengguna,
-            'kata_sandi' => Hash::make($request->kata_sandi),
+            'kata_sandi' => bcrypt($request->kata_sandi),
+            'foto' => $request->foto,
             'role' => $request->role,
         ]);
 
