@@ -17,8 +17,8 @@
             <div class="flex items-center gap-4">
                 <img
                     v-if="foto"
-                    :src="`/storage/foto_pengguna/${foto}`"
-                    class="w-10 h-10 rounded-full object-cover border-2 border-white"
+                    :src="`/foto_pengguna/${foto}`"
+                    class="w-10 h-10 rounded-full object-cover"
                 />
                 <span>{{ nama }}</span>
             </div>
@@ -56,7 +56,7 @@
                 </div>
 
                 <!-- Tabel Barang -->
-                <div class="bg-white rounded p-4">
+                <div class="max-h-[500px] overflow-y-auto border rounded">
                     <table class="w-full border border-gray-300 rounded-lg">
                         <thead class="bg-gray-100 sticky top-0 z-20">
                             <tr>

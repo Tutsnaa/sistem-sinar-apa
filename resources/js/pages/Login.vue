@@ -35,7 +35,9 @@
                         placeholder="Masukkan Kata Sandi"
                     />
 
-                    <ButtonPrimary>MASUK</ButtonPrimary>
+                    <ButtonPrimary type="submit" :disabled="loading">
+                        {{ loading ? "Memproses..." : "MASUK" }}
+                    </ButtonPrimary>
                 </form>
             </div>
         </div>
@@ -51,13 +53,16 @@ import FormInputPassword from "../components/FormInputPassword.vue";
 export default {
     name: "Login",
     components: { ButtonPrimary, FormInput, FormInputPassword },
+
     data() {
         return {
             namapengguna: "",
             katasandi: "",
             logo: "/assets/img/Logo-Toko.png",
+            loading: false,
         };
     },
+
     methods: {
         async login() {
             if (!this.namapengguna || !this.katasandi) {
@@ -65,34 +70,43 @@ export default {
                 return;
             }
 
+            this.loading = true;
+
             try {
-                const response = await axios.post(
-                    "http://127.0.0.1:8000/api/login",
-                    {
-                        nama_pengguna: this.namapengguna,
-                        kata_sandi: this.katasandi,
-                    }
-                );
+                const response = await axios.post("/api/login", {
+                    nama_pengguna: this.namapengguna,
+                    kata_sandi: this.katasandi,
+                });
 
-                if (response.data.success) {
-                    const user = response.data.data;
-
-                    localStorage.setItem("id_pengguna", user.id);
-                    localStorage.setItem("role", user.role);
-                    localStorage.setItem("nama", user.nama);
-                    localStorage.setItem("foto", user.foto);
-
-                    if (user.role === "pemilik_toko") {
-                        this.$router.push("/beranda-pemilik");
-                    } else if (user.role === "karyawan") {
-                        this.$router.push("/beranda-karyawan");
-                    }
+                if (!response.data.success) {
+                    throw new Error("Login gagal");
                 }
-                console.log(response.data);
+
+                const user = response.data.data;
+
+                // 🔐 Simpan data user
+                localStorage.setItem("id_pengguna", user.id);
+                localStorage.setItem("role", user.role);
+                localStorage.setItem("nama", user.nama);
+                localStorage.setItem("foto", user.foto ?? "");
+
+                // 🔁 Redirect sesuai role
+                if (user.role === "pemilik_toko") {
+                    this.$router.replace("/beranda-pemilik");
+                } else if (user.role === "karyawan") {
+                    this.$router.replace("/beranda-karyawan");
+                } else {
+                    alert("Role tidak dikenali");
+                    localStorage.clear();
+                }
             } catch (error) {
-                const pesan = error.response?.data?.message || "Login gagal!";
+                const pesan =
+                    error.response?.data?.message ||
+                    error.message ||
+                    "Login gagal!";
                 alert(pesan);
-                console.log(error.response?.data);
+            } finally {
+                this.loading = false;
             }
         },
     },

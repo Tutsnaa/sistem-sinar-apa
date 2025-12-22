@@ -11,40 +11,40 @@ class PenggunaController extends Controller
     // ============================
     // LOGIN API UNTUK VUE
     // ============================
-    public function login(Request $request)
-    {
-        $request->validate([
-            'nama_pengguna' => 'required',
-            'kata_sandi' => 'required'
-        ]);
+        public function login(Request $request)
+        {
+            $request->validate([
+                'nama_pengguna' => 'required',
+                'kata_sandi' => 'required'
+            ]);
 
-        $user = Pengguna::where('nama_pengguna', $request->nama_pengguna)->first();
+            $user = Pengguna::where('nama_pengguna', $request->nama_pengguna)->first();
 
-        if (!$user) {
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Nama pengguna tidak ditemukan'
+                ], 404);
+            }
+
+            if (!Hash::check($request->kata_sandi, $user->kata_sandi)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Kata sandi salah'
+                ], 401);
+            }
+
             return response()->json([
-                'success' => false,
-                'message' => 'Nama pengguna tidak ditemukan'
-            ], 404);
+                'success' => true,
+                'message' => 'Login berhasil',
+                'data' => [
+                    'id' => $user->id,
+                    'nama' => $user->nama_lengkap,
+                    'role' => $user->role,
+                    'foto' => $user->foto,
+                ]
+            ]);
         }
-
-        if (!Hash::check($request->kata_sandi, $user->kata_sandi)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Kata sandi salah'
-            ], 401);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Login berhasil',
-            'data' => [
-                'id' => $user->id,
-                'nama' => $user->nama_lengkap,
-                'role' => $user->role,
-                'foto' => $user->foto ?? null,
-            ]
-        ]);
-    }
 
     // ============================
     // CREATE
@@ -61,14 +61,22 @@ class PenggunaController extends Controller
             'role' => 'required|in:pemilik_toko,karyawan',
         ]);
 
+         $namaFile = null;
+
+    if ($request->hasFile('foto')) {
+        $file = $request->file('foto');
+        $namaFile = time() . '.' . $file->getClientOriginalExtension();
+        $file->move(public_path('foto_pengguna'), $namaFile);
+    }
+
         $pengguna = Pengguna::create([
             'nama_lengkap' => $request->nama_lengkap,
             'email' => $request->email,
             'no_telepon' => $request->no_telepon,
             'nama_pengguna' => $request->nama_pengguna,
             'kata_sandi' => bcrypt($request->kata_sandi),
-            'foto' => $request->foto,
             'role' => $request->role,
+            'foto' => $namaFile
         ]);
 
         return response()->json([
@@ -86,7 +94,24 @@ class PenggunaController extends Controller
         return response()->json(Pengguna::all());
     }
 
-    // ============================
+    public function detail($id)
+{
+    $pengguna = Pengguna::find($id);
+
+    if (!$pengguna) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Pengguna tidak ditemukan'
+        ], 404);
+    }
+
+    return response()->json([
+        'success' => true,
+        'data' => $pengguna
+    ]);
+}
+
+// ============================
 // READ KARYAWAN
 // ============================
 public function viewKaryawan(Request $request)
@@ -110,15 +135,11 @@ public function viewKaryawan(Request $request)
     ]);
 }
 
+public function show($id)
+{
+    $pengguna = Pengguna::find($id);
 
-    // ============================
-    // READ BY NAME
-    // ============================
-    public function show($namaLengkap)
-    {
-    $pengguna = Pengguna::where('nama_lengkap', 'like', "%$namaLengkap%")->get();
-
-    if ($pengguna->isEmpty()) {
+    if (!$pengguna) {
         return response()->json([
             'success' => false,
             'message' => 'Pengguna tidak ditemukan'
@@ -131,38 +152,76 @@ public function viewKaryawan(Request $request)
     ]);
 }
 
+//     // ============================
+//     // READ BY NAME
+//     // ============================
+//     public function show($namaLengkap)
+//     {
+//     $pengguna = Pengguna::where('nama_lengkap', 'like', "%$namaLengkap%")->get();
+
+//     if ($pengguna->isEmpty()) {
+//         return response()->json([
+//             'success' => false,
+//             'message' => 'Pengguna tidak ditemukan'
+//         ], 404);
+//     }
+
+//     return response()->json([
+//         'success' => true,
+//         'data' => $pengguna
+//     ]);
+// }
+
     // ============================
     // UPDATE
     // ============================
-    public function update(Request $request, $id)
+public function update(Request $request, $id)
 {
+    
     $pengguna = Pengguna::find($id);
+
     if (!$pengguna) {
-        return response()->json(['success' => false, 'message' => 'Pengguna tidak ditemukan'], 404);
+        return response()->json([
+            'success' => false,
+            'message' => 'Pengguna tidak ditemukan'
+        ], 404);
     }
 
-    // Validasi data yang akan diubah
     $request->validate([
         'nama_lengkap' => 'required|max:100',
-        'email' => 'required|email|unique:pengguna,email,'.$id,
+        'email' => 'required|email|unique:pengguna,email,' . $id,
         'no_telepon' => 'required|max:15',
-        'nama_pengguna' => 'required|max:50|unique:pengguna,nama_pengguna,'.$id,
+        'nama_pengguna' => 'required|max:50|unique:pengguna,nama_pengguna,' . $id,
         'kata_sandi' => 'nullable|min:6',
+        'foto' => 'nullable|image|max:2048',
     ]);
+
+    // Upload foto jika ada
+    if ($request->hasFile('foto')) {
+        $file = $request->file('foto');
+        $namaFile = time() . '.' . $file->getClientOriginalExtension();
+        $file->move(public_path('foto_pengguna'), $namaFile);
+        $pengguna->foto = $namaFile;
+    }
 
     $pengguna->nama_lengkap = $request->nama_lengkap;
     $pengguna->email = $request->email;
     $pengguna->no_telepon = $request->no_telepon;
     $pengguna->nama_pengguna = $request->nama_pengguna;
 
-   if ($request->kata_sandi) {
-    $pengguna->kata_sandi = Hash::make($request->kata_sandi);
-}
+    if ($request->kata_sandi) {
+        $pengguna->kata_sandi = Hash::make($request->kata_sandi);
+    }
 
     $pengguna->save();
 
-    return response()->json(['success' => true, 'message' => 'Karyawan berhasil diperbarui', 'data' => $pengguna]);
+    return response()->json([
+        'success' => true,
+        'message' => 'Profil berhasil diperbarui',
+        'data' => $pengguna
+    ]);
 }
+
 
 
     // ============================

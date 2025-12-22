@@ -7,10 +7,10 @@
             <h1 class="text-xl font-semibold">SISTEM SINAR APA</h1>
             <div class="flex items-center gap-4">
                 <img
-                    v-if="foto"
-                    :src="`/storage/foto_pengguna/${foto}`"
-                    class="w-10 h-10 rounded-full object-cover border-2 border-white"
+                    :src="`/foto_pengguna/${foto}?v=${Date.now()}`"
+                    class="w-10 h-10 rounded-full"
                 />
+
                 <span>{{ nama }}</span>
                 <button
                     @click="logout"

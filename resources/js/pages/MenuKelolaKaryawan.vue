@@ -12,12 +12,12 @@
                     >arrow_back</span
                 >Kembali
             </h1>
-            <h1 class="text-xl font-semibold">BARANG MASUK</h1>
+            <h1 class="text-xl font-semibold">KELOLA KARYAWAN</h1>
             <div class="flex items-center gap-4">
                 <img
                     v-if="foto"
-                    :src="`/storage/foto_pengguna/${foto}`"
-                    class="w-10 h-10 rounded-full object-cover border-2 border-white"
+                    :src="`/foto_pengguna/${foto}`"
+                    class="w-10 h-10 rounded-full object-cover"
                 />
                 <span>{{ nama }}</span>
             </div>
@@ -46,57 +46,71 @@
             @close="showTambahModal = false"
             @refresh="fetchKaryawan"
         />
+        <div class="max-h-[500px] overflow-y-auto border rounded">
+            <table class="w-full bg-white border border-gray-300 rounded-lg">
+                <thead class="bg-gray-100 sticky top-0 z-20">
+                    <tr>
+                        <th class="px-4 py-2 border-b">No</th>
+                        <th class="px-4 py-2 border-b">Foto</th>
+                        <th class="px-4 py-2 border-b">Nama Lengkap</th>
+                        <th class="px-4 py-2 border-b">Email</th>
+                        <th class="px-4 py-2 border-b">No. Telepon</th>
+                        <th class="px-4 py-2 border-b">Username</th>
+                        <th class="px-4 py-2 border-b">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        v-for="(karyawan, index) in karyawanList"
+                        :key="karyawan.id"
+                        class="hover:bg-gray-50"
+                    >
+                        <td class="px-4 py-2 border-b">{{ index + 1 }}</td>
+                        <td class="px-4 py-2 border-b text-center">
+                            <img
+                                v-if="karyawan.foto"
+                                :src="`/foto_pengguna/${karyawan.foto}`"
+                                alt="Foto Karyawan"
+                                class="w-12 h-12 rounded-full object-cover mx-auto"
+                            />
+                            <span v-else class="text-gray-400"
+                                >Tidak ada foto</span
+                            >
+                        </td>
 
-        <table class="w-full bg-white border border-gray-300 rounded-lg">
-            <thead class="bg-gray-100">
-                <tr>
-                    <th class="px-4 py-2 border-b">No</th>
-                    <th class="px-4 py-2 border-b">Nama Lengkap</th>
-                    <th class="px-4 py-2 border-b">Email</th>
-                    <th class="px-4 py-2 border-b">No. Telepon</th>
-                    <th class="px-4 py-2 border-b">Username</th>
-                    <th class="px-4 py-2 border-b">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr
-                    v-for="(karyawan, index) in karyawanList"
-                    :key="karyawan.id"
-                    class="hover:bg-gray-50"
-                >
-                    <td class="px-4 py-2 border-b">{{ index + 1 }}</td>
-                    <td class="px-4 py-2 border-b">
-                        {{ karyawan.nama_lengkap }}
-                    </td>
-                    <td class="px-4 py-2 border-b">{{ karyawan.email }}</td>
-                    <td class="px-4 py-2 border-b">
-                        {{ karyawan.no_telepon }}
-                    </td>
-                    <td class="px-4 py-2 border-b">
-                        {{ karyawan.nama_pengguna }}
-                    </td>
-                    <td class="px-4 py-2 border-b flex gap-2">
-                        <button
-                            @click="editKaryawan(karyawan)"
-                            class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600 transition"
-                        >
-                            Ubah
-                        </button>
-                        <button
-                            @click="hapusKaryawan(karyawan.id)"
-                            class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition"
-                        >
-                            Hapus
-                        </button>
-                    </td>
-                </tr>
-                <tr v-if="karyawanList.length === 0">
-                    <td colspan="6" class="text-center py-4 text-gray-500">
-                        Data karyawan tidak ditemukan
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                        <td class="px-4 py-2 border-b">
+                            {{ karyawan.nama_lengkap }}
+                        </td>
+                        <td class="px-4 py-2 border-b">{{ karyawan.email }}</td>
+                        <td class="px-4 py-2 border-b">
+                            {{ karyawan.no_telepon }}
+                        </td>
+                        <td class="px-4 py-2 border-b">
+                            {{ karyawan.nama_pengguna }}
+                        </td>
+                        <td class="px-4 py-2 border-b flex gap-2">
+                            <button
+                                @click="editKaryawan(karyawan)"
+                                class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600 transition"
+                            >
+                                Ubah
+                            </button>
+                            <button
+                                @click="hapusKaryawan(karyawan.id)"
+                                class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition"
+                            >
+                                Hapus
+                            </button>
+                        </td>
+                    </tr>
+                    <tr v-if="karyawanList.length === 0">
+                        <td colspan="6" class="text-center py-4 text-gray-500">
+                            Data karyawan tidak ditemukan
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
     <!-- Modal Edit Karyawan -->
     <div
