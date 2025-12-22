@@ -21,10 +21,12 @@
             </div>
         </nav>
 
-        <div class="flex flex-wrap justify-center mx-60 mt-8">
+        <div
+            class="flex flex-wrap justify-center gap-4 max-w-6xl mx-auto mt-3 px-4"
+        >
             <div
                 @click="$router.push('/menu-penjualan')"
-                class="basis-1/3 flex justify-center mb-8"
+                class="w-full sm:w-[48%] lg:w-[32%] p-4 rounded box-border"
             >
                 <MenuBeranda title="Penjualan" fontsize="text-3xl">
                     <template #icon>
@@ -37,7 +39,7 @@
 
             <div
                 @click="$router.push('/menu-barang-masuk')"
-                class="basis-1/3 flex justify-center mb-8"
+                class="w-full sm:w-[48%] lg:w-[32%] p-4 rounded box-border"
             >
                 <MenuBeranda title="Barang Masuk" fontsize="text-3xl">
                     <template #icon>
@@ -50,7 +52,7 @@
 
             <div
                 @click="$router.push('/menu-barang')"
-                class="basis-1/3 flex justify-center mb-8"
+                class="w-full sm:w-[48%] lg:w-[32%] p-4 rounded box-border"
             >
                 <MenuBeranda title="Barang" fontsize="text-3xl">
                     <template #icon>
@@ -63,7 +65,7 @@
 
             <div
                 @click="$router.push('/menu-profil')"
-                class="basis-1/3 flex justify-center mb-8"
+                class="w-full sm:w-[48%] lg:w-[32%] p-4 rounded box-border"
             >
                 <MenuBeranda title="Profil" fontsize="text-3xl">
                     <template #icon>

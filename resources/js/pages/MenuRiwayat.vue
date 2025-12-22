@@ -52,14 +52,19 @@
                     />
                 </div>
 
-                <div class="flex items-end">
+                <!-- <div class="flex items-end">
                     <button
-                        @click="getRiwayat"
                         class="bg-[#3674B5] text-white px-4 py-2 rounded hover:bg-blue-700 transition"
                     >
                         Tampilkan
                     </button>
-                </div>
+                </div> -->
+                <button
+                    @click="downloadExcel"
+                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                >
+                    Unduh Excel
+                </button>
             </div>
 
             <!-- Tabel -->
@@ -84,7 +89,10 @@
                         </thead>
 
                         <tbody>
-                            <tr v-for="(item, index) in riwayat" :key="item.id">
+                            <tr
+                                v-for="(item, index) in riwayatFiltered"
+                                :key="item.id"
+                            >
                                 <td class="border px-3 py-2 text-center">
                                     {{ index + 1 }}
                                 </td>
@@ -121,6 +129,9 @@
 </template>
 
 <script>
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+
 import axios from "axios";
 
 export default {
@@ -152,20 +163,111 @@ export default {
 
     computed: {
         riwayatFiltered() {
-            return this.riwayat.map((p) => {
-                const total =
-                    p.items?.reduce((sum, i) => sum + i.harga * i.jumlah, 0) ||
-                    0;
+            return this.riwayat.filter((p) => {
+                if (!this.periodeAwal && !this.periodeAkhir) return true;
 
-                return {
-                    ...p,
-                    total,
-                };
+                const tanggal = new Date(p.created_at).setHours(0, 0, 0, 0);
+
+                const awal = this.periodeAwal
+                    ? new Date(this.periodeAwal).setHours(0, 0, 0, 0)
+                    : null;
+
+                const akhir = this.periodeAkhir
+                    ? new Date(this.periodeAkhir).setHours(23, 59, 59, 999)
+                    : null;
+
+                if (awal && tanggal < awal) return false;
+                if (akhir && tanggal > akhir) return false;
+
+                return true;
             });
         },
     },
 
     methods: {
+        downloadExcel() {
+            if (this.riwayatFiltered.length === 0) {
+                alert("Tidak ada data untuk diunduh");
+                return;
+            }
+
+            // Format periode
+            const periode =
+                this.periodeAwal && this.periodeAkhir
+                    ? `${this.formatTanggal(
+                          this.periodeAwal
+                      )} s/d ${this.formatTanggal(this.periodeAkhir)}`
+                    : "Semua Periode";
+
+            // 🔹 Judul & keterangan
+            const headerInfo = [
+                ["LAPORAN PENJUALAN TOKO SINAR APA"],
+                [`Periode : ${periode}`],
+                [], // baris kosong
+            ];
+
+            // 🔹 Header tabel
+            const tableHeader = [
+                ["No", "Tanggal", "Pengguna", "Total Penjualan"],
+            ];
+
+            // 🔹 Isi data
+            const tableBody = this.riwayatFiltered.map((item, index) => [
+                index + 1,
+                this.formatTanggal(item.created_at),
+                item.pengguna?.nama_lengkap || "-",
+                item.total,
+            ]);
+
+            // 🔹 Buat worksheet
+            const worksheet = XLSX.utils.aoa_to_sheet([
+                ...headerInfo,
+                ...tableHeader,
+                ...tableBody,
+            ]);
+
+            // 🔹 Lebar kolom
+            worksheet["!cols"] = [
+                { wch: 5 },
+                { wch: 15 },
+                { wch: 25 },
+                { wch: 20 },
+            ];
+
+            // 🔹 Bold judul & header
+            const range = XLSX.utils.decode_range(worksheet["!ref"]);
+            for (let C = range.s.c; C <= range.e.c; ++C) {
+                // Bold header (baris ke-4 karena 0-based, baris pertama data header)
+                const cellRef = XLSX.utils.encode_cell({ r: 3, c: C });
+                if (!worksheet[cellRef]) continue;
+                worksheet[cellRef].s = { font: { bold: true } };
+            }
+
+            // 🔹 Format Rupiah (kolom D)
+            const startRow = headerInfo.length + tableHeader.length + 1; // baris pertama data (1-based)
+            for (let i = startRow; i <= startRow + tableBody.length - 1; i++) {
+                const cellRef = `D${i}`;
+                const cell = worksheet[cellRef];
+                if (cell) {
+                    cell.z = '"Rp "#,##0'; // Rupiah tanpa desimal
+                }
+            }
+
+            // 🔹 Buat workbook & download
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Riwayat");
+
+            const buffer = XLSX.write(workbook, {
+                bookType: "xlsx",
+                type: "array",
+            });
+            const blob = new Blob([buffer], {
+                type: "application/octet-stream",
+            });
+
+            saveAs(blob, `Laporan_Riwayat_Penjualan.xlsx`);
+        },
+
         getRiwayat() {
             axios
                 .get("/api/penjualan")
