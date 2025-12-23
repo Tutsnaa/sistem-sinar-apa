@@ -8,8 +8,10 @@ use App\Models\Barang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+
 class PenjualanController extends Controller
 {
+    
     /**
      * 🔹 RIWAYAT PENJUALAN
      */
@@ -53,71 +55,74 @@ class PenjualanController extends Controller
      * 🔹 SIMPAN PENJUALAN
      */
     public function create(Request $request)
-    {
-        $request->validate([
-            'id_pengguna' => 'required|exists:pengguna,id',
-            'nama_pelanggan' => 'required|string',
-            'bayar' => 'required|numeric|min:0',
-            'items' => 'required|array|min:1',
-            'items.*.id_barang' => 'required|exists:barang,id',
-            'items.*.harga' => 'required|numeric',
-            'items.*.jumlah' => 'required|integer|min:1',
+{
+    $request->validate([
+        'id_pengguna' => 'required|exists:pengguna,id',
+        'nama_pelanggan' => 'required|string',
+        'bayar' => 'required|numeric|min:0',
+        'items' => 'required|array|min:1',
+        'items.*.id_barang' => 'required|exists:barang,id',
+        'items.*.harga' => 'required|numeric',
+        'items.*.jumlah' => 'required|integer|min:1',
+    ]);
+
+    DB::beginTransaction();
+
+    try {
+        $total = collect($request->items)
+            ->sum(fn ($i) => $i['harga'] * $i['jumlah']);
+
+        if ($request->bayar < $total) {
+            return response()->json([
+                'message' => 'Uang bayar kurang'
+            ], 422);
+        }
+
+        $penjualan = Penjualan::create([
+            'id_pengguna' => $request->id_pengguna,
+            'nama_pelanggan' => $request->nama_pelanggan,
+            'total' => $total,
+            'bayar' => $request->bayar,
+            'kembalian' => $request->bayar - $total,
         ]);
 
-        DB::beginTransaction();
+        foreach ($request->items as $item) {
+            $barang = Barang::lockForUpdate()->find($item['id_barang']);
 
-        try {
-            $total = collect($request->items)
-                ->sum(fn ($i) => $i['harga'] * $i['jumlah']);
-
-            if ($request->bayar < $total) {
-                return response()->json([
-                    'message' => 'Uang bayar kurang'
-                ], 422);
+            if ($barang->jumlah < $item['jumlah']) {
+                throw new \Exception(
+                    "Stok {$barang->nama_barang} tidak mencukupi"
+                );
             }
 
-            $penjualan = Penjualan::create([
-                'id_pengguna' => $request->id_pengguna,
-                'nama_pelanggan' => $request->nama_pelanggan,
-                'total' => $total,
-                'bayar' => $request->bayar,
-                'kembalian' => $request->bayar - $total,
+            DetailPenjualan::create([
+                'id_penjualan' => $penjualan->id,
+                'id_barang' => $item['id_barang'],
+                'harga' => $item['harga'],
+                'jumlah' => $item['jumlah'],
+                'total' => $item['harga'] * $item['jumlah'],
             ]);
 
-            foreach ($request->items as $item) {
-                $barang = Barang::lockForUpdate()->find($item['id_barang']);
-
-                if ($barang->jumlah < $item['jumlah']) {
-                    throw new \Exception(
-                        "Stok {$barang->nama_barang} tidak mencukupi"
-                    );
-                }
-
-                DetailPenjualan::create([
-                    'id_penjualan' => $penjualan->id,
-                    'id_barang' => $item['id_barang'],
-                    'harga' => $item['harga'],
-                    'jumlah' => $item['jumlah'],
-                    'total' => $item['harga'] * $item['jumlah'],
-                ]);
-
-                $barang->decrement('jumlah', $item['jumlah']);
-            }
-
-            DB::commit();
-
-            return response()->json([
-                'message' => 'Penjualan berhasil',
-                'data' => $penjualan
-            ], 201);
-
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            return response()->json([
-                'message' => $e->getMessage()
-            ], 500);
+            $barang->decrement('jumlah', $item['jumlah']);
         }
+
+        // ✅ COMMIT DULU
+        DB::commit();
+
+        // ✅ BARU RETURN
+        return response()->json([
+            'message' => 'Penjualan berhasil',
+            'id_penjualan' => $penjualan->id
+        ], 201);
+
+    } catch (\Throwable $e) {
+        DB::rollBack();
+        return response()->json([
+            'message' => $e->getMessage()
+        ], 500);
     }
+}
+
 
     /**
      * 🔹 HAPUS PENJUALAN
