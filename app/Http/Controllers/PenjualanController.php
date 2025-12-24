@@ -11,7 +11,60 @@ use Illuminate\Support\Facades\DB;
 
 class PenjualanController extends Controller
 {
-    
+    public function show($id)
+{
+    try {
+        $penjualan = DB::table('penjualan')
+            ->join('pengguna', 'pengguna.id', '=', 'penjualan.id_pengguna')
+            ->where('penjualan.id', $id)
+            ->select(
+                'penjualan.id as id_penjualan',
+                'penjualan.nama_pelanggan',
+                'penjualan.total',
+                'penjualan.bayar',
+                'penjualan.kembalian',
+                'pengguna.nama_lengkap as kasir',
+                'penjualan.created_at'
+            )
+            ->first();
+
+        if (!$penjualan) {
+            return response()->json(['message' => 'Penjualan tidak ditemukan'], 404);
+        }
+
+        $items = DB::table('detail_penjualan')
+            ->join('barang', 'barang.id', '=', 'detail_penjualan.id_barang')
+            ->where('detail_penjualan.id_penjualan', $id)
+            ->select(
+                'barang.id as id_barang',
+                'barang.nama_barang as nama',
+                'detail_penjualan.jumlah',
+                'detail_penjualan.harga'
+            )
+            ->get();
+            
+
+        return response()->json([
+    'data' => [
+        'id_penjualan' => $penjualan->id_penjualan,
+        'tanggal'      => date('d-m-Y', strtotime($penjualan->created_at)),
+        'kasir'        => $penjualan->kasir,
+        'pelanggan'    => $penjualan->nama_pelanggan ?? 'Umum',
+        'items'        => $items,
+        'total'        => $penjualan->total,
+        'bayar'        => $penjualan->bayar,
+        'kembalian'    => $penjualan->kembalian,
+    ]
+]);
+
+    } catch (\Throwable $e) {
+        return response()->json([
+            'message' => 'Server error',
+            'error'   => $e->getMessage()
+        ], 500);
+    }
+}
+
     /**
      * 🔹 RIWAYAT PENJUALAN
      */
@@ -50,10 +103,8 @@ class PenjualanController extends Controller
     ]);
 }
 
+     // SIMPAN PENJUALAN
 
-    /**
-     * 🔹 SIMPAN PENJUALAN
-     */
     public function create(Request $request)
 {
     $request->validate([
