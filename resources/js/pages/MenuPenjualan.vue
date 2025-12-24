@@ -115,6 +115,7 @@
 </template>
 
 <script>
+import { jsPDF } from "jspdf";
 import FormInput from "../components/FormInput.vue";
 import FormOutput from "../components/FormOutput.vue";
 import DaftarPembelian from "../components/DaftarPembelian.vue";
@@ -280,143 +281,270 @@ export default {
         },
 
         downloadInvoice() {
+            if (!this.invoiceData) return;
+
             const d = this.invoiceData;
+            const lineHeight = 5;
 
-            // format rupiah
-            const rupiah = (n) => "Rp" + Number(n).toLocaleString("id-ID");
+            // Catatan invoice
+            const noteLines = [
+                "Barang yang sudah dibeli tidak dapat dikembalikan.",
+                "Terima kasih telah berbelanja di Toko Sinar Apa!",
+            ];
 
-            // daftar barang
-            const items = d.items
-                .map(
-                    (i) => `
-            <div class="row">
-                <div class="name">${i.nama}</div>
-                <div class="qty">${i.jumlah}</div>
-                <div class="price">${rupiah(i.harga)}</div>
-                <div class="total">${rupiah(i.harga * i.jumlah)}</div>
-            </div>
-        `
-                )
-                .join("");
+            // Hitung jumlah baris untuk menentukan tinggi kertas
+            const numHeaderLines = 8; // judul, alamat, telp, garis, info invoice, pelanggan
+            const numItemLines = d.items.length + 1; // header tabel + items
+            const numSummaryLines = 3; // Total, Bayar, Kembalian
+            const numNoteLines = noteLines.length + 1; // +1 untuk judul "Catatan:"
+            const extraBottomMargin = 20; // Jarak ekstra di bawah agar lebih panjang
+            const totalLines =
+                numHeaderLines + numItemLines + numSummaryLines + numNoteLines;
 
-            const html = `
-    <div class="invoice">
-        <div class="center bold">TOKO SINAR APA</div>
-        <div class="center">Jl. Krisna, Mas, Ubud</div>
-        <div class="center">Telp: 0812-3456-789</div>
+            const pageHeight = totalLines * lineHeight + extraBottomMargin; // panjang kertas otomatis
 
-        <div class="line"></div>
+            const doc = new jsPDF({
+                unit: "mm",
+                format: [80, pageHeight], // lebar 80mm, panjang sesuai isi + margin bawah
+            });
 
-        <div>No. Invoice : ${String(d.id_penjualan).padStart(4, "0")}</div>
-        <div>Tanggal    : ${d.tanggal}</div>
-        <div>Kasir      : ${d.kasir}</div>
+            let y = 5; // posisi vertikal awal
 
-        <div class="line"></div>
+            // Header Toko
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(10);
+            doc.text("TOKO SINAR APA", 40, y, { align: "center" });
+            y += lineHeight;
 
-        <div>Nama Pelanggan:</div>
-        <div class="bold">${d.pelanggan}</div>
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(8);
+            doc.text("Jl. Krisna, Mas, Kecamatan Ubud", 40, y, {
+                align: "center",
+            });
+            y += lineHeight;
+            doc.text("Telp: (0361) 123456 | 0812-3456-789", 40, y, {
+                align: "center",
+            });
+            y += lineHeight;
+            doc.line(5, y, 75, y);
+            y += lineHeight;
 
-        <div class="line"></div>
+            // Info Invoice
+            doc.text("No.Invoice      :", 5, y);
+            doc.text(String(d.id_penjualan), 28, y);
+            y += lineHeight;
+            doc.text("Tanggal          :", 5, y);
+            doc.text(d.tanggal, 28, y);
+            y += lineHeight;
+            doc.text("Kasir               :", 5, y);
+            doc.text(d.kasir, 28, y);
+            y += lineHeight;
 
-        <div class="row header">
-            <div class="name">Nama</div>
-            <div class="qty">Q</div>
-            <div class="price">Harga</div>
-            <div class="total">Total</div>
-        </div>
+            // Info Pelanggan
+            doc.text("Pelanggan      :", 5, y);
+            doc.text(d.pelanggan, 28, y);
+            y += lineHeight;
 
-        ${items}
+            doc.line(5, y, 75, y);
+            y += lineHeight;
 
-        <div class="line"></div>
+            // Header tabel
+            doc.setFont("helvetica", "bold");
+            doc.text("Nama", 5, y);
+            doc.text("Jumlah", 35, y);
+            doc.text("Harga", 50, y);
+            doc.text("Total", 75, y, { align: "right" });
+            y += lineHeight;
+            doc.setFont("helvetica", "normal");
 
-        <div class="summary">
-            <div><span>Total</span><span>${rupiah(d.total)}</span></div>
-            <div><span>Bayar</span><span>${rupiah(d.bayar)}</span></div>
-            <div><span>Kembali</span><span>${rupiah(d.kembalian)}</span></div>
-        </div>
+            // Fungsi format angka
+            const formatNumber = (n) => Number(n).toLocaleString("id-ID");
 
-        <div class="line"></div>
+            // Items
+            d.items.forEach((item) => {
+                doc.text(item.nama, 5, y);
+                doc.text(String(item.jumlah), 35, y);
+                doc.text(formatNumber(item.harga), 50, y);
+                doc.text(formatNumber(item.harga * item.jumlah), 75, y, {
+                    align: "right",
+                });
+                y += lineHeight;
+            });
 
-        <div class="note">
-            Barang yang sudah dibeli tidak dapat dikembalikan.<br>
-            Terima kasih telah berbelanja 🙏
-        </div>
-    </div>
-    `;
+            doc.line(5, y, 75, y);
+            y += lineHeight;
 
-            const win = window.open("", "", "width=260,height=600");
-            win.document.write(`
-        <html>
-        <head>
-            <title>Struk Penjualan</title>
-            <style>
-                @media print {
-                    body { margin: 0; }
-                }
-                body {
-                    font-family: monospace;
-                    padding: 4px;
-                }
-                .invoice {
-                    width: 220px; /* 🔥 UKURAN INDOMARET */
-                    border: 1px solid #000;
-                    padding: 6px;
-                    font-size: 10px;
-                }
-                .center {
-                    text-align: center;
-                }
-                .bold {
-                    font-weight: bold;
-                }
-                .line {
-                    border-top: 1px dashed #000;
-                    margin: 6px 0;
-                }
-                .row {
-                    display: flex;
-                    justify-content: space-between;
-                    font-size: 9px;
-                }
-                .header {
-                    font-weight: bold;
-                    border-bottom: 1px solid #000;
-                    margin-bottom: 3px;
-                }
-                .name {
-                    width: 40%;
-                }
-                .qty {
-                    width: 10%;
-                    text-align: center;
-                }
-                .price {
-                    width: 20%;
-                    text-align: right;
-                }
-                .total {
-                    width: 30%;
-                    text-align: right;
-                }
-                .summary div {
-                    display: flex;
-                    justify-content: space-between;
-                    font-size: 10px;
-                }
-                .note {
-                    text-align: center;
-                    font-size: 9px;
-                }
-            </style>
-        </head>
-        <body>${html}</body>
-        </html>
-    `);
+            const rightX = 75; // posisi angka paling kanan
+            const labelX = 5;
+            const labelWidth = 35;
 
-            win.document.close();
-            win.focus();
-            win.print();
+            // Ringkasan pembayaran
+            function writeLabelValue(label, value) {
+                doc.text(label, labelX + labelWidth, y, { align: "left" });
+                doc.text(formatNumber(value), rightX, y, { align: "right" });
+                y += lineHeight;
+            }
+
+            writeLabelValue("Total         :", d.total);
+            writeLabelValue("Bayar        :", d.bayar);
+            writeLabelValue("Kembalian :", d.kembalian);
+
+            doc.line(5, y, 75, y);
+            y += lineHeight;
+
+            // Catatan
+            doc.setFontSize(7);
+            doc.text("Catatan:", 5, y);
+            y += lineHeight;
+            noteLines.forEach((line) => {
+                doc.text(line, 5, y);
+                y += lineHeight;
+            });
+
+            // Margin bawah tambahan supaya catatan tidak menempel di batas kertas
+            y += extraBottomMargin;
+
+            doc.save(`Invoice_${d.id_penjualan}.pdf`);
         },
+
+        //     downloadInvoice() {
+        //         const d = this.invoiceData;
+
+        //         // format rupiah
+        //         const rupiah = (n) => "Rp" + Number(n).toLocaleString("id-ID");
+
+        //         // daftar barang
+        //         const items = d.items
+        //             .map(
+        //                 (i) => `
+        //         <div class="row">
+        //             <div class="name">${i.nama}</div>
+        //             <div class="qty">${i.jumlah}</div>
+        //             <div class="price">${rupiah(i.harga)}</div>
+        //             <div class="total">${rupiah(i.harga * i.jumlah)}</div>
+        //         </div>
+        //     `
+        //             )
+        //             .join("");
+
+        //         const html = `
+        // <div class="invoice">
+        //     <div class="center bold">TOKO SINAR APA</div>
+        //     <div class="center">Jl. Krisna, Mas, Ubud</div>
+        //     <div class="center">Telp: 0812-3456-789</div>
+
+        //     <div class="line"></div>
+
+        //     <div>No. Invoice : ${String(d.id_penjualan).padStart(4, "0")}</div>
+        //     <div>Tanggal    : ${d.tanggal}</div>
+        //     <div>Kasir      : ${d.kasir}</div>
+
+        //     <div class="line"></div>
+
+        //     <div>Nama Pelanggan:</div>
+        //     <div class="bold">${d.pelanggan}</div>
+
+        //     <div class="line"></div>
+
+        //     <div class="row header">
+        //         <div class="name">Nama</div>
+        //         <div class="qty">Q</div>
+        //         <div class="price">Harga</div>
+        //         <div class="total">Total</div>
+        //     </div>
+
+        //     ${items}
+
+        //     <div class="line"></div>
+
+        //     <div class="summary">
+        //         <div><span>Total</span><span>${rupiah(d.total)}</span></div>
+        //         <div><span>Bayar</span><span>${rupiah(d.bayar)}</span></div>
+        //         <div><span>Kembali</span><span>${rupiah(d.kembalian)}</span></div>
+        //     </div>
+
+        //     <div class="line"></div>
+
+        //     <div class="note">
+        //         Barang yang sudah dibeli tidak dapat dikembalikan.<br>
+        //         Terima kasih telah berbelanja 🙏
+        //     </div>
+        // </div>
+        // `;
+
+        //         const win = window.open("", "", "width=260,height=600");
+        //         win.document.write(`
+        //     <html>
+        //     <head>
+        //         <title>Struk Penjualan</title>
+        //         <style>
+        //             @media print {
+        //                 body { margin: 0; }
+        //             }
+        //             body {
+        //                 font-family: monospace;
+        //                 padding: 4px;
+        //             }
+        //             .invoice {
+        //                 width: 220px; /* 🔥 UKURAN INDOMARET */
+        //                 border: 1px solid #000;
+        //                 padding: 6px;
+        //                 font-size: 10px;
+        //             }
+        //             .center {
+        //                 text-align: center;
+        //             }
+        //             .bold {
+        //                 font-weight: bold;
+        //             }
+        //             .line {
+        //                 border-top: 1px dashed #000;
+        //                 margin: 6px 0;
+        //             }
+        //             .row {
+        //                 display: flex;
+        //                 justify-content: space-between;
+        //                 font-size: 9px;
+        //             }
+        //             .header {
+        //                 font-weight: bold;
+        //                 border-bottom: 1px solid #000;
+        //                 margin-bottom: 3px;
+        //             }
+        //             .name {
+        //                 width: 40%;
+        //             }
+        //             .qty {
+        //                 width: 10%;
+        //                 text-align: center;
+        //             }
+        //             .price {
+        //                 width: 20%;
+        //                 text-align: right;
+        //             }
+        //             .total {
+        //                 width: 30%;
+        //                 text-align: right;
+        //             }
+        //             .summary div {
+        //                 display: flex;
+        //                 justify-content: space-between;
+        //                 font-size: 10px;
+        //             }
+        //             .note {
+        //                 text-align: center;
+        //                 font-size: 9px;
+        //             }
+        //         </style>
+        //     </head>
+        //     <body>${html}</body>
+        //     </html>
+        // `);
+
+        //         win.document.close();
+        //         win.focus();
+        //         win.print();
+        //     },
     },
 };
 </script>
