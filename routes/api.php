@@ -7,6 +7,8 @@ use App\Http\Controllers\BarangController;
 use App\Http\Controllers\PenjualanController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\BarangMasukController;
+use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\DetailPenjualanController;
 
 // Login API
 Route::post('/login', [PenggunaController::class, 'login']);
@@ -55,3 +57,21 @@ Route::post('/barang-masuk', [BarangMasukController::class, 'create']);
 Route::get('/barang-masuk/{id}', [BarangMasukController::class, 'show']);
 Route::put('/barang-masuk/{id}', [BarangMasukController::class, 'update']);
 Route::delete('/barang-masuk/{id}', [BarangMasukController::class, 'delete']);
+
+Route::get('/barang-terlaris', [DetailPenjualanController::class, 'barangTerlaris']);
+
+
+// Ambil semua detail penjualan
+Route::get('/detail-penjualan', [DetailPenjualanController::class, 'view']);
+
+// Tambah detail penjualan
+Route::post('/detail-penjualan', [DetailPenjualanController::class, 'create']);
+
+// Ambil detail penjualan berdasarkan ID
+Route::get('/detail-penjualan/{id}', [DetailPenjualanController::class, 'show']);
+
+// Update detail penjualan
+Route::put('/detail-penjualan/{id}', [DetailPenjualanController::class, 'update']);
+
+// Hapus detail penjualan
+Route::delete('/detail-penjualan/{id}', [DetailPenjualanController::class, 'delete']);
