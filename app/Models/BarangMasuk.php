@@ -17,7 +17,7 @@ class BarangMasuk extends Model
         'jumlah',
         'harga_beli',
         'harga_jual',
-        'status',
+        'status'
     ];
 
     // Relasi ke tabel barang

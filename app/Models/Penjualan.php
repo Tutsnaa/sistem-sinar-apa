@@ -20,7 +20,8 @@ class Penjualan extends Model
     ];
 
     // Relasi: 1 penjualan punya banyak detail
-    public function detail()
+   // ✅ SAMAKAN NAMA RELASI
+    public function detailPenjualan()
     {
         return $this->hasMany(DetailPenjualan::class, 'id_penjualan');
     }

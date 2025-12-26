@@ -35,11 +35,13 @@ class PenjualanController extends Controller
         $items = DB::table('detail_penjualan')
             ->join('barang', 'barang.id', '=', 'detail_penjualan.id_barang')
             ->where('detail_penjualan.id_penjualan', $id)
+            
             ->select(
                 'barang.id as id_barang',
                 'barang.nama_barang as nama',
                 'detail_penjualan.jumlah',
-                'detail_penjualan.harga'
+                'detail_penjualan.harga',
+                'detail_penjualan.keuntungan'
             )
             ->get();
             
@@ -87,9 +89,11 @@ class PenjualanController extends Controller
     //         'data' => $query->get()
     //     ]);
     // }
-    public function view(Request $request)
+public function view(Request $request)
 {
-    $query = Penjualan::with('pengguna')->orderBy('created_at', 'desc');
+    $query = Penjualan::with('pengguna')
+        ->withSum('detailPenjualan as keuntungan', 'keuntungan')
+        ->orderBy('created_at', 'desc');
 
     if ($request->periode_awal && $request->periode_akhir) {
         $query->whereBetween('created_at', [
@@ -102,6 +106,8 @@ class PenjualanController extends Controller
         'data' => $query->get()
     ]);
 }
+
+
 
      // SIMPAN PENJUALAN
 
@@ -152,6 +158,7 @@ class PenjualanController extends Controller
                 'harga' => $item['harga'],
                 'jumlah' => $item['jumlah'],
                 'total' => $item['harga'] * $item['jumlah'],
+                'keuntungan' => ($item['harga'] - $barang->harga_beli) * $item['jumlah'],
             ]);
 
             $barang->decrement('jumlah', $item['jumlah']);

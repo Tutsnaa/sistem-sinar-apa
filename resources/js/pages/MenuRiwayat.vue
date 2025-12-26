@@ -86,6 +86,9 @@
                                     Total Penjualan
                                 </th>
                                 <th class="border px-3 py-2 text-center">
+                                    Keuntungan
+                                </th>
+                                <th class="border px-3 py-2 text-center">
                                     Aksi
                                 </th>
                             </tr>
@@ -112,6 +115,11 @@
                                     class="border px-3 py-2 text-right font-semibold"
                                 >
                                     {{ formatRupiah(item.total) }}
+                                </td>
+                                <td
+                                    class="border px-3 py-2 text-right font-semibold"
+                                >
+                                    {{ formatRupiah(item.keuntungan) }}
                                 </td>
                                 <td class="border px-3 py-2 text-center">
                                     <button
@@ -420,7 +428,7 @@ export default {
 
             // 🔹 Header tabel
             const tableHeader = [
-                ["No", "Tanggal", "Pengguna", "Total Penjualan"],
+                ["No", "Tanggal", "Pengguna", "Total Penjualan", "Keuntungan"],
             ];
 
             // 🔹 Isi data
@@ -428,7 +436,8 @@ export default {
                 index + 1,
                 this.formatTanggal(item.created_at),
                 item.pengguna?.nama_lengkap || "-",
-                item.total,
+                Number(item.total || 0),
+                Number(item.keuntungan || 0),
             ]);
 
             // 🔹 Buat worksheet
@@ -461,9 +470,22 @@ export default {
                 const cellRef = `D${i}`;
                 const cell = worksheet[cellRef];
                 if (cell) {
-                    cell.z = '"Rp "#,##0'; // Rupiah tanpa desimal
+                    cell.z = "#,##0";
+                    cell.t = "n"; // Rupiah tanpa desimal
                 }
             }
+
+            //Format Rupiah (kolom E)
+            ["D", "E"].forEach((col) => {
+                for (
+                    let i = startRow;
+                    i <= startRow + tableBody.length - 1;
+                    i++
+                ) {
+                    const cell = worksheet[`${col}${i}`];
+                    if (cell) cell.z = "#,##0";
+                }
+            });
 
             // 🔹 Buat workbook & download
             const workbook = XLSX.utils.book_new();

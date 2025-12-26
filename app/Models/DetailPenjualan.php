@@ -17,6 +17,7 @@ class DetailPenjualan extends Model
         'harga',
         'jumlah',
         'total',
+        'keuntungan'
     ];
 
     /**
