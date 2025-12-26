@@ -57,17 +57,31 @@
 
                 <!-- Tabel Barang -->
                 <div class="max-h-[500px] overflow-y-auto border rounded">
-                    <table class="w-full border border-gray-300 rounded-lg">
+                    <table class="min-w-full border border-gray-200">
                         <thead class="bg-gray-100 sticky top-0 z-20">
                             <tr>
-                                <th class="px-4 py-2 text-center">No</th>
-                                <th class="px-4 py-2 text-left">Nama Barang</th>
-                                <th class="px-4 py-2 text-left">Kategori</th>
-                                <th class="px-4 py-2 text-right">Harga Beli</th>
-                                <th class="px-4 py-2 text-right">Harga Jual</th>
-                                <th class="px-4 py-2 text-center">Jumlah</th>
-                                <th class="px-4 py-2 text-center">Status</th>
-                                <th class="pr-20 py-2 text-right">Aksi</th>
+                                <th class="border px-4 py-2 text-center">No</th>
+                                <th class="border px-4 py-2 text-center">
+                                    Nama Barang
+                                </th>
+                                <th class="border px-4 py-2 text-center">
+                                    Kategori
+                                </th>
+                                <th class="border px-4 py-2 text-center">
+                                    Harga Beli
+                                </th>
+                                <th class="border px-4 py-2 text-center">
+                                    Harga Jual
+                                </th>
+                                <th class="border px-4 py-2 text-center">
+                                    Jumlah
+                                </th>
+                                <th class="border px-4 py-2 text-center">
+                                    Status
+                                </th>
+                                <th class="border pr-4 py-2 text-center">
+                                    Aksi
+                                </th>
                             </tr>
                         </thead>
 
@@ -77,16 +91,16 @@
                                 :key="barang.id"
                                 class="border-b hover:bg-gray-50"
                             >
-                                <td class="px-4 py-2 text-center">
+                                <td class="border px-4 py-2 text-center">
                                     {{ filteredBarang.indexOf(barang) + 1 }}
                                 </td>
-                                <td class="px-4 py-2">
+                                <td class="border px-4 py-2">
                                     {{ barang.nama_barang }}
                                 </td>
-                                <td class="px-4 py-2">
+                                <td class="border px-4 py-2">
                                     {{ barang.kategori?.nama_kategori }}
                                 </td>
-                                <td class="px-4 py-2 text-right">
+                                <td class="border px-4 py-2 text-right">
                                     Rp
                                     {{
                                         Number(
@@ -94,7 +108,7 @@
                                         ).toLocaleString("id-ID")
                                     }}
                                 </td>
-                                <td class="px-4 py-2 text-right">
+                                <td class="border px-4 py-2 text-right">
                                     Rp
                                     {{
                                         Number(
@@ -102,10 +116,10 @@
                                         ).toLocaleString("id-ID")
                                     }}
                                 </td>
-                                <td class="px-4 py-2 text-center">
+                                <td class="border px-4 py-2 text-center">
                                     {{ barang.jumlah }}
                                 </td>
-                                <td class="px-4 py-2 text-center">
+                                <td class="border px-4 py-2 text-center">
                                     <span
                                         :class="
                                             barang.status === 'tersedia'
@@ -121,8 +135,8 @@
                                         }}
                                     </span>
                                 </td>
-                                <td class="px-4 py-2">
-                                    <div class="flex justify-end gap-2">
+                                <td class="border px-4 py-2">
+                                    <div class="flex justify-center gap-2">
                                         <button
                                             class="bg-yellow-500 text-white px-3 py-1 rounded"
                                             @click="
@@ -134,6 +148,7 @@
                                         </button>
                                         <button
                                             class="bg-red-500 text-white px-3 py-1 rounded"
+                                            @click="hapusBarang(barang.id)"
                                         >
                                             Hapus
                                         </button>
@@ -183,7 +198,7 @@ export default {
 
     computed: {
         filteredBarang() {
-            let data = [...this.daftarBarang]; // copy array agar tidak rusak
+            let data = [...this.daftarBarang];
 
             // 🔍 filter pencarian
             if (this.cari) {
@@ -220,6 +235,23 @@ export default {
     },
 
     methods: {
+        async hapusBarang(id) {
+            if (!confirm("Yakin ingin menghapus barang ini?")) return;
+
+            try {
+                await axios.delete(`/api/barang/${id}`);
+
+                this.daftarBarang = this.daftarBarang.filter(
+                    (barang) => barang.id !== id
+                );
+
+                alert("Barang berhasil dihapus");
+            } catch (error) {
+                console.error(error);
+                alert("Gagal menghapus barang");
+            }
+        },
+
         goBack() {
             const role = localStorage.getItem("role");
             if (role === "pemilik_toko") this.$router.push("/beranda-pemilik");

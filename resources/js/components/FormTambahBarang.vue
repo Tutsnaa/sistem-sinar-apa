@@ -49,6 +49,7 @@
                         <input
                             type="text"
                             :value="formatRupiah(form.harga_beli)"
+                            @keydown="onlyNumber"
                             @input="
                                 form.harga_beli = unformatRupiah(
                                     $event.target.value
@@ -64,6 +65,7 @@
                         <input
                             type="text"
                             :value="formatRupiah(form.harga_jual)"
+                            @keydown="onlyNumber"
                             @input="
                                 form.harga_jual = unformatRupiah(
                                     $event.target.value
@@ -126,6 +128,21 @@ export default {
         };
     },
     methods: {
+        onlyNumber(e) {
+            // izinkan: angka, backspace, delete, panah
+            if (
+                !/[0-9]/.test(e.key) &&
+                ![
+                    "Backspace",
+                    "Delete",
+                    "ArrowLeft",
+                    "ArrowRight",
+                    "Tab",
+                ].includes(e.key)
+            ) {
+                e.preventDefault(); //BLOKIR HURUF
+            }
+        },
         async simpanBarang() {
             try {
                 await axios.post("/api/barang", this.form);
@@ -136,13 +153,18 @@ export default {
             }
         },
 
-        formatRupiah(angka) {
-            if (!angka) return "";
-            return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        formatRupiah(value) {
+            if (value === null || value === undefined || value === "")
+                return "";
+
+            return Number(value).toLocaleString("id-ID");
         },
 
-        unformatRupiah(angka) {
-            return angka.replace(/\./g, "");
+        unformatRupiah(value) {
+            if (!value) return 0;
+
+            // hapus titik, koma, dan spasi
+            return Number(value.replace(/[^\d]/g, ""));
         },
     },
 };

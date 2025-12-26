@@ -48,53 +48,57 @@
                 <canvas ref="chartBarang"></canvas>
             </div>
         </div>
-
         <!-- Tabel Barang Terlaris -->
-        <h2 class="text-lg font-semibold mb-3">Grafik Barang Terlaris</h2>
-        <div class="max-h-[500px] overflow-y-auto border rounded">
-            <table class="min-w-full border bg-white">
-                <thead class="bg-gray-100 sticky top-0 z-20">
-                    <tr>
-                        <th class="px-4 py-2 border text-center">No</th>
-                        <th class="px-4 py-2 border">Nama Barang</th>
-                        <th class="px-4 py-2 border text-center">
-                            Total Terjual
-                        </th>
-                        <th class="px-4 py-2 border text-right">
-                            Total Pendapatan
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr
-                        v-for="(item, index) in laporan"
-                        :key="index"
-                        class="hover:bg-gray-50"
-                    >
-                        <td class="px-4 py-2 border text-center">
-                            {{ index + 1 }}
-                        </td>
+        <div class="bg-white p-4 rounded shadow">
+            <h2 class="text-lg font-semibold mb-3">Daftar Barang Terlaris</h2>
+            <div class="max-h-[500px] overflow-y-auto border rounded">
+                <table class="min-w-full border bg-white">
+                    <thead class="bg-gray-100 sticky top-0 z-20">
+                        <tr>
+                            <th class="px-4 py-2 border text-center">No</th>
+                            <th class="px-4 py-2 border">Nama Barang</th>
+                            <th class="px-4 py-2 border text-center">
+                                Total Terjual
+                            </th>
+                            <th class="px-4 py-2 border text-center">
+                                Total Pendapatan
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr
+                            v-for="(item, index) in laporan"
+                            :key="index"
+                            class="hover:bg-gray-50"
+                        >
+                            <td class="px-4 py-2 border text-center">
+                                {{ index + 1 }}
+                            </td>
 
-                        <td class="px-4 py-2 border">
-                            {{ item.nama_barang }}
-                        </td>
+                            <td class="px-4 py-2 border">
+                                {{ item.nama_barang }}
+                            </td>
 
-                        <td class="px-4 py-2 border text-center">
-                            {{ item.total_terjual }}
-                        </td>
+                            <td class="px-4 py-2 border text-center">
+                                {{ item.total_terjual }}
+                            </td>
 
-                        <td class="px-4 py-2 border text-right">
-                            Rp {{ formatRupiah(item.total_pendapatan) }}
-                        </td>
-                    </tr>
+                            <td class="px-4 py-2 border text-right">
+                                Rp {{ formatRupiah(item.total_pendapatan) }}
+                            </td>
+                        </tr>
 
-                    <tr v-if="laporan.length === 0">
-                        <td colspan="4" class="text-center py-6 text-gray-500">
-                            Data tidak tersedia
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                        <tr v-if="laporan.length === 0">
+                            <td
+                                colspan="4"
+                                class="text-center py-6 text-gray-500"
+                            >
+                                Data tidak tersedia
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </template>

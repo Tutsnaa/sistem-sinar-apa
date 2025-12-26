@@ -9,12 +9,12 @@
             <table class="min-w-full border-collapse">
                 <thead class="bg-gray-100 sticky top-0 z-10">
                     <tr>
-                        <th class="px-4 py-2 border-b">No</th>
-                        <th class="px-4 py-2 border-b">Nama Barang</th>
-                        <th class="px-4 py-2 border-b">Jumlah</th>
-                        <th class="px-4 py-2 border-b">Harga</th>
-                        <th class="px-4 py-2 border-b">Total Harga</th>
-                        <th class="px-4 py-2 border-b">Aksi</th>
+                        <th class="px-4 py-2 border">No</th>
+                        <th class="px-4 py-2 border">Nama Barang</th>
+                        <th class="px-4 py-2 border">Jumlah</th>
+                        <th class="px-4 py-2 border">Harga</th>
+                        <th class="px-4 py-2 border">Total Harga</th>
+                        <th class="px-4 py-2 border">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -23,9 +23,11 @@
                         :key="index"
                         class="border-b hover:bg-gray-50"
                     >
-                        <td class="px-4 py-2">{{ index + 1 }}</td>
-                        <td class="px-4 py-2">{{ item.nama }}</td>
-                        <td class="px-4 py-2">
+                        <td class="border px-4 py-2 text-center">
+                            {{ index + 1 }}
+                        </td>
+                        <td class="border px-4 py-2">{{ item.nama }}</td>
+                        <td class="border px-4 py-2 text-center">
                             <!-- MODE VIEW -->
                             <span v-if="editIndex !== index">
                                 {{ item.jumlah }}
@@ -41,14 +43,14 @@
                             />
                         </td>
 
-                        <td class="px-4 py-2">
+                        <td class="border px-4 py-2">
                             {{ formatRupiah(item.harga) }}
                         </td>
-                        <td class="px-4 py-2">
+                        <td class="border px-4 py-2">
                             {{ formatRupiah(item.harga * item.jumlah) }}
                         </td>
 
-                        <td class="px-4 py-2 flex gap-2">
+                        <td class="border px-4 py-2 flex justify-center gap-2">
                             <!-- TOMBOL UBAH -->
                             <button
                                 v-if="editIndex !== index"

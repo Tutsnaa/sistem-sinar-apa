@@ -50,13 +50,13 @@
             <table class="w-full bg-white border border-gray-300 rounded-lg">
                 <thead class="bg-gray-100 sticky top-0 z-20">
                     <tr>
-                        <th class="px-4 py-2 border-b">No</th>
-                        <th class="px-4 py-2 border-b">Foto</th>
-                        <th class="px-4 py-2 border-b">Nama Lengkap</th>
-                        <th class="px-4 py-2 border-b">Email</th>
-                        <th class="px-4 py-2 border-b">No. Telepon</th>
-                        <th class="px-4 py-2 border-b">Username</th>
-                        <th class="px-4 py-2 border-b">Aksi</th>
+                        <th class="border px-4 py-2">No</th>
+                        <th class="border px-4 py-2">Foto</th>
+                        <th class="border px-4 py-2">Nama Lengkap</th>
+                        <th class="border px-4 py-2">Email</th>
+                        <th class="border px-4 py-2">No. Telepon</th>
+                        <th class="border px-4 py-2">Username</th>
+                        <th class="border px-4 py-2">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -65,8 +65,10 @@
                         :key="karyawan.id"
                         class="hover:bg-gray-50"
                     >
-                        <td class="px-4 py-2 border-b">{{ index + 1 }}</td>
-                        <td class="px-4 py-2 border-b text-center">
+                        <td class="border px-4 py-2 text-center">
+                            {{ index + 1 }}
+                        </td>
+                        <td class="border px-4 py-2 text-center">
                             <img
                                 v-if="karyawan.foto"
                                 :src="`/foto_pengguna/${karyawan.foto}`"
@@ -78,29 +80,31 @@
                             >
                         </td>
 
-                        <td class="px-4 py-2 border-b">
+                        <td class="border px-4 py-2">
                             {{ karyawan.nama_lengkap }}
                         </td>
-                        <td class="px-4 py-2 border-b">{{ karyawan.email }}</td>
-                        <td class="px-4 py-2 border-b">
+                        <td class="border px-4 py-2">{{ karyawan.email }}</td>
+                        <td class="border px-4 py-2">
                             {{ karyawan.no_telepon }}
                         </td>
-                        <td class="px-4 py-2 border-b">
+                        <td class="border px-4 py-2">
                             {{ karyawan.nama_pengguna }}
                         </td>
-                        <td class="px-4 py-2 border-b flex gap-2">
-                            <button
-                                @click="editKaryawan(karyawan)"
-                                class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600 transition"
-                            >
-                                Ubah
-                            </button>
-                            <button
-                                @click="hapusKaryawan(karyawan.id)"
-                                class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition"
-                            >
-                                Hapus
-                            </button>
+                        <td class="border px-4 py-2">
+                            <div class="flex justify-center gap-2">
+                                <button
+                                    @click="editKaryawan(karyawan)"
+                                    class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600 transition"
+                                >
+                                    Ubah
+                                </button>
+                                <button
+                                    @click="hapusKaryawan(karyawan.id)"
+                                    class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition"
+                                >
+                                    Hapus
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     <tr v-if="karyawanList.length === 0">

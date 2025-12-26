@@ -10,11 +10,15 @@
             <table class="min-w-full border-collapse">
                 <thead class="bg-gray-100 sticky top-0 z-10">
                     <tr>
-                        <th class="px-4 py-2 border-b text-center">No</th>
-                        <th class="px-4 py-2 border-b text-left">
+                        <th class="border px-4 py-2 border-b text-center">
+                            No
+                        </th>
+                        <th class="border px-4 py-2 border-b text-center">
                             Nama Kategori
                         </th>
-                        <th class="px-20 py-2 border-b text-right">Aksi</th>
+                        <th class="borderpx-20 py-2 border-b text-center">
+                            Aksi
+                        </th>
                     </tr>
                 </thead>
 
@@ -24,14 +28,14 @@
                         :key="kategori.id"
                         class="border-b hover:bg-gray-50"
                     >
-                        <td class="px-4 py-2 text-center">{{ index + 1 }}</td>
-                        <td class="px-4 py-2 text-left">
+                        <td class="border px-4 py-2 text-center">
+                            {{ index + 1 }}
+                        </td>
+                        <td class="border px-4 py-2 text-left">
                             {{ kategori.nama_kategori }}
                         </td>
-                        <td class="px-4 py-2">
-                            <div
-                                class="flex justify-end items-center gap-2 pr-2"
-                            >
+                        <td class="border px-4 py-2 text-center">
+                            <div class="flex justify-center gap-2">
                                 <button
                                     @click="$emit('ubah', kategori)"
                                     class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
