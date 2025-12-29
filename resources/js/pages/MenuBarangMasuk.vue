@@ -88,8 +88,8 @@ export default {
     methods: {
         sortBarangMasuk() {
             const priority = {
-                Ditolak: 0,
-                Menunggu: 1,
+                Menunggu: 0,
+                Ditolak: 1,
                 Diterima: 2,
             };
 
@@ -113,12 +113,12 @@ export default {
             );
 
             if (index !== -1) {
-                // replace item lama, tapi tetap ambil relasi barang lama supaya nama tampil
                 this.barangMasuk.splice(index, 1, {
                     ...this.barangMasuk[index],
                     ...dataBaru,
                 });
             } else {
+                // INI TIDAK BOLEH TERJADI SAAT EDIT
                 this.barangMasuk.push(dataBaru);
             }
         },
@@ -159,19 +159,24 @@ export default {
                     alert("Gagal menghapus, cek console");
                 });
         },
-        updateStatusBarang({ id, status }) {
+        updateStatusBarang({ item, status }) {
             axios
-                .put(`/api/barang-masuk/${id}/status`, { status })
+                .put(`/api/barang-masuk/${item.id}/status`, {
+                    status: status,
+                })
                 .then((res) => {
+                    const updated = res.data.data;
+
                     const index = this.barangMasuk.findIndex(
-                        (item) => item.id === id
+                        (b) => b.id === updated.id
                     );
 
                     if (index !== -1) {
-                        this.barangMasuk[index].status = status;
+                        this.barangMasuk.splice(index, 1, updated);
                     }
                 })
-                .catch(() => {
+                .catch((err) => {
+                    console.error(err.response?.data || err);
                     alert("Gagal update status");
                 });
         },

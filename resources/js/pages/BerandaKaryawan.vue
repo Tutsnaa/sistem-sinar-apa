@@ -4,7 +4,7 @@
         <nav
             class="bg-[#3674B5] text-white px-6 py-6 flex justify-between items-center shadow"
         >
-            <h1 class="text-xl font-semibold">SISTEM SINAR APA</h1>
+            <h1 class="text-xl font-semibold">TOKO SINAR APA</h1>
             <div class="flex items-center gap-4">
                 <img
                     :src="`/foto_pengguna/${foto}?v=${Date.now()}`"

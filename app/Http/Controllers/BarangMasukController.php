@@ -24,15 +24,22 @@ class BarangMasukController extends Controller
     }
 
     // POST: simpan barang masuk
-    public function create(Request $request)
+   public function create(Request $request)
 {
+    if ($request->has('id')) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Edit data harus menggunakan update'
+        ], 400);
+    }
+
     $validator = Validator::make($request->all(), [
         'id_barang'   => 'required|exists:barang,id',
         'id_pengguna' => 'required|exists:pengguna,id',
         'jumlah'      => 'required|integer|min:1',
         'harga_beli'  => 'required|numeric',
         'harga_jual'  => 'required|numeric',
-        'status'      => 'required|in:Diterima,Menunggu,Ditolak',
+        'status'      => 'required|in:Menunggu',
     ]);
 
     if ($validator->fails()) {
@@ -44,15 +51,13 @@ class BarangMasukController extends Controller
 
     $barangMasuk = BarangMasuk::create($request->all());
 
-    // Ambil ulang dengan relasi barang
-    $barangMasuk = BarangMasuk::with('barang')->find($barangMasuk->id);
-
     return response()->json([
         'success' => true,
         'message' => 'Barang masuk berhasil disimpan',
-        'data'    => $barangMasuk
+        'data'    => BarangMasuk::with('barang')->find($barangMasuk->id)
     ], 201);
 }
+
 
 
     // GET: detail barang masuk
@@ -76,7 +81,7 @@ class BarangMasukController extends Controller
     // PUT: update barang masuk
 public function update(Request $request, $id)
 {
-    $barangMasuk = BarangMasuk::findOrFail($id);
+    $barangMasuk = BarangMasuk::with('barang')->findOrFail($id);
 
     if ($barangMasuk->status === 'Diterima') {
         return response()->json([
@@ -86,22 +91,30 @@ public function update(Request $request, $id)
 
     $validated = $request->validate([
         'id_barang'   => 'required|exists:barang,id',
-        'jumlah'      => 'required|numeric|min:1',
+        'jumlah'      => 'required|integer|min:1',
         'harga_beli'  => 'required|numeric',
         'harga_jual'  => 'required|numeric',
-        'status'      => 'required|in:Menunggu,Diterima,Ditolak',
     ]);
 
     $previousStatus = $barangMasuk->status;
 
+    // 🔥 JIKA DATA DITOLAK & DIEDIT → RESET KE MENUNGGU
+    if ($previousStatus === 'Ditolak') {
+        $validated['status'] = 'Menunggu';
+    }
+
     $barangMasuk->update($validated);
 
-    // jika status jadi diterima
-    if ($validated['status'] === 'Diterima' && $previousStatus !== 'Diterima') {
+    // stok hanya ditambah saat BERUBAH ke DITERIMA
+    if (
+        isset($validated['status']) &&
+        $validated['status'] === 'Diterima' &&
+        $previousStatus !== 'Diterima'
+    ) {
         $barang = $barangMasuk->barang;
         $barang->jumlah += $validated['jumlah'];
-$barang->harga_beli = $validated['harga_beli'];
-$barang->harga_jual = $validated['harga_jual'];
+        $barang->harga_beli = $validated['harga_beli'];
+        $barang->harga_jual = $validated['harga_jual'];
         $barang->save();
     }
 
@@ -111,6 +124,43 @@ $barang->harga_jual = $validated['harga_jual'];
     ]);
 }
 
+public function updateStatus(Request $request, $id)
+{
+    $barangMasuk = BarangMasuk::with('barang')->findOrFail($id);
+
+    // hanya pemilik boleh terima / tolak (opsional)
+    // if (auth()->user()->role !== 'pemilik_toko') {
+    //     return response()->json(['message' => 'Unauthorized'], 403);
+    // }
+
+    $validated = $request->validate([
+        'status' => 'required|in:Diterima,Ditolak',
+    ]);
+
+    // ❌ jika sudah diterima, tidak boleh diubah
+    if ($barangMasuk->status === 'Diterima') {
+        return response()->json([
+            'message' => 'Barang sudah diterima, status tidak bisa diubah'
+        ], 403);
+    }
+
+    $barangMasuk->status = $validated['status'];
+    $barangMasuk->save();
+
+    // ✅ TAMBAH STOK HANYA SAAT DITERIMA
+    if ($validated['status'] === 'Diterima') {
+        $barang = $barangMasuk->barang;
+        $barang->jumlah += $barangMasuk->jumlah;
+        $barang->harga_beli = $barangMasuk->harga_beli;
+        $barang->harga_jual = $barangMasuk->harga_jual;
+        $barang->save();
+    }
+
+    return response()->json([
+        'success' => true,
+        'data' => BarangMasuk::with('barang')->find($id)
+    ]);
+}
 
 
 

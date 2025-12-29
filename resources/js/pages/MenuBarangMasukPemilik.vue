@@ -25,12 +25,12 @@
 
             <div class="p-6 bg-gray-100 min-h-screen pt-28"">
                 <DaftarBarangMasuk
-                    :barangMasuk="barangMasukBulanIniFiltered"
-                    :role="role"
-                    @update-status="updateStatusBarang"
-                    @edit="onEditBarang"
-                    @delete="hapusBarang"
-                />
+    :barangMasuk="barangMasukBulanIniFiltered"
+    :role="role"
+    @update-status="updateStatusBarang"
+    @edit="onEditBarang"
+/>
+
             </div>
         </div>
     </template>
@@ -73,6 +73,7 @@
             this.getBarangMasuk();
         },
         methods: {
+            
             refreshBarangMasuk(updatedItem) {
                 if (!updatedItem) {
                     // fetch ulang semua data
@@ -94,28 +95,30 @@
                 this.editItem = item;
             },
             
-            updateStatusBarang({ item, status }) {
+           updateStatusBarang({ item, status }) {
         axios
-            .put(`/api/barang-masuk/${item.id}`, {
-                id_barang: item.id_barang,
-                jumlah: item.jumlah,
-                harga_beli: item.harga_beli,
-                harga_jual: item.harga_jual,
+            .put(`/api/barang-masuk/${item.id}/status`, {
                 status: status,
             })
+            
             .then((res) => {
+                const updated = res.data.data;
+
                 const index = this.barangMasuk.findIndex(
-                    (b) => b.id === item.id
+                    (b) => b.id === updated.id
                 );
+
                 if (index !== -1) {
-                    this.barangMasuk.splice(index, 1, res.data.data);
+                    // update data, BUKAN nambah
+                    this.barangMasuk.splice(index, 1, updated);
                 }
             })
+             
             .catch((err) => {
                 console.error(err.response?.data || err);
+                alert("Gagal update status");
             });
     },
-
             getBarangMasuk() {
                 axios.get("/api/barang-masuk").then((res) => {
                     console.log("DATA BARANG MASUK:", res.data.data);
@@ -145,8 +148,8 @@
                 deep: true,
                 handler() {
                     const priority = {
-                        Ditolak: 0,
-                        Menunggu: 1,
+                        Menunggu: 0,
+                        Ditolak: 1,
                         Diterima: 2,
                     };
 

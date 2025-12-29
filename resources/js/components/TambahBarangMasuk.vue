@@ -31,9 +31,15 @@
 
                     <li
                         v-if="filteredBarang.length === 0"
-                        class="px-3 py-2 text-gray-500 italic"
+                        class="px-3 py-3 text-gray-500 italic text-center"
                     >
-                        Barang tidak ditemukan
+                        Barang tidak ditemukan.
+                        <button
+                            @click="openTambahBarang"
+                            class="block w-full mt-2 text-blue-600 hover:underline font-medium"
+                        >
+                            + Tambah barang baru
+                        </button>
                     </li>
                 </ul>
             </div>
@@ -107,102 +113,41 @@
             </div>
         </div>
     </div>
+    <FormTambahBarang
+        v-if="showForm"
+        :kategori="kategori"
+        @close="showForm = false"
+        @success="handleBarangAdded"
+    />
 </template>
 
 <script>
+import FormTambahBarang from "@/components/FormTambahBarang.vue";
 import axios from "axios";
 
 export default {
-    emits: ["refresh"],
+    components: {
+        FormTambahBarang,
+    },
+    emits: ["refresh", "resetEdit"],
     props: {
         editData: {
             type: Object,
             default: null,
         },
     },
-    watch: {
-        editData: {
-            immediate: true,
-            handler(newVal) {
-                if (newVal) {
-                    // isi form dengan data yang diedit
-                    this.form.id_barang = newVal.id_barang;
-                    this.form.jumlah = newVal.jumlah;
-                    this.form.harga_beli = Number(newVal.harga_beli);
-                    this.form.harga_jual = Number(newVal.harga_jual);
-                    this.searchBarang = newVal.barang?.nama_barang || "";
-                } else {
-                    this.reset();
-                }
-            },
-        },
-    },
-    submit() {
-        if (this.isSubmitting) return;
-
-        const idPengguna = Number(localStorage.getItem("id_pengguna"));
-        if (!idPengguna) {
-            alert("Session login tidak valid. Silakan login ulang.");
-            return;
-        }
-        if (!this.form.id_barang) {
-            alert("Barang harus dipilih");
-            return;
-        }
-
-        this.isSubmitting = true;
-
-        let request;
-        if (this.editData && this.editData.id) {
-            // Mode edit → PUT
-            request = axios.put(`/api/barang-masuk/${this.editData.id}`, {
-                id_barang: parseInt(this.form.id_barang),
-                jumlah: parseInt(this.form.jumlah),
-                harga_beli: Number(this.form.harga_beli),
-                harga_jual: Number(this.form.harga_jual),
-                status: this.form.status || "Menunggu",
-            });
-        } else {
-            // Mode tambah → POST
-            request = axios.post("/api/barang-masuk", {
-                id_barang: parseInt(this.form.id_barang),
-                id_pengguna: idPengguna,
-                jumlah: parseInt(this.form.jumlah),
-                harga_beli: Number(this.form.harga_beli),
-                harga_jual: Number(this.form.harga_jual),
-                status: "Menunggu",
-            });
-        }
-
-        request
-            .then((res) => {
-                this.$emit("refresh", res.data.data ?? res.data);
-                alert(
-                    this.editData
-                        ? "Barang berhasil diubah"
-                        : "Barang masuk berhasil ditambahkan"
-                );
-                this.reset();
-                this.$emit("resetEdit");
-            })
-            .catch((err) => {
-                console.error(err.response?.data);
-                alert("Validasi gagal, cek console");
-            })
-            .finally(() => {
-                this.isSubmitting = false;
-            });
-    },
 
     data() {
         return {
             listBarang: [],
+            kategori: [],
             searchBarang: "",
             showDropdown: false,
             isSubmitting: false,
+            showForm: false,
             form: {
                 id_barang: null,
-                jumlah: "",
+                jumlah: 0,
                 harga_beli: 0,
                 harga_jual: 0,
             },
@@ -213,21 +158,39 @@ export default {
         isLocked() {
             return this.editData?.status === "Diterima";
         },
-
         filteredBarang() {
             const key = this.searchBarang.toLowerCase();
             return this.listBarang.filter((b) =>
                 b.nama_barang.toLowerCase().includes(key)
             );
         },
-
         totalPembelian() {
             return this.form.jumlah * this.form.harga_beli;
         },
     },
 
+    watch: {
+        editData: {
+            immediate: true,
+            handler(val) {
+                if (val) {
+                    this.form.id = val.id;
+                    this.form.id_barang = val.id_barang;
+                    this.form.jumlah = val.jumlah;
+                    this.form.harga_beli = Number(val.harga_beli);
+                    this.form.harga_jual = Number(val.harga_jual);
+                    this.form.status = val.status;
+                    this.searchBarang = val.barang?.nama_barang || "";
+                } else {
+                    this.reset();
+                }
+            },
+        },
+    },
+
     mounted() {
         this.getBarang();
+        this.getKategori(); // ✅ SEKARANG TERPANGGIL
         document.addEventListener("click", this.handleClickOutside);
     },
 
@@ -242,12 +205,29 @@ export default {
             });
         },
 
+        getKategori() {
+            axios.get("/api/kategori").then((res) => {
+                this.kategori = res.data.data ?? res.data;
+            });
+        },
+
+        openTambahBarang() {
+            this.showForm = true;
+            this.showDropdown = false;
+        },
+
+        handleBarangAdded(pesan) {
+            this.showForm = false;
+            this.getBarang();
+            alert(pesan || "Barang berhasil ditambahkan");
+        },
+
         pilihBarang(barang) {
             this.form.id_barang = barang.id;
             this.searchBarang = barang.nama_barang;
             this.form.harga_beli = barang.harga_beli ?? 0;
             this.form.harga_jual = barang.harga_jual ?? 0;
-            this.form.jumlah = 0;
+            this.form.jumlah = 1;
             this.showDropdown = false;
         },
 
@@ -257,71 +237,60 @@ export default {
             }
         },
 
-        onHargaBeliInput(e) {
-            this.form.harga_beli = this.parseRupiah(e.target.value);
-        },
-
-        onHargaJualInput(e) {
-            this.form.harga_jual = this.parseRupiah(e.target.value);
-        },
-
         submit() {
             if (this.isSubmitting) return;
 
             const idPengguna = Number(localStorage.getItem("id_pengguna"));
-            if (!idPengguna) {
-                alert("Session login tidak valid. Silakan login ulang.");
-                return;
-            }
-
-            if (!this.form.id_barang) {
+            if (!idPengguna || !this.form.id_barang) {
                 alert("Barang harus dipilih");
                 return;
             }
 
             this.isSubmitting = true;
 
-            let request;
-            if (this.editData) {
-                // Mode Ubah
-                request = axios.put(`/api/barang-masuk/${this.editData.id}`, {
-                    id_barang: parseInt(this.form.id_barang),
-                    jumlah: parseInt(this.form.jumlah),
-                    harga_beli: Number(this.form.harga_beli),
-                    harga_jual: Number(this.form.harga_jual),
-                    status: this.form.status || "Menunggu",
-                });
-            } else {
-                // Mode Tambah
-                request = axios.post("/api/barang-masuk", {
-                    id_barang: parseInt(this.form.id_barang),
-                    id_pengguna: idPengguna,
-                    jumlah: parseInt(this.form.jumlah),
-                    harga_beli: Number(this.form.harga_beli),
-                    harga_jual: Number(this.form.harga_jual),
-                    status: "Menunggu",
-                });
-            }
+            const payload = {
+                id_barang: this.form.id_barang,
+                id_pengguna: idPengguna,
+                jumlah: this.form.jumlah,
+                harga_beli: this.form.harga_beli,
+                harga_jual: this.form.harga_jual,
+            };
 
-            request
-                .then((res) => {
-                    const dataBaru = res.data.data ?? res.data; // ambil data yang diubah atau baru
-                    this.$emit("refresh", dataBaru); // kirim ke parent
-                    alert(
-                        this.editData
-                            ? "Barang berhasil diubah"
-                            : "Barang masuk berhasil ditambahkan"
-                    );
-                    this.reset();
-                    this.$emit("resetEdit");
-                })
-                .catch((err) => {
-                    console.error(err.response?.data);
-                    alert("Validasi gagal, cek console");
-                })
-                .finally(() => {
-                    this.isSubmitting = false;
-                });
+            // ==========================
+            // ✏️ MODE EDIT (PUT)
+            // ==========================
+            if (this.editData && this.editData.id) {
+                axios
+                    .put(`/api/barang-masuk/${this.editData.id}`, {
+                        ...payload,
+                        status: "Menunggu", // ⬅️ otomatis reset
+                    })
+                    .then((res) => {
+                        this.$emit("refresh", res.data.data);
+                        this.$emit("resetEdit");
+                        alert("Data berhasil diperbarui");
+                        this.reset();
+                    })
+                    .catch(() => alert("Gagal mengedit data"))
+                    .finally(() => (this.isSubmitting = false));
+
+                // ==========================
+                // ➕ MODE TAMBAH (POST)
+                // ==========================
+            } else {
+                axios
+                    .post("/api/barang-masuk", {
+                        ...payload,
+                        status: "Menunggu",
+                    })
+                    .then((res) => {
+                        this.$emit("refresh", res.data.data);
+                        alert("Barang masuk berhasil ditambahkan");
+                        this.reset();
+                    })
+                    .catch(() => alert("Gagal menyimpan"))
+                    .finally(() => (this.isSubmitting = false));
+            }
         },
 
         reset() {
@@ -333,25 +302,17 @@ export default {
             };
             this.searchBarang = "";
         },
-        // Format angka menjadi Rupiah
+
         formatRupiah(val) {
-            return val !== null && val !== undefined
-                ? "Rp " + Number(val).toLocaleString("id-ID")
-                : "";
+            return "Rp " + Number(val).toLocaleString("id-ID");
         },
 
-        // Mengubah input menjadi angka + update tampilan
         onHargaBeliInput(e) {
-            const angka = e.target.value.replace(/[^0-9]/g, "");
-            this.form.harga_beli = angka ? parseInt(angka) : 0;
-            // Update tampilan agar selalu format Rupiah
-            e.target.value = this.formatRupiah(this.form.harga_beli);
+            this.form.harga_beli = Number(e.target.value.replace(/\D/g, ""));
         },
 
         onHargaJualInput(e) {
-            const angka = e.target.value.replace(/[^0-9]/g, "");
-            this.form.harga_jual = angka ? parseInt(angka) : 0;
-            e.target.value = this.formatRupiah(this.form.harga_jual);
+            this.form.harga_jual = Number(e.target.value.replace(/\D/g, ""));
         },
     },
 };

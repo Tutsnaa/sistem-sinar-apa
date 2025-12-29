@@ -15,55 +15,79 @@
             </button>
 
             <!-- Form -->
-            <div class="flex flex-col gap-3">
-                <input
-                    v-model="karyawan.nama_lengkap"
-                    placeholder="Nama Lengkap"
-                    class="border px-3 py-2 rounded"
-                />
-                <input
-                    v-model="karyawan.email"
-                    type="email"
-                    placeholder="Email"
-                    class="border px-3 py-2 rounded"
-                />
-                <input
-                    v-model="karyawan.no_telepon"
-                    placeholder="No Telepon"
-                    class="border px-3 py-2 rounded"
-                />
-                <input
-                    v-model="karyawan.nama_pengguna"
-                    placeholder="Username"
-                    class="border px-3 py-2 rounded"
-                />
-
-                <!-- Password -->
-                <div class="relative">
+            <div class="flex flex-col space-y-4">
+                <!-- Nama Lengkap -->
+                <div class="flex flex-col space-y-1">
+                    <label class="text-sm font-medium">Nama Lengkap</label>
                     <input
-                        :type="showPassword ? 'text' : 'password'"
+                        v-model="karyawan.nama_lengkap"
+                        placeholder="Nama Lengkap"
+                        class="border px-3 py-2 rounded"
+                    />
+                </div>
+
+                <!-- Email -->
+                <div class="flex flex-col space-y-1">
+                    <label class="text-sm font-medium">Email</label>
+                    <input
+                        v-model="karyawan.email"
+                        type="email"
+                        placeholder="Email"
+                        class="border px-3 py-2 rounded"
+                    />
+                </div>
+
+                <!-- No Telepon -->
+                <div class="flex flex-col space-y-1">
+                    <label class="text-sm font-medium">No Telepon</label>
+                    <input
+                        v-model="karyawan.no_telepon"
+                        placeholder="No Telepon"
+                        class="border px-3 py-2 rounded"
+                    />
+                </div>
+
+                <!-- Username -->
+                <div class="flex flex-col space-y-1">
+                    <label class="text-sm font-medium">Nama Pengguna</label>
+                    <input
+                        v-model="karyawan.nama_pengguna"
+                        placeholder="Username"
+                        class="border px-3 py-2 rounded"
+                    />
+                </div>
+
+                <!-- Kata Sandi -->
+                <div class="flex flex-col space-y-1 relative">
+                    <label class="text-sm font-medium">Kata Sandi</label>
+                    <input
+                        :type="showPassword ? 'text' : 'kata_sandi'"
                         v-model="karyawan.kata_sandi"
-                        placeholder="Password (min 6 karakter)"
-                        class="border px-3 py-2 rounded w-full"
+                        placeholder="Kata Sandi (min 6 karakter)"
+                        class="border px-3 py-2 rounded pr-10"
                     />
                     <span
-                        class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
+                        class="absolute right-3 top-7 cursor-pointer text-gray-500"
                         @click="showPassword = !showPassword"
                     >
-                        <span class="material-icons">
+                        <span class="material-icons text-base">
                             {{ showPassword ? "visibility_off" : "visibility" }}
                         </span>
                     </span>
                 </div>
 
-                <select
-                    v-model="karyawan.role"
-                    class="border px-3 py-2 rounded"
-                >
-                    <option value="">Pilih Role</option>
-                    <option value="pemilik_toko">Pemilik Toko</option>
-                    <option value="karyawan">Karyawan</option>
-                </select>
+                <!-- Role -->
+                <div class="flex flex-col space-y-1">
+                    <label class="text-sm font-medium">Role</label>
+                    <select
+                        v-model="karyawan.role"
+                        class="border px-3 py-2 rounded"
+                    >
+                        <option value="">Pilih Role</option>
+                        <option value="pemilik_toko">Pemilik Toko</option>
+                        <option value="karyawan">Karyawan</option>
+                    </select>
+                </div>
             </div>
 
             <!-- Upload Foto -->
@@ -114,6 +138,18 @@ export default {
         };
     },
     methods: {
+        resetForm() {
+            this.karyawan = {
+                nama_lengkap: "",
+                email: "",
+                no_telepon: "",
+                nama_pengguna: "",
+                kata_sandi: "",
+                role: "",
+                foto: "",
+            };
+            this.showPassword = false;
+        },
         simpanKaryawan() {
             const formData = new FormData();
             formData.append("nama_lengkap", this.karyawan.nama_lengkap);
@@ -128,22 +164,20 @@ export default {
             }
 
             axios
-                .post("/api/pengguna", formData, {
-                    headers: {
-                        Accept: "application/json",
-                    },
-                })
+                .post("/api/pengguna", formData)
                 .then((res) => {
                     console.log(res);
-                })
-                .then(() => {
-                    this.$emit("refresh");
-                    this.$emit("close");
+                    if (res.data.success) {
+                        alert("Karyawan berhasil ditambahkan");
+                        this.resetForm();
+                        this.$emit("refresh");
+                        this.$emit("close");
+                    }
                 })
                 .catch((err) => {
-                    console.error(err.response);
                     alert(
                         err.response?.data?.message ||
+                            err.message ||
                             "Gagal menambahkan karyawan"
                     );
                 });

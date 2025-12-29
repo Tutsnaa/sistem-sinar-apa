@@ -57,6 +57,9 @@ Route::post('/barang-masuk', [BarangMasukController::class, 'create']);
 Route::get('/barang-masuk/{id}', [BarangMasukController::class, 'show']);
 Route::put('/barang-masuk/{id}', [BarangMasukController::class, 'update']);
 Route::delete('/barang-masuk/{id}', [BarangMasukController::class, 'delete']);
+Route::put('/barang-masuk/{id}/status', [BarangMasukController::class, 'updateStatus']);
+
+
 
 Route::get('/barang-terlaris', [DetailPenjualanController::class, 'barangTerlaris']);
 
