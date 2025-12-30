@@ -22,16 +22,8 @@
                 <span>{{ nama }}</span>
             </div>
         </nav>
-        <!-- <div class="mb-4">
-            <label class="font-semibold mr-2">Filter Status:</label>
-            <select v-model="filterStatus" class="border rounded px-3 py-1">
-                <option value="Semua">Semua</option>
-                <option value="Menunggu">Menunggu</option>
-                <option value="Diterima">Diterima</option>
-                <option value="Ditolak">Ditolak</option>
-            </select>
-        </div> -->
-        <div class="p-6 bg-gray-100 min-h-screen pt-28">
+
+        <div class="p-6 bg-gray-100 min-h-screen mt-16">
             <TambahBarangMasuk
                 :editData="editItem"
                 @refresh="refreshBarangMasuk"

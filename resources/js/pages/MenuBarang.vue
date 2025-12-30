@@ -33,7 +33,7 @@
                 >
                     <!-- Tombol Tambah -->
                     <button
-                        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-fit"
+                        class="bg-[#3674B5] text-white hover:bg-[#2C5F9E] px-4 py-2 rounded w-fit"
                         @click="showForm = true"
                     >
                         + Tambah Barang
@@ -63,6 +63,9 @@
                                 <th class="border px-4 py-2 text-center">No</th>
                                 <th class="border px-4 py-2 text-center">
                                     Nama Barang
+                                </th>
+                                <th class="border px-4 py-2 text-center">
+                                    Satuan
                                 </th>
                                 <th class="border px-4 py-2 text-center">
                                     Kategori
@@ -96,6 +99,9 @@
                                 </td>
                                 <td class="border px-4 py-2">
                                     {{ barang.nama_barang }}
+                                </td>
+                                <td class="border px-4 py-2">
+                                    {{ barang.satuan }}
                                 </td>
                                 <td class="border px-4 py-2">
                                     {{ barang.kategori?.nama_kategori }}

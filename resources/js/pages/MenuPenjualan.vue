@@ -27,9 +27,9 @@
         </nav>
 
         <!-- Konten Utama -->
-        <div class="px-8 mt-4 flex flex-wrap gap-4 pt-28">
+        <div class="px-8 mt-4 flex flex-wrap gap-4 pt-24">
             <FormOutput
-                class="w-80 rounded-10px"
+                class="w-64 rounded-10px"
                 label="Pengguna"
                 :value="nama"
             />

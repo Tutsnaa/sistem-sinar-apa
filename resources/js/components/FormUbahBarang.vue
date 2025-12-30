@@ -27,6 +27,22 @@
                     />
                 </div>
 
+                <!-- Satuan -->
+                <div>
+                    <label class="block font-medium mb-1">Satuan</label>
+                    <select
+                        v-model="form.satuan"
+                        placeholder="Satuan"
+                        class="w-full border rounded px-3 py-2"
+                        required
+                    >
+                        <option value="">-- Pilih Satuan --</option>
+                        <option v-for="s in satuanList" :key="s" :value="s">
+                            {{ s }}
+                        </option>
+                    </select>
+                </div>
+
                 <!-- Kategori -->
                 <div>
                     <label class="block font-medium mb-1">Kategori</label>
@@ -118,8 +134,10 @@ export default {
 
     data() {
         return {
+            satuanList: ["Pcs", "Unit", "Set", "Box", "Pack", "Roll", "Meter"],
             form: {
                 nama_barang: "",
+                satuan: "",
                 id_kategori: "",
                 harga_beli: "",
                 harga_jual: "",
@@ -132,6 +150,7 @@ export default {
         // isi form otomatis
         this.form = {
             nama_barang: this.barang.nama_barang,
+            satuan: this.barang.satuan,
             id_kategori: this.barang.id_kategori,
             harga_beli: this.barang.harga_beli,
             harga_jual: this.barang.harga_jual,

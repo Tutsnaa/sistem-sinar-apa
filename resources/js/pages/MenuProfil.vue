@@ -22,68 +22,106 @@
         </nav>
 
         <!-- KONTEN PROFIL -->
-        <div class="max-w-2xl mx-auto bg-white rounded-lg shadow p-6">
-            <!-- FOTO -->
-            <div class="flex flex-col items-center mb-6">
-                <img
-                    v-if="form.foto"
-                    :src="`/foto_pengguna/${form.foto}`"
-                    class="w-32 h-32 rounded-full object-cover border mb-3"
-                />
-                <div
-                    v-else
-                    class="w-32 h-32 rounded-full bg-gray-300 flex items-center justify-center mb-3"
-                >
-                    <span class="text-gray-600">No Foto</span>
+        <div class="w-full bg-white shadow p-10">
+            <div class="flex gap-8">
+                <!-- FOTO (KIRI) -->
+                <div class="w-1/4 flex flex-col">
+                    <img
+                        v-if="form.foto"
+                        :src="`/foto_pengguna/${form.foto}`"
+                        class="w-full h-[420px] object-cover border-2 border-gray-300 rounded-lg mb-4"
+                    />
+                    <div
+                        v-else
+                        class="w-full h-[320px] bg-gray-200 border-2 border-gray-300 rounded-lg flex items-center justify-center mb-4"
+                    >
+                        <span class="text-gray-600">No Foto</span>
+                    </div>
+
+                    <label class="text-sm font-semibold mb-1"
+                        >Foto Profil</label
+                    >
+                    <input type="file" @change="onFileChange" class="text-sm" />
                 </div>
 
-                <input type="file" @change="onFileChange" />
+                <!-- FORM (KANAN) -->
+                <div class="flex-1">
+                    <form @submit.prevent="updateProfil" class="space-y-5">
+                        <!-- Nama Lengkap -->
+                        <div>
+                            <label class="block text-sm font-semibold mb-1">
+                                Nama Lengkap
+                            </label>
+                            <input
+                                type="text"
+                                v-model="form.nama_lengkap"
+                                class="input w-full"
+                                placeholder="Masukkan nama lengkap"
+                            />
+                        </div>
+
+                        <!-- Email -->
+                        <div>
+                            <label class="block text-sm font-semibold mb-1">
+                                Email
+                            </label>
+                            <input
+                                type="email"
+                                v-model="form.email"
+                                class="input w-full"
+                                placeholder="Masukkan email"
+                            />
+                        </div>
+
+                        <!-- No Telepon -->
+                        <div>
+                            <label class="block text-sm font-semibold mb-1">
+                                No Telepon
+                            </label>
+                            <input
+                                type="text"
+                                v-model="form.no_telepon"
+                                class="input w-full"
+                                placeholder="Masukkan nomor telepon"
+                            />
+                        </div>
+
+                        <!-- Nama Pengguna -->
+                        <div>
+                            <label class="block text-sm font-semibold mb-1">
+                                Nama Pengguna
+                            </label>
+                            <input
+                                type="text"
+                                v-model="form.nama_pengguna"
+                                class="input w-full"
+                                placeholder="Masukkan nama pengguna"
+                            />
+                        </div>
+
+                        <!-- Kata Sandi -->
+                        <div>
+                            <label class="block text-sm font-semibold mb-1">
+                                Kata Sandi
+                            </label>
+                            <input
+                                type="password"
+                                v-model="form.kata_sandi"
+                                class="input w-full"
+                                placeholder="Kosongkan jika tidak ingin mengubah"
+                            />
+                        </div>
+
+                        <!-- Tombol -->
+                        <button
+                            type="submit"
+                            class="w-full bg-[#1E5AA8] text-white hover:bg-[#164B8A] py-3 rounded transition"
+                        >
+                            Simpan Perubahan
+                        </button>
+                    </form>
+                </div>
             </div>
-
-            <!-- FORM -->
-            <form @submit.prevent="updateProfil" class="space-y-4">
-                <input
-                    type="text"
-                    v-model="form.nama_lengkap"
-                    placeholder="Nama Lengkap"
-                    class="input"
-                />
-
-                <input
-                    type="email"
-                    v-model="form.email"
-                    placeholder="Email"
-                    class="input"
-                />
-
-                <input
-                    type="text"
-                    v-model="form.no_telepon"
-                    placeholder="No Telepon"
-                    class="input"
-                />
-
-                <input
-                    type="text"
-                    v-model="form.nama_pengguna"
-                    placeholder="Nama Pengguna"
-                    class="input"
-                />
-
-                <input
-                    type="password"
-                    v-model="form.kata_sandi"
-                    placeholder="Kata Sandi Baru (opsional)"
-                    class="input"
-                />
-
-                <button
-                    type="submit"
-                    class="w-full bg-[#3674B5] text-white py-2 rounded hover:bg-blue-700 transition"
-                >
-                    Simpan Perubahan
-                </button>
-            </form>
         </div>
     </div>
 </template>
@@ -195,7 +233,7 @@ export default {
                 // update tampilan profil
                 this.form.foto = user.foto;
 
-                alert("Profil berhasil diperbarui");
+                alert("Data berhasil diperbarui");
                 this.getProfil();
             } catch (error) {
                 if (error.response?.status === 422) {

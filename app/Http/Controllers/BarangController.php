@@ -25,6 +25,7 @@ class BarangController extends Controller
         $request->validate([
             'id_kategori' => 'required|exists:kategori,id',
             'nama_barang' => 'required|string|max:100',
+            'satuan' => 'required|string|max:100',
             'harga_beli' => 'required|numeric',
             'harga_jual' => 'required|numeric',
             'jumlah' => 'required|integer|min:0',
@@ -33,6 +34,7 @@ class BarangController extends Controller
         $barang = Barang::create([
             'id_kategori' => $request->id_kategori,
             'nama_barang' => $request->nama_barang,
+            'satuan' => $request->satuan,
             'harga_beli' => $request->harga_beli,
             'harga_jual' => $request->harga_jual,
             'jumlah' => $request->jumlah,
@@ -65,6 +67,7 @@ class BarangController extends Controller
         $request->validate([
             'id_kategori' => 'required|exists:kategori,id',
             'nama_barang' => 'required|string|max:100',
+            'satuan' => 'required|string|max:100',
             'harga_beli' => 'required|numeric',
             'harga_jual' => 'required|numeric',
             'jumlah' => 'required|integer|min:0',
@@ -73,6 +76,7 @@ class BarangController extends Controller
         $barang->update([
             'id_kategori' => $request->id_kategori,
             'nama_barang' => $request->nama_barang,
+            'satuan' => $request->satuan,
             'harga_beli' => $request->harga_beli,
             'harga_jual' => $request->harga_jual,
             'jumlah' => $request->jumlah,

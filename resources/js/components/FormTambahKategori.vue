@@ -19,18 +19,18 @@
                 class="px-4 py-2 rounded text-white"
                 :class="
                     isEdit
-                        ? 'bg-blue-500 hover:bg-blue-600'
-                        : 'bg-green-500 hover:bg-green-600'
+                        ? 'bg-[#3674B5] hover:bg-[#2C5F9E]'
+                        : 'bg-[#3674B5] hover:bg-[#2C5F9E]'
                 "
             >
-                {{ isEdit ? "Update" : "Simpan" }}
+                {{ isEdit ? "Simpan" : "Simpan" }}
             </button>
 
             <!-- Tombol batal saat edit -->
             <button
                 v-if="isEdit"
                 @click="batal"
-                class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+                class="bg-gray-400 text-white hover:bg-gray-500 px-4 py-2 rounded"
             >
                 Batal
             </button>

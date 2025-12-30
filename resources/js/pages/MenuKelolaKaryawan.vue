@@ -23,8 +23,14 @@
             </div>
         </nav>
 
-        <div class="bg-white p-4 rounded shadow mt-8 mb-6">
+        <div class="bg-white p-4 rounded shadow mt-5 mb-6">
             <div class="flex justify-between items-center">
+                <button
+                    @click="bukaTambahKaryawan"
+                    class="bg-[#3674B5] text-white px-4 py-2 rounded hover:bg-blue-600"
+                >
+                    + Tambah Karyawan
+                </button>
                 <input
                     v-model="search"
                     @input="fetchKaryawan"
@@ -32,13 +38,6 @@
                     placeholder="Cari karyawan..."
                     class="border px-3 py-2 rounded w-1/3"
                 />
-
-                <button
-                    @click="bukaTambahKaryawan"
-                    class="bg-[#3674B5] text-white px-4 py-2 rounded hover:bg-blue-600"
-                >
-                    + Tambah Karyawan
-                </button>
             </div>
         </div>
 

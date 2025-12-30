@@ -27,7 +27,7 @@
         </nav>
 
         <!-- Content -->
-        <div class="pt-32 px-6">
+        <div class="pt-28 px-6">
             <!-- Filter -->
             <div class="bg-white rounded shadow p-4 mb-6 flex flex-wrap gap-4">
                 <div>
@@ -61,7 +61,7 @@
                 </div> -->
                 <button
                     @click="downloadExcel"
-                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                    class="bg-[#3674B5] text-white hover:bg-sky-600 px-4 py-2 rounded"
                 >
                     Unduh Excel
                 </button>
@@ -411,7 +411,7 @@ export default {
                 return;
             }
 
-            // Format periode
+            // 🔹 Format periode
             const periode =
                 this.periodeAwal && this.periodeAkhir
                     ? `${this.formatTanggal(
@@ -419,11 +419,11 @@ export default {
                       )} s/d ${this.formatTanggal(this.periodeAkhir)}`
                     : "Semua Periode";
 
-            // 🔹 Judul & keterangan
+            // 🔹 Header laporan
             const headerInfo = [
                 ["LAPORAN PENJUALAN TOKO SINAR APA"],
                 [`Periode : ${periode}`],
-                [], // baris kosong
+                [],
             ];
 
             // 🔹 Header tabel
@@ -431,7 +431,7 @@ export default {
                 ["No", "Tanggal", "Pengguna", "Total Penjualan", "Keuntungan"],
             ];
 
-            // 🔹 Isi data
+            // 🔹 Data tabel
             const tableBody = this.riwayatFiltered.map((item, index) => [
                 index + 1,
                 this.formatTanggal(item.created_at),
@@ -440,11 +440,27 @@ export default {
                 Number(item.keuntungan || 0),
             ]);
 
-            // 🔹 Buat worksheet
+            // 🔹 Hitung TOTAL
+            const totalPenjualan = this.riwayatFiltered.reduce(
+                (sum, item) => sum + Number(item.total || 0),
+                0
+            );
+
+            const totalKeuntungan = this.riwayatFiltered.reduce(
+                (sum, item) => sum + Number(item.keuntungan || 0),
+                0
+            );
+
+            // 🔹 Baris TOTAL
+            const totalRow = ["", "", "TOTAL", totalPenjualan, totalKeuntungan];
+
+            // 🔹 Gabungkan semua data
             const worksheet = XLSX.utils.aoa_to_sheet([
                 ...headerInfo,
                 ...tableHeader,
                 ...tableBody,
+                [], // baris kosong
+                totalRow,
             ]);
 
             // 🔹 Lebar kolom
@@ -453,41 +469,42 @@ export default {
                 { wch: 15 },
                 { wch: 25 },
                 { wch: 20 },
+                { wch: 20 },
             ];
 
-            // 🔹 Bold judul & header
+            // 🔹 Bold header tabel
             const range = XLSX.utils.decode_range(worksheet["!ref"]);
             for (let C = range.s.c; C <= range.e.c; ++C) {
-                // Bold header (baris ke-4 karena 0-based, baris pertama data header)
                 const cellRef = XLSX.utils.encode_cell({ r: 3, c: C });
-                if (!worksheet[cellRef]) continue;
-                worksheet[cellRef].s = { font: { bold: true } };
-            }
-
-            // 🔹 Format Rupiah (kolom D)
-            const startRow = headerInfo.length + tableHeader.length + 1; // baris pertama data (1-based)
-            for (let i = startRow; i <= startRow + tableBody.length - 1; i++) {
-                const cellRef = `D${i}`;
-                const cell = worksheet[cellRef];
-                if (cell) {
-                    cell.z = "#,##0";
-                    cell.t = "n"; // Rupiah tanpa desimal
+                if (worksheet[cellRef]) {
+                    worksheet[cellRef].s = { font: { bold: true } };
                 }
             }
 
-            //Format Rupiah (kolom E)
+            // 🔹 Format Rupiah kolom D & E
+            const startRow = headerInfo.length + tableHeader.length + 1;
+            const endRow = startRow + tableBody.length;
+
             ["D", "E"].forEach((col) => {
-                for (
-                    let i = startRow;
-                    i <= startRow + tableBody.length - 1;
-                    i++
-                ) {
+                for (let i = startRow; i <= endRow + 1; i++) {
                     const cell = worksheet[`${col}${i}`];
-                    if (cell) cell.z = "#,##0";
+                    if (cell) {
+                        cell.z = "#,##0";
+                        cell.t = "n";
+                    }
                 }
             });
 
-            // 🔹 Buat workbook & download
+            // 🔹 Bold baris TOTAL
+            const totalRowIndex = endRow + 2;
+            ["C", "D", "E"].forEach((col) => {
+                const cell = worksheet[`${col}${totalRowIndex}`];
+                if (cell) {
+                    cell.s = { font: { bold: true } };
+                }
+            });
+
+            // 🔹 Buat file Excel
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Riwayat");
 
@@ -495,11 +512,12 @@ export default {
                 bookType: "xlsx",
                 type: "array",
             });
+
             const blob = new Blob([buffer], {
                 type: "application/octet-stream",
             });
 
-            saveAs(blob, `Laporan_Riwayat_Penjualan.xlsx`);
+            saveAs(blob, "Laporan_Riwayat_Penjualan.xlsx");
         },
 
         getRiwayat() {

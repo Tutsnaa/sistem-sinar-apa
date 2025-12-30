@@ -55,14 +55,14 @@
                             <button
                                 v-if="editIndex !== index"
                                 @click="editIndex = index"
-                                class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
+                                class="bg-yellow-500 text-white hover:bg-yellow-600 px-2 py-1 rounded"
                             >
                                 Ubah
                             </button>
                             <button
                                 v-else
                                 @click="selesaiEdit"
-                                class="bg-green-500 text-white px-2 py-1 rounded"
+                                class="bg-[#3674B5] text-white hover:bg-[#2C5F9E] px-2 py-1 rounded"
                             >
                                 Simpan
                             </button>
@@ -70,7 +70,7 @@
                             <!-- TOMBOL HAPUS -->
                             <button
                                 @click="hapusItem(index)"
-                                class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                                class="bg-[#DC3545] text-white hover:bg-[#B02A37] px-2 py-1 rounded"
                             >
                                 Hapus
                             </button>
@@ -118,13 +118,13 @@
                 <!-- Tombol -->
                 <button
                     @click="batal"
-                    class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                    class="bg-gray-400 text-white hover:bg-gray-500 px-4 py-2 rounded"
                 >
                     Batal
                 </button>
                 <button
                     @click="simpan"
-                    class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                    class="bg-[#3674B5] text-white hover:bg-[#2C5F9E] px-4 py-2 rounded"
                 >
                     Simpan
                 </button>
