@@ -56,6 +56,9 @@
                     <thead class="bg-gray-100 sticky top-0 z-20">
                         <tr>
                             <th class="px-4 py-2 border text-center">No</th>
+                            <!-- <th class="px-4 py-2 border text-center">
+                                Id Barang
+                            </th> -->
                             <th class="px-4 py-2 border">Nama Barang</th>
                             <th class="px-4 py-2 border text-center">
                                 Total Terjual
@@ -74,6 +77,10 @@
                             <td class="px-4 py-2 border text-center">
                                 {{ index + 1 }}
                             </td>
+                            <!-- BRG-{{ item.id_barang.toString().padStart(5, '0') }} -->
+                            <!-- <td class="px-4 py-2 border text-center">
+                                {{ item.id_barang }}
+                            </td> -->
 
                             <td class="px-4 py-2 border">
                                 {{ item.nama_barang }}
@@ -180,6 +187,7 @@ export default {
                     params: { bulan, tahun },
                 })
                 .then((res) => {
+                    console.log("DATA LAPORAN:", res.data.data);
                     this.laporan = res.data.data || [];
                     this.$nextTick(() => {
                         this.renderChart(); // 🔥 render grafik

@@ -102,7 +102,6 @@
                                 <td class="border px-3 py-2 text-center">
                                     {{ index + 1 }}
                                 </td>
-
                                 <td class="border px-3 py-2 text-center">
                                     {{ formatTanggal(item.created_at) }}
                                 </td>

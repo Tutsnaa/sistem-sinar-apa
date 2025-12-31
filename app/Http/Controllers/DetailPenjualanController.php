@@ -28,6 +28,7 @@ public function barangTerlaris(Request $request)
     $data = DetailPenjualan::join('barang', 'barang.id', '=', 'detail_penjualan.id_barang')
         ->join('penjualan', 'penjualan.id', '=', 'detail_penjualan.id_penjualan')
         ->select(
+            'detail_penjualan.id_barang',
             'barang.nama_barang',
             DB::raw('SUM(detail_penjualan.jumlah) as total_terjual'),
             DB::raw('SUM(detail_penjualan.total) as total_pendapatan')
