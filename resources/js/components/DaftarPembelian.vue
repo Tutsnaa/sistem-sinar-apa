@@ -1,10 +1,13 @@
 <template>
-    <div class="p-6 bg-white rounded-lg shadow-md w-full max-w-auto">
+    <div
+        class="min-h-[calc(78vh-80px)] p-6 bg-white rounded-lg shadow-md flex flex-col"
+    >
+        <!-- Judul -->
         <h2 class="text-xl font-bold mb-4">Daftar Pembelian</h2>
 
-        <!-- Tabel pembelian -->
+        <!-- TABEL -->
         <div
-            class="max-h-[325px] overflow-y-auto border border-gray-300 rounded"
+            class="min-h-[303px] max-h-[325px] overflow-y-auto border border-gray-300 rounded""
         >
             <table class="min-w-full border-collapse">
                 <thead class="bg-gray-100 sticky top-0 z-10">
@@ -27,13 +30,11 @@
                             {{ index + 1 }}
                         </td>
                         <td class="border px-4 py-2">{{ item.nama }}</td>
+
                         <td class="border px-4 py-2 text-center">
-                            <!-- MODE VIEW -->
                             <span v-if="editIndex !== index">
                                 {{ item.jumlah }}
                             </span>
-
-                            <!-- MODE UBAH -->
                             <input
                                 v-else
                                 type="number"
@@ -46,12 +47,12 @@
                         <td class="border px-4 py-2">
                             {{ formatRupiah(item.harga) }}
                         </td>
+
                         <td class="border px-4 py-2">
                             {{ formatRupiah(item.harga * item.jumlah) }}
                         </td>
 
                         <td class="px-4 py-2 flex justify-center gap-2">
-                            <!-- TOMBOL UBAH -->
                             <button
                                 v-if="editIndex !== index"
                                 @click="editIndex = index"
@@ -59,6 +60,7 @@
                             >
                                 Ubah
                             </button>
+
                             <button
                                 v-else
                                 @click="selesaiEdit"
@@ -67,7 +69,6 @@
                                 Simpan
                             </button>
 
-                            <!-- TOMBOL HAPUS -->
                             <button
                                 @click="hapusItem(index)"
                                 class="bg-[#DC3545] text-white hover:bg-[#B02A37] px-2 py-1 rounded"
@@ -76,8 +77,9 @@
                             </button>
                         </td>
                     </tr>
+
                     <tr v-if="daftarPembelian.length === 0">
-                        <td class="px-4 py-2 text-center" colspan="6">
+                        <td colspan="6" class="px-4 py-4 text-center">
                             Belum ada pembelian
                         </td>
                     </tr>
@@ -85,17 +87,22 @@
             </table>
         </div>
 
-        <!-- Total, Bayar, Kembalian, Tombol -->
-        <div class="flex flex-col md:flex-row justify-between mt-4 gap-4">
+        <!-- BLOK BAWAH (NEMPEL BAWAH) -->
+        <div
+            class="flex flex-col md:flex-row justify-between gap-4 mt-auto pt-4"
+        >
             <!-- Total -->
-            <div class="flex items-center space-x-2">
+            <div class="flex items-center gap-2">
                 <span class="font-bold">Total:</span>
                 <span
                     class="flex items-center text-xl border px-2 py-1 rounded w-60 h-20"
-                    >{{ formatRupiah(totalHarga) }}</span
                 >
+                    {{ formatRupiah(totalHarga) }}
+                </span>
             </div>
-            <div class="flex items-center space-x-2">
+
+            <!-- Bayar -->
+            <div class="flex items-center gap-2">
                 <span class="font-bold">Bayar:</span>
                 <input
                     type="text"
@@ -106,7 +113,9 @@
                     placeholder="Jumlah bayar"
                 />
             </div>
-            <div class="flex items-center space-x-2">
+
+            <!-- Kembalian -->
+            <div class="flex items-center gap-2">
                 <span class="font-bold">Kembalian:</span>
                 <input
                     type="text"
@@ -116,29 +125,8 @@
                 />
             </div>
 
-            <!-- Bayar dan Kembalian -->
+            <!-- Tombol -->
             <div class="flex flex-col md:flex-row items-end gap-2">
-                <!-- <div class="flex flex-col">
-                    <label class="font-bold">Bayar</label>
-                    <input
-                        type="text"
-                        :value="formatRupiah(bayar)"
-                        @keydown="onlyNumber"
-                        @input="onInputBayar"
-                        class="border px-2 py-1 rounded w-32"
-                        placeholder="Jumlah bayar"
-                    />
-                </div> -->
-                <!-- <div class="flex flex-col">
-                    <label class="font-bold">Kembalian</label>
-                    <input
-                        type="text"
-                        :value="formatRupiah(kembalian)"
-                        class="border px-2 py-1 rounded w-32 bg-gray-100"
-                        readonly
-                    />
-                </div> -->
-                <!-- Tombol -->
                 <button
                     @click="batal"
                     class="bg-gray-400 text-white hover:bg-gray-500 px-4 py-2 rounded"

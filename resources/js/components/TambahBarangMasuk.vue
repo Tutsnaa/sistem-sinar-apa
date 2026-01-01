@@ -36,7 +36,7 @@
                         Barang tidak ditemukan.
                         <button
                             @click="openTambahBarang"
-                            class="block w-full mt-2 text-blue-600 hover:underline font-medium"
+                            class="block w-full mt-2 text-[#3674B5] hover:underline font-medium"
                         >
                             + Tambah barang baru
                         </button>
@@ -106,7 +106,7 @@
                 <button
                     @click="submit"
                     :disabled="!form.id_barang || isLocked"
-                    class="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50 transition-colors"
+                    class="w-full bg-[#3674B5] text-white hover:bg-[#2C5F9E] px-4 py-2 rounded disabled:opacity-50 transition-colors"
                 >
                     {{ isLocked ? "Terkunci" : "Simpan" }}
                 </button>

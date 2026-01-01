@@ -27,7 +27,7 @@
             <div class="flex justify-between items-center">
                 <button
                     @click="bukaTambahKaryawan"
-                    class="bg-[#3674B5] text-white px-4 py-2 rounded hover:bg-blue-600"
+                    class="bg-[#3674B5] text-white hover:bg-[#2C5F9E] px-4 py-2 rounded"
                 >
                     + Tambah Karyawan
                 </button>

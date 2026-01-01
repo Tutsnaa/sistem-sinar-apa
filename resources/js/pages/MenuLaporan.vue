@@ -135,9 +135,8 @@ export default {
         return {
             nama: "",
             foto: "",
-            periode: new Date().toISOString().slice(0, 7), // yyyy-mm
+            periode: new Date().toISOString().slice(0, 7),
             laporan: [],
-            chart: null,
         };
     },
 
@@ -155,6 +154,7 @@ export default {
         this.foto = foto;
 
         this.ambilLaporan();
+        this._chart = null;
     },
 
     computed: {
@@ -187,15 +187,18 @@ export default {
                     params: { bulan, tahun },
                 })
                 .then((res) => {
-                    console.log("DATA LAPORAN:", res.data.data);
-                    this.laporan = res.data.data || [];
+                    this.laporan = res.data.data ?? [];
+
                     this.$nextTick(() => {
-                        this.renderChart(); // 🔥 render grafik
+                        this.renderChart(); // ✅ SATU-SATUNYA TEMPAT
                     });
                 })
                 .catch(() => {
                     this.laporan = [];
-                    if (this.chart) this.chart.destroy();
+                    if (this._chart) {
+                        this._chart.destroy();
+                        this._chart = null;
+                    }
                 });
         },
 
@@ -204,28 +207,38 @@ export default {
         },
 
         renderChart() {
-            if (this.chart) {
-                this.chart.destroy();
+            if (!this.$refs.chartBarang) return;
+
+            const labels = this.top10Laporan.map((i) => i.nama_barang);
+            const data = this.top10Laporan.map((i) => Number(i.total_terjual));
+
+            // =========================
+            // UPDATE
+            // =========================
+            if (this._chart) {
+                this._chart.data.labels.length = 0;
+                this._chart.data.labels.push(...labels);
+
+                this._chart.data.datasets[0].data.length = 0;
+                this._chart.data.datasets[0].data.push(...data);
+
+                this._chart.update("none"); // ❗ penting
+                return;
             }
 
-            if (!this.top10Laporan || this.top10Laporan.length === 0) return;
-
-            const labels = this.top10Laporan.map((item) => item.nama_barang);
-
-            const dataTerjual = this.top10Laporan.map(
-                (item) => item.total_terjual
-            );
-
+            // =========================
+            // CREATE ONCE
+            // =========================
             const ctx = this.$refs.chartBarang.getContext("2d");
 
-            this.chart = new Chart(ctx, {
+            this._chart = new Chart(ctx, {
                 type: "bar",
                 data: {
-                    labels,
+                    labels: [...labels],
                     datasets: [
                         {
                             label: "Jumlah Terjual",
-                            data: dataTerjual,
+                            data: [...data],
                             backgroundColor: "#3674B5",
                         },
                     ],
@@ -233,15 +246,14 @@ export default {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: false, // ❗ wajib
                     plugins: {
                         legend: { display: false },
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
-                            ticks: {
-                                precision: 0,
-                            },
+                            ticks: { precision: 0 },
                         },
                     },
                 },

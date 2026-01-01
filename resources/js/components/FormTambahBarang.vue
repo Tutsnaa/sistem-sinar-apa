@@ -108,13 +108,13 @@
                     <button
                         type="button"
                         @click="$emit('close')"
-                        class="px-4 py-2 border rounded"
+                        class="bg-gray-400 text-white hover:bg-gray-500 px-4 py-2 border rounded"
                     >
                         Batal
                     </button>
                     <button
                         type="submit"
-                        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                        class="bg-[#3674B5] text-white hover:bg-[#2C5F9E] px-4 py-2 rounded"
                     >
                         Simpan
                     </button>
@@ -133,7 +133,7 @@ export default {
     },
     data() {
         return {
-            satuanList: ["Pcs", "Unit", "Set", "Box", "Pack", "Roll", "Meter"],
+            satuanList: ["Box", "Meter", "Pack", "Pcs", "Roll", "Set", "Unit"],
             form: {
                 nama_barang: "",
                 satuan: "",

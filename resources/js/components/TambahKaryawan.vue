@@ -52,7 +52,7 @@
                     <label class="text-sm font-medium">Nama Pengguna</label>
                     <input
                         v-model="karyawan.nama_pengguna"
-                        placeholder="Username"
+                        placeholder="Nama Pengguna"
                         class="border px-3 py-2 rounded"
                     />
                 </div>
@@ -105,13 +105,13 @@
             <div class="flex justify-end gap-2 mt-6">
                 <button
                     @click="$emit('close')"
-                    class="px-4 py-2 bg-gray-300 rounded"
+                    class="bg-gray-400 text-white hover:bg-gray-500 px-4 py-2 rounded"
                 >
                     Batal
                 </button>
                 <button
                     @click="simpanKaryawan"
-                    class="px-4 py-2 bg-blue-500 text-white rounded"
+                    class="bg-[#3674B5] text-white hover:bg-[#2C5F9E] px-4 py-2 rounded"
                 >
                     Simpan
                 </button>

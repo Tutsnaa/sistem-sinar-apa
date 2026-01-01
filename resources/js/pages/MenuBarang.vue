@@ -144,7 +144,7 @@
                                 <td class="border px-4 py-2">
                                     <div class="flex justify-center gap-2">
                                         <button
-                                            class="bg-yellow-500 text-white px-3 py-1 rounded"
+                                            class="bg-yellow-500 text-white hover:bg-yellow-600 px-3 py-1 rounded"
                                             @click="
                                                 barangDipilih = barang;
                                                 showEdit = true;
@@ -153,7 +153,7 @@
                                             Ubah
                                         </button>
                                         <button
-                                            class="bg-red-500 text-white px-3 py-1 rounded"
+                                            class="bg-[#DC3545] text-white hover:bg-[#B02A37] px-3 py-1 rounded"
                                             @click="hapusBarang(barang.id)"
                                         >
                                             Hapus

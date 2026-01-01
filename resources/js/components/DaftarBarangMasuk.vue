@@ -2,14 +2,44 @@
     <div class="bg-white rounded shadow p-4 mt-6">
         <!-- Judul -->
         <h2 class="text-lg font-bold mb-4">Daftar Barang Masuk</h2>
-        <div class="flex items-center gap-3 mb-4">
-            <label class="font-semibold">Filter Status:</label>
-            <select v-model="filterStatus" class="border rounded px-3 py-1">
-                <option value="Semua">Semua</option>
-                <option value="Menunggu">Menunggu</option>
-                <option value="Diterima">Diterima</option>
-                <option value="Ditolak">Ditolak</option>
-            </select>
+        <div class="flex items-end justify-between gap-4 mb-4 flex-wrap">
+            <!-- Filter Status -->
+            <div class="flex items-center gap-3">
+                <label class="font-semibold whitespace-nowrap">
+                    Filter Status:
+                </label>
+                <select v-model="filterStatus" class="border rounded px-3 py-1">
+                    <option value="Semua">Semua</option>
+                    <option value="Menunggu">Menunggu</option>
+                    <option value="Diterima">Diterima</option>
+                    <option value="Ditolak">Ditolak</option>
+                </select>
+            </div>
+
+            <!-- Periode -->
+            <div class="flex items-end gap-3">
+                <div>
+                    <label class="block text-sm font-semibold mb-1">
+                        Periode Awal
+                    </label>
+                    <input
+                        type="date"
+                        v-model="periodeAwal"
+                        class="border rounded px-3 py-2"
+                    />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-1">
+                        Periode Akhir
+                    </label>
+                    <input
+                        type="date"
+                        v-model="periodeAkhir"
+                        class="border rounded px-3 py-2"
+                    />
+                </div>
+            </div>
         </div>
         <!-- Tabel -->
         <div class="max-h-[500px] overflow-y-auto border rounded">
@@ -144,10 +174,9 @@
                         </td>
                     </tr>
 
-                    <!-- Jika data kosong -->
-                    <tr v-if="barangMasuk.length === 0">
-                        <td colspan="7" class="text-center py-4 text-gray-500">
-                            Belum ada data barang masuk
+                    <tr v-if="barangMasukFiltered.length === 0">
+                        <td colspan="9" class="text-center py-4 text-gray-500">
+                            Tidak ada data sesuai filter
                         </td>
                     </tr>
                 </tbody>
@@ -172,7 +201,13 @@ export default {
     data() {
         return {
             filterStatus: "Semua",
+            periodeAwal: "",
+            periodeAkhir: "",
         };
+    },
+
+    mounted() {
+        console.log("Barang Masuk dari parent:", this.barangMasuk);
     },
 
     methods: {
@@ -188,16 +223,49 @@ export default {
             });
         },
     },
-
     computed: {
         barangMasukFiltered() {
-            if (this.filterStatus === "Semua") {
-                return this.barangMasuk;
-            }
+            const now = new Date();
+            const bulanSekarang = now.getMonth();
+            const tahunSekarang = now.getFullYear();
 
-            return this.barangMasuk.filter(
-                (item) => item.status === this.filterStatus
-            );
+            const isFilterTanggalAktif =
+                this.periodeAwal !== "" || this.periodeAkhir !== "";
+
+            return this.barangMasuk.filter((item) => {
+                if (!item.created_at) return false;
+
+                const tanggalItem = new Date(item.created_at);
+
+                if (
+                    this.filterStatus !== "Semua" &&
+                    item.status !== this.filterStatus
+                ) {
+                    return false;
+                }
+
+                // DEFAULT: BULAN SEKARANG
+                if (!isFilterTanggalAktif) {
+                    return (
+                        tanggalItem.getMonth() === bulanSekarang &&
+                        tanggalItem.getFullYear() === tahunSekarang
+                    );
+                }
+
+                // FILTER MANUAL
+                const awal = this.periodeAwal
+                    ? new Date(this.periodeAwal + "T00:00:00")
+                    : null;
+
+                const akhir = this.periodeAkhir
+                    ? new Date(this.periodeAkhir + "T23:59:59")
+                    : null;
+
+                if (awal && tanggalItem < awal) return false;
+                if (akhir && tanggalItem > akhir) return false;
+
+                return true;
+            });
         },
     },
 };

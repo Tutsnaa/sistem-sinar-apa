@@ -52,16 +52,9 @@
                     />
                 </div>
 
-                <!-- <div class="flex items-end">
-                    <button
-                        class="bg-[#3674B5] text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-                    >
-                        Tampilkan
-                    </button>
-                </div> -->
                 <button
                     @click="downloadExcel"
-                    class="bg-[#3674B5] text-white hover:bg-sky-600 px-4 py-2 rounded"
+                    class="bg-[#3674B5] text-white hover:bg-[#2C5F9E] px-4 py-2 rounded"
                 >
                     Unduh Excel
                 </button>
@@ -123,7 +116,7 @@
                                 <td class="border px-3 py-2 text-center">
                                     <button
                                         @click="lihatInvoice(item.id)"
-                                        class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                                        class="bg-[#3674B5] text-white hover:bg-[#2C5F9E] px-3 py-1 rounded"
                                     >
                                         Invoice
                                     </button>

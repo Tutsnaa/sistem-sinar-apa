@@ -14,7 +14,7 @@
                 <span>{{ nama }}</span>
                 <button
                     @click="logout"
-                    class="bg-white text-[#3674B5] px-3 py-1 rounded hover:bg-gray-200 text-sm transition"
+                    class="bg-white text-[#3674B5] px-4 py-1 rounded hover:bg-gray-200 text-l transition"
                 >
                     Keluar
                 </button>

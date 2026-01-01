@@ -162,26 +162,37 @@ export default {
     },
     computed: {
         barangMasukBulanIniFiltered() {
-            const now = new Date();
-            const bulanSekarang = now.getMonth();
-            const tahunSekarang = now.getFullYear();
+            return this.barangMasuk.filter((item) => {
+                if (!item.created_at) return false;
 
-            return (
-                this.barangMasuk
-                    // 1️⃣ Filter bulan & tahun
-                    .filter((item) => {
-                        const tgl = new Date(item.created_at);
-                        return (
-                            tgl.getMonth() === bulanSekarang &&
-                            tgl.getFullYear() === tahunSekarang
-                        );
-                    })
-                    // 2️⃣ Filter status
-                    .filter((item) => {
-                        if (this.filterStatus === "Semua") return true;
-                        return item.status === this.filterStatus;
-                    })
-            );
+                // ======================
+                // FILTER STATUS
+                // ======================
+                if (
+                    this.filterStatus !== "Semua" &&
+                    item.status !== this.filterStatus
+                ) {
+                    return false;
+                }
+
+                // ======================
+                // FILTER TANGGAL (FIX)
+                // ======================
+                const tanggalItem = new Date(item.created_at);
+
+                const awal = this.periodeAwal
+                    ? new Date(this.periodeAwal + "T00:00:00")
+                    : null;
+
+                const akhir = this.periodeAkhir
+                    ? new Date(this.periodeAkhir + "T23:59:59")
+                    : null;
+
+                if (awal && tanggalItem < awal) return false;
+                if (akhir && tanggalItem > akhir) return false;
+
+                return true;
+            });
         },
     },
 };

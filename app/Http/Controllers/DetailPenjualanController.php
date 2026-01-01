@@ -22,8 +22,8 @@ class DetailPenjualanController extends Controller
 
 public function barangTerlaris(Request $request)
 {
-    $bulan = $request->bulan;
-    $tahun = $request->tahun;
+    $bulan = (int) $request->bulan;   // 🔥 FIX
+    $tahun = (int) $request->tahun;   // 🔥 FIX
 
     $data = DetailPenjualan::join('barang', 'barang.id', '=', 'detail_penjualan.id_barang')
         ->join('penjualan', 'penjualan.id', '=', 'detail_penjualan.id_penjualan')
@@ -33,9 +33,9 @@ public function barangTerlaris(Request $request)
             DB::raw('SUM(detail_penjualan.jumlah) as total_terjual'),
             DB::raw('SUM(detail_penjualan.total) as total_pendapatan')
         )
-        ->whereMonth('penjualan.created_at', $bulan) // ✅ FIX
-        ->whereYear('penjualan.created_at', $tahun) // ✅ FIX
-        ->groupBy('barang.nama_barang')
+        ->whereMonth('penjualan.created_at', $bulan)
+        ->whereYear('penjualan.created_at', $tahun)
+        ->groupBy('detail_penjualan.id_barang', 'barang.nama_barang') // 🔥 FIX GROUP
         ->orderByDesc('total_terjual')
         ->get();
 
@@ -44,6 +44,7 @@ public function barangTerlaris(Request $request)
         'data' => $data
     ]);
 }
+
 
 
 
