@@ -59,6 +59,7 @@
                             <th class="border px-4 py-2">Email</th>
                             <th class="border px-4 py-2">No. Telepon</th>
                             <th class="border px-4 py-2">Nama Pengguna</th>
+                            <th class="border px-4 py-2">Status</th>
                             <th class="border px-4 py-2">Aksi</th>
                         </tr>
                     </thead>
@@ -95,6 +96,55 @@
                             <td class="border px-4 py-2">
                                 {{ karyawan.nama_pengguna }}
                             </td>
+                            <td class="border px-6 py-2 text-center">
+                                <div
+                                    class="flex justify-center items-center gap-2"
+                                >
+                                    <label
+                                        class="inline-flex items-center cursor-pointer"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            class="sr-only"
+                                            :checked="
+                                                karyawan.status === 'aktif'
+                                            "
+                                            @change="toggleStatus(karyawan)"
+                                        />
+
+                                        <!-- Switch -->
+                                        <div
+                                            class="w-10 h-5 rounded-full transition relative"
+                                            :class="
+                                                karyawan.status === 'aktif'
+                                                    ? 'bg-green-500'
+                                                    : 'bg-gray-300'
+                                            "
+                                        >
+                                            <div
+                                                class="w-4 h-4 bg-white rounded-full shadow absolute top-0.5 transition"
+                                                :class="
+                                                    karyawan.status === 'aktif'
+                                                        ? 'translate-x-5'
+                                                        : 'translate-x-0.5'
+                                                "
+                                            ></div>
+                                        </div>
+                                    </label>
+
+                                    <span
+                                        class="text-sm font-semibold w-[72px] text-center inline-block"
+                                        :class="
+                                            karyawan.status === 'aktif'
+                                                ? 'text-green-600'
+                                                : 'text-red-600'
+                                        "
+                                    >
+                                        {{ karyawan.status }}
+                                    </span>
+                                </div>
+                            </td>
+
                             <td class="border px-4 py-2">
                                 <div class="flex justify-center gap-2">
                                     <button
@@ -255,6 +305,29 @@ export default {
         this.fetchKaryawan();
     },
     methods: {
+        async toggleStatus(karyawan) {
+            if (!karyawan || !karyawan.status) return;
+
+            // Cegah nonaktif pemilik toko
+            if (karyawan.role === "pemilik_toko") {
+                alert("Pemilik toko tidak bisa dinonaktifkan");
+                return;
+            }
+
+            const statusBaru =
+                karyawan.status === "aktif" ? "nonaktif" : "aktif";
+
+            try {
+                await axios.patch(`/api/pengguna/${karyawan.id}/${statusBaru}`);
+
+                // Update UI langsung
+                karyawan.status = statusBaru;
+            } catch (error) {
+                console.error(error);
+                alert("Gagal mengubah status karyawan");
+            }
+        },
+
         bukaTambahKaryawan() {
             console.log("Tombol diklik"); // 🔍 DEBUG
             this.showTambahModal = true;

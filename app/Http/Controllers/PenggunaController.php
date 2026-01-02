@@ -26,6 +26,14 @@ class PenggunaController extends Controller
                     'message' => 'Nama pengguna tidak ditemukan'
                 ], 404);
             }
+            
+            //Cek status
+             if ($user->status !== 'aktif') {
+        return response()->json([
+            'success' => false,
+            'message' => 'Akun Anda nonaktif. Silakan hubungi pemilik toko.'
+        ], 403);
+    }
 
             if (!Hash::check($request->kata_sandi, $user->kata_sandi)) {
                 return response()->json([
@@ -245,4 +253,31 @@ public function update(Request $request, $id)
             'message' => 'Pengguna berhasil dihapus'
         ]);
     }
+
+
+    // ============================
+    // STATUS
+    // ============================
+    public function nonaktif($id)
+{
+    $pengguna = Pengguna::findOrFail($id);
+    $pengguna->status = 'nonaktif';
+    $pengguna->save();
+
+    return response()->json([
+        'message' => 'Pengguna berhasil dinonaktifkan'
+    ]);
+}
+
+public function aktif($id)
+{
+    $pengguna = Pengguna::findOrFail($id);
+    $pengguna->status = 'aktif';
+    $pengguna->save();
+
+    return response()->json([
+        'message' => 'Pengguna berhasil diaktifkan'
+    ]);
+}
+
 }

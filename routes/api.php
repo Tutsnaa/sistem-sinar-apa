@@ -14,12 +14,14 @@ use App\Http\Controllers\DetailPenjualanController;
 Route::post('/login', [PenggunaController::class, 'login']);
 
 // CRUD Pengguna
-
 Route::get('/pengguna', [PenggunaController::class, 'view']);
 Route::get('/pengguna/{id}', [PenggunaController::class, 'show']);
 Route::post('/pengguna', [PenggunaController::class, 'create']);
 Route::put('/pengguna/{id}', [PenggunaController::class, 'update']);
 Route::delete('/pengguna/{id}', [PenggunaController::class, 'delete']);
+//STATUS
+Route::patch('/pengguna/{id}/nonaktif', [PenggunaController::class, 'nonaktif']);
+Route::patch('/pengguna/{id}/aktif', [PenggunaController::class, 'aktif']);
 
 // Karyawan
 Route::get('/karyawan', [PenggunaController::class, 'viewKaryawan']);
