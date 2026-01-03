@@ -107,15 +107,15 @@
                     <button
                         type="button"
                         @click="$emit('close')"
-                        class="px-4 py-2 border rounded"
+                        class="px-4 py-2 border rounded bg-gray-300 hover:bg-gray-400"
                     >
                         Batal
                     </button>
                     <button
                         type="submit"
-                        class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+                        class="bg-[#3674B5] text-white hover:bg-[#2C5F9E] px-4 py-2 rounded"
                     >
-                        Update
+                        Simpan
                     </button>
                 </div>
             </form>

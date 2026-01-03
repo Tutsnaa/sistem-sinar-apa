@@ -98,14 +98,14 @@
             <div class="flex justify-end gap-3 mt-4">
                 <button
                     @click="downloadInvoice"
-                    class="bg-blue-600 text-white px-4 py-2 rounded"
+                    class="bg-[#3674B5] text-white hover:bg-[#2C5F9E] px-4 py-2 rounded"
                 >
-                    Download
+                    Unduh
                 </button>
 
                 <button
                     @click="showInvoice = false"
-                    class="bg-gray-300 px-4 py-2 rounded"
+                    class="bg-gray-400 text-white hover:bg-gray-500 px-4 py-2 rounded"
                 >
                     Tutup
                 </button>

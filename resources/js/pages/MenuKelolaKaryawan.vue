@@ -257,13 +257,13 @@
             <div class="flex justify-end gap-2 mt-6">
                 <button
                     @click="showEditModal = false"
-                    class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400"
+                    class="bg-gray-400 text-white hover:bg-gray-500 px-4 py-2 rounded"
                 >
                     Batal
                 </button>
                 <button
                     @click="updateKaryawan"
-                    class="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+                    class="bg-[#3674B5] text-white hover:bg-[#2C5F9E] px-4 py-2 rounded"
                 >
                     Simpan
                 </button>

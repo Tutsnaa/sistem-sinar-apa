@@ -22,7 +22,7 @@
             </div>
         </nav>
         <div
-            class="flex flex-wrap justify-center gap-4 max-w-6xl mx-auto mt-3 px-4"
+            class="flex flex-wrap justify-center gap-4 max-w-6xl mx-auto mt-5 px-4"
         >
             <div
                 @click="$router.push('/menu-penjualan')"
