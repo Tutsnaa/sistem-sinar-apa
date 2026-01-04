@@ -1,0 +1,13 @@
+//TEMPLATE WARNA TOMBOL:
+Batal
+bg-gray-400 text-white hover:bg-gray-500
+
+Simpan
+bg-[#3674B5] text-white hover:bg-[#2C5F9E]
+
+Hapus
+bg-[#DC3545] text-white hover:bg-[#B02A37]
+
+Ubah
+bg-yellow-500 text-white hover:bg-yellow-600
+

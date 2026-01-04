@@ -140,47 +140,167 @@
     <!-- POPUP INVOICE -->
     <div
         v-if="showInvoice"
-        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+        class="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
     >
-        <div class="bg-white w-[400px] rounded-lg shadow-lg p-6">
-            <h2 class="text-xl font-bold mb-2 text-center">INVOICE</h2>
+        <div class="bg-white shadow-lg flex">
+            <!-- INVOICE -->
+            <div class="p-4">
+                <div class="w-[280px] border text-black font-mono">
+                    <!-- HEADER -->
+                    <div class="text-center p-2">
+                        <div class="font-bold text-sm">TOKO SINAR APA</div>
+                        <div class="text-[10px] leading-tight">
+                            Jl. Krisna, Mas, Kecamatan Ubud
+                        </div>
+                        <div class="text-[10px] pt-1 leading-tight">
+                            Telp: (0361) 123456 | 0812-3456-789
+                        </div>
+                    </div>
 
-            <p><b>ID:</b> {{ invoiceData.id_penjualan }}</p>
-            <p><b>Tanggal:</b> {{ invoiceData.tanggal }}</p>
-            <p><b>Kasir:</b> {{ invoiceData.kasir }}</p>
-            <p><b>Pelanggan:</b> {{ invoiceData.pelanggan }}</p>
+                    <hr class="border-black w-[95%] mx-auto" />
 
-            <hr class="my-3" />
+                    <!-- INFO -->
+                    <div class="text-[11px] p-2 space-y-0.5">
+                        <div class="flex">
+                            <span class="w-[80px]">No.Invoice</span>
+                            <span>: {{ invoiceData.id_penjualan }}</span>
+                        </div>
+                        <div class="flex">
+                            <span class="w-[80px]">Tanggal</span>
+                            <span>: {{ invoiceData.tanggal }}</span>
+                        </div>
+                        <div class="flex">
+                            <span class="w-[80px]">Kasir</span>
+                            <span>: {{ invoiceData.kasir }}</span>
+                        </div>
+                        <div class="flex">
+                            <span class="w-[80px]">Pelanggan</span>
+                            <span>: {{ invoiceData.pelanggan }}</span>
+                        </div>
+                    </div>
 
-            <div
-                v-for="item in invoiceData.items"
-                :key="item.id_barang"
-                class="flex justify-between text-sm"
-            >
-                <span>{{ item.nama }} x{{ item.jumlah }}</span>
-                <span>Rp {{ item.harga * item.jumlah }}</span>
+                    <hr class="border-black w-[95%] mx-auto" />
+
+                    <!-- ITEM HEADER -->
+                    <div class="text-[11px] p-2">
+                        <div
+                            class="grid grid-cols-[minmax(0,1fr)_40px_55px_55px] font-bold"
+                        >
+                            <div>Nama</div>
+                            <div class="text-right">Jumlah</div>
+                            <div class="text-right">Harga</div>
+                            <div class="text-right">Total</div>
+                        </div>
+                    </div>
+
+                    <!-- ITEM DATA -->
+                    <div class="text-[11px] px-2 space-y-0.5">
+                        <div
+                            v-for="item in invoiceData.items"
+                            :key="item.id_barang"
+                            class="grid grid-cols-[minmax(0,1fr)_40px_55px_55px]"
+                        >
+                            <!-- NAMA BARANG -->
+                            <div
+                                class="whitespace-normal break-words leading-tight"
+                            >
+                                {{ item.nama }}
+                            </div>
+
+                            <!-- QTY -->
+                            <div class="text-center">
+                                {{ item.jumlah }}
+                            </div>
+
+                            <!-- HARGA -->
+                            <div class="text-right">
+                                {{ Number(item.harga).toLocaleString("id-ID") }}
+                            </div>
+
+                            <!-- TOTAL -->
+                            <div class="text-right font-medium">
+                                {{
+                                    (item.harga * item.jumlah).toLocaleString(
+                                        "id-ID"
+                                    )
+                                }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="border-black my-1 w-[95%] mx-auto" />
+
+                    <!-- TOTAL -->
+                    <div class="text-[11px] p-2 space-y-0.5">
+                        <div class="flex">
+                            <span class="w-[80px]">Total</span>
+
+                            <span class="ml-auto text-right w-[70px]">
+                                {{ invoiceData.total.toLocaleString("id-ID") }}
+                            </span>
+                        </div>
+
+                        <div class="flex">
+                            <span class="w-[80px]">Bayar</span>
+
+                            <span class="ml-auto text-right w-[70px]">
+                                {{ invoiceData.bayar.toLocaleString("id-ID") }}
+                            </span>
+                        </div>
+
+                        <div class="flex font-bold">
+                            <span class="w-[80px]">Kembalian</span>
+
+                            <span class="ml-auto text-right w-[70px]">
+                                {{
+                                    invoiceData.kembalian.toLocaleString(
+                                        "id-ID"
+                                    )
+                                }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <hr class="border-black w-[95%] mx-auto" />
+
+                    <!-- FOOTER -->
+                    <div class="text-center text-[10px] p-2 space-y-1">
+                        <div>
+                            Barang yang sudah dibeli tidak dapat dikembalikan.
+                        </div>
+                        <div>
+                            Terima kasih telah berbelanja di Toko Sinar Apa!
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <hr class="my-3" />
+            <!-- PANEL AKSI -->
+            <div
+                class="w-[200px] p-4 flex flex-col justify-between bg-gray-50 border-l"
+            >
+                <div>
+                    <h3 class="font-semibold text-sm mb-2">Aksi Invoice</h3>
+                    <p class="text-xs text-gray-500">
+                        Pilih tindakan untuk invoice ini
+                    </p>
+                </div>
 
-            <p><b>Total:</b> Rp {{ invoiceData.total }}</p>
-            <p><b>Bayar:</b> Rp {{ invoiceData.bayar }}</p>
-            <p><b>Kembalian:</b> Rp {{ invoiceData.kembalian }}</p>
+                <div class="flex flex-col gap-2">
+                    <button
+                        @click="downloadInvoice()"
+                        class="bg-[#3674B5] text-white hover:bg-[#2C5F9E] text-sm py-2 rounded"
+                    >
+                        Unduh
+                    </button>
 
-            <div class="flex justify-end gap-3 mt-4">
-                <button
-                    @click="downloadInvoice"
-                    class="bg-[#3674B5] text-white hover:bg-[#2C5F9E] px-4 py-2 rounded"
-                >
-                    Unduh
-                </button>
-
-                <button
-                    @click="showInvoice = false"
-                    class="bg-gray-400 text-white hover:bg-gray-500 px-4 py-2 rounded"
-                >
-                    Tutup
-                </button>
+                    <button
+                        @click="showInvoice = false"
+                        class="bg-gray-400 text-white text-sm py-2 rounded hover:bg-gray-500"
+                    >
+                        Tutup
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -246,6 +366,9 @@ export default {
     },
 
     methods: {
+        // printInvoice() {
+        //     window.print();
+        // },
         async lihatInvoice(id) {
             try {
                 const res = await axios.get(`/api/penjualan/${id}`);
@@ -382,12 +505,11 @@ export default {
             doc.line(5, y, 75, y);
             y += lineHeight;
 
-            // Catatan
+            // Catatan (rata tengah)
             doc.setFontSize(7);
-            doc.text("Catatan:", 5, y);
-            y += lineHeight;
+
             noteLines.forEach((line) => {
-                doc.text(line, 5, y);
+                doc.text(line, 40, y, { align: "center" });
                 y += lineHeight;
             });
 
