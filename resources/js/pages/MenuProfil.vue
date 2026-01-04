@@ -33,7 +33,7 @@
                     />
                     <div
                         v-else
-                        class="w-full h-[320px] bg-gray-200 border-2 border-gray-300 rounded-lg flex items-center justify-center mb-4"
+                        class="w-full h-80 bg-gray-200 border-2 border-gray-300 rounded-lg flex items-center justify-center mb-4"
                     >
                         <span class="text-gray-600">No Foto</span>
                     </div>

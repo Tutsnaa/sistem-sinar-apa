@@ -68,47 +68,167 @@
     <!-- POPUP INVOICE -->
     <div
         v-if="showInvoice"
-        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+        class="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
     >
-        <div class="bg-white w-[400px] rounded-lg shadow-lg p-6">
-            <h2 class="text-xl font-bold mb-2 text-center">INVOICE</h2>
+        <div class="bg-white shadow-lg flex">
+            <!-- INVOICE -->
+            <div class="p-4">
+                <div class="w-[280px] border text-black font-mono">
+                    <!-- HEADER -->
+                    <div class="text-center p-5">
+                        <div class="font-bold text-sm">TOKO SINAR APA</div>
+                        <div class="text-[10px] leading-tight">
+                            Jl. Krisna, Mas, Kecamatan Ubud
+                        </div>
+                        <div class="text-[10px] pt-1 leading-tight">
+                            Telp: (0361) 123456 | 0812-3456-789
+                        </div>
+                    </div>
 
-            <p><b>ID:</b> {{ invoiceData.id_penjualan }}</p>
-            <p><b>Tanggal:</b> {{ invoiceData.tanggal }}</p>
-            <p><b>Kasir:</b> {{ invoiceData.kasir }}</p>
-            <p><b>Pelanggan:</b> {{ invoiceData.pelanggan }}</p>
+                    <hr class="border-black w-[95%] mx-auto" />
 
-            <hr class="my-3" />
+                    <!-- INFO -->
+                    <div class="text-[11px] p-2 space-y-0.5">
+                        <div class="flex">
+                            <span class="w-20">No.Invoice</span>
+                            <span>: {{ invoiceData.id_penjualan }}</span>
+                        </div>
+                        <div class="flex">
+                            <span class="w-20">Tanggal</span>
+                            <span>: {{ invoiceData.tanggal }}</span>
+                        </div>
+                        <div class="flex">
+                            <span class="w-20">Kasir</span>
+                            <span>: {{ invoiceData.kasir }}</span>
+                        </div>
+                        <div class="flex">
+                            <span class="w-20">Pelanggan</span>
+                            <span>: {{ invoiceData.pelanggan }}</span>
+                        </div>
+                    </div>
 
-            <div
-                v-for="item in invoiceData.items"
-                :key="item.id_barang"
-                class="flex justify-between text-sm"
-            >
-                <span>{{ item.nama }} x{{ item.jumlah }}</span>
-                <span>Rp {{ item.harga * item.jumlah }}</span>
+                    <hr class="border-black w-[95%] mx-auto" />
+
+                    <!-- ITEM HEADER -->
+                    <div class="text-[11px] p-2">
+                        <div
+                            class="grid grid-cols-[minmax(0,1fr)_40px_55px_55px] font-bold"
+                        >
+                            <div>Nama</div>
+                            <div class="text-right">Jumlah</div>
+                            <div class="text-right">Harga</div>
+                            <div class="text-right">Total</div>
+                        </div>
+                    </div>
+
+                    <!-- ITEM DATA -->
+                    <div class="text-[11px] px-2 space-y-0.5">
+                        <div
+                            v-for="item in invoiceData.items"
+                            :key="item.id_barang"
+                            class="grid grid-cols-[minmax(0,1fr)_40px_55px_55px]"
+                        >
+                            <!-- NAMA BARANG -->
+                            <div
+                                class="whitespace-normal wrap-break-words leading-tight"
+                            >
+                                {{ item.nama }}
+                            </div>
+
+                            <!-- Jumlah -->
+                            <div class="text-center">
+                                {{ item.jumlah }}
+                            </div>
+
+                            <!-- HARGA -->
+                            <div class="text-right">
+                                {{ Number(item.harga).toLocaleString("id-ID") }}
+                            </div>
+
+                            <!-- TOTAL -->
+                            <div class="text-right font-medium">
+                                {{
+                                    (item.harga * item.jumlah).toLocaleString(
+                                        "id-ID"
+                                    )
+                                }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="border-black my-1 w-[95%] mx-auto" />
+
+                    <!-- TOTAL -->
+                    <div class="text-[11px] p-2 space-y-0.5">
+                        <div class="flex">
+                            <span class="w-20">Subtotal</span>
+
+                            <span class="ml-auto text-right w-[70px]">
+                                {{ invoiceData.total.toLocaleString("id-ID") }}
+                            </span>
+                        </div>
+
+                        <div class="flex">
+                            <span class="w-20">Bayar</span>
+
+                            <span class="ml-auto text-right w-[70px]">
+                                {{ invoiceData.bayar.toLocaleString("id-ID") }}
+                            </span>
+                        </div>
+
+                        <div class="flex font-bold">
+                            <span class="w-20">Kembalian</span>
+
+                            <span class="ml-auto text-right w-[70px]">
+                                {{
+                                    invoiceData.kembalian.toLocaleString(
+                                        "id-ID"
+                                    )
+                                }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <hr class="border-black w-[95%] mx-auto" />
+
+                    <!-- FOOTER -->
+                    <div class="text-center text-[10px] p-2 space-y-1">
+                        <div>
+                            Barang yang sudah dibeli tidak dapat dikembalikan.
+                        </div>
+                        <div>
+                            Terima kasih telah berbelanja di Toko Sinar Apa!
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <hr class="my-3" />
+            <!-- PANEL AKSI -->
+            <div
+                class="w-[200px] p-4 flex flex-col justify-between bg-gray-50 border-l"
+            >
+                <div>
+                    <h3 class="font-semibold text-sm mb-2">Aksi Invoice</h3>
+                    <p class="text-xs text-gray-500">
+                        Pilih tindakan untuk invoice ini
+                    </p>
+                </div>
 
-            <p><b>Total:</b> Rp {{ invoiceData.total }}</p>
-            <p><b>Bayar:</b> Rp {{ invoiceData.bayar }}</p>
-            <p><b>Kembalian:</b> Rp {{ invoiceData.kembalian }}</p>
+                <div class="flex flex-col gap-2">
+                    <button
+                        @click="downloadInvoice()"
+                        class="bg-[#3674B5] text-white hover:bg-[#2C5F9E] text-sm py-2 rounded"
+                    >
+                        Unduh
+                    </button>
 
-            <div class="flex justify-end gap-3 mt-4">
-                <button
-                    @click="downloadInvoice"
-                    class="bg-[#3674B5] text-white hover:bg-[#2C5F9E] px-4 py-2 rounded"
-                >
-                    Unduh
-                </button>
-
-                <button
-                    @click="showInvoice = false"
-                    class="bg-gray-400 text-white hover:bg-gray-500 px-4 py-2 rounded"
-                >
-                    Tutup
-                </button>
+                    <button
+                        @click="showInvoice = false"
+                        class="bg-gray-400 text-white text-sm py-2 rounded hover:bg-gray-500"
+                    >
+                        Tutup
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -263,16 +383,19 @@ export default {
                     tanggal: this.tanggal,
                     kasir: this.nama,
                     pelanggan: this.namapelanggan,
-                    items: [...this.daftarPembelian], // 🔥 penting clone
+                    items: [...this.daftarPembelian], // clone supaya reactive
                     total: this.totalHarga,
                     bayar: payloadChild.bayar,
                     kembalian: payloadChild.bayar - this.totalHarga,
                 };
 
-                // ===== LANGSUNG CETAK =====
-                this.$nextTick(() => {
-                    this.downloadInvoice();
-                });
+                // ===== TAMPILKAN POPUP INVOICE =====
+                this.showInvoice = true;
+
+                // ===== OPSIONAL: jika ingin download otomatis setelah popup muncul =====
+                // this.$nextTick(() => {
+                //     this.downloadInvoice();
+                // });
 
                 // ===== RESET FORM =====
                 this.daftarPembelian = [];
@@ -290,132 +413,163 @@ export default {
             const d = this.invoiceData;
             const lineHeight = 5;
 
-            // Catatan invoice
+            // =====================
+            // PENGATURAN GLOBAL
+            // =====================
+            const pageWidth = 80;
+            const paddingX = 6; // 🔥 ATUR KIRI–KANAN DI SINI
+            const rightX = pageWidth - paddingX;
+
             const noteLines = [
                 "Barang yang sudah dibeli tidak dapat dikembalikan.",
                 "Terima kasih telah berbelanja di Toko Sinar Apa!",
             ];
 
-            // Hitung jumlah baris untuk menentukan tinggi kertas
-            const numHeaderLines = 8; // judul, alamat, telp, garis, info invoice, pelanggan
-            const numItemLines = d.items.length + 1; // header tabel + items
-            const numSummaryLines = 3; // Total, Bayar, Kembalian
-            const numNoteLines = noteLines.length + 1; // +1 untuk judul "Catatan:"
-            const extraBottomMargin = 20; // Jarak ekstra di bawah agar lebih panjang
-            const totalLines =
-                numHeaderLines + numItemLines + numSummaryLines + numNoteLines;
-
-            const pageHeight = totalLines * lineHeight + extraBottomMargin; // panjang kertas otomatis
+            const pageHeight =
+                (10 + d.items.length * 1.5 + 12) * lineHeight + 20;
 
             const doc = new jsPDF({
                 unit: "mm",
-                format: [80, pageHeight], // lebar 80mm, panjang sesuai isi + margin bawah
+                format: [pageWidth, pageHeight],
             });
 
-            let y = 5; // posisi vertikal awal
+            // =====================
+            // POSISI ATAS
+            // =====================
+            let y = 10; // 🔥 ATUR ATAS DI SINI
 
-            // Header Toko
-            doc.setFont("helvetica", "bold");
+            // =====================
+            // FONT (MONO)
+            // =====================
+            doc.setFont("courier");
+
+            // =====================
+            // HEADER
+            // =====================
             doc.setFontSize(10);
-            doc.text("TOKO SINAR APA", 40, y, { align: "center" });
+            doc.setFont(undefined, "bold");
+            doc.text("TOKO SINAR APA", pageWidth / 2, y, { align: "center" });
             y += lineHeight;
 
-            doc.setFont("helvetica", "normal");
             doc.setFontSize(8);
-            doc.text("Jl. Krisna, Mas, Kecamatan Ubud", 40, y, {
+            doc.setFont(undefined, "normal");
+            doc.text("Jl. Krisna, Mas, Kecamatan Ubud", pageWidth / 2, y, {
                 align: "center",
             });
             y += lineHeight;
-            doc.text("Telp: (0361) 123456 | 0812-3456-789", 40, y, {
+            doc.text("Telp: (0361) 123456 | 0812-3456-789", pageWidth / 2, y, {
                 align: "center",
             });
             y += lineHeight;
-            doc.line(5, y, 75, y);
+
+            doc.line(paddingX, y, rightX, y);
             y += lineHeight;
 
-            // Info Invoice
-            doc.text("No.Invoice      :", 5, y);
-            doc.text(String(d.id_penjualan), 28, y);
-            y += lineHeight;
-            doc.text("Tanggal          :", 5, y);
-            doc.text(d.tanggal, 28, y);
-            y += lineHeight;
-            doc.text("Kasir               :", 5, y);
-            doc.text(d.kasir, 28, y);
+            // =====================
+            // INFO INVOICE
+            // =====================
+            doc.setFontSize(8);
+
+            const info = [
+                ["No.Invoice", d.id_penjualan],
+                ["Tanggal", d.tanggal],
+                ["Kasir", d.kasir],
+                ["Pelanggan", d.pelanggan],
+            ];
+
+            info.forEach(([label, value]) => {
+                doc.text(label, paddingX, y);
+                doc.text(`: ${value}`, paddingX + 24, y);
+                y += lineHeight;
+            });
+
+            doc.line(paddingX, y, rightX, y);
             y += lineHeight;
 
-            // Info Pelanggan
-            doc.text("Pelanggan      :", 5, y);
-            doc.text(d.pelanggan, 28, y);
+            // =====================
+            // HEADER ITEM
+            // =====================
+            doc.setFont(undefined, "bold");
+            doc.text("Nama", paddingX, y);
+            doc.text("Jumlah", paddingX + 34, y, { align: "center" });
+            doc.text("Harga", paddingX + 52, y, { align: "right" });
+            doc.text("Total", rightX, y, { align: "right" });
             y += lineHeight;
 
-            doc.line(5, y, 75, y);
-            y += lineHeight;
+            doc.setFont(undefined, "normal");
 
-            // Header tabel
-            doc.setFont("helvetica", "bold");
-            doc.text("Nama", 5, y);
-            doc.text("Jumlah", 35, y);
-            doc.text("Harga", 50, y);
-            doc.text("Total", 75, y, { align: "right" });
-            y += lineHeight;
-            doc.setFont("helvetica", "normal");
+            const format = (n) => Number(n).toLocaleString("id-ID");
 
-            // Fungsi format angka
-            const formatNumber = (n) => Number(n).toLocaleString("id-ID");
-
-            // Items
+            // =====================
+            // DATA ITEM
+            // =====================
             d.items.forEach((item) => {
-                doc.text(item.nama, 5, y);
-                doc.text(String(item.jumlah), 35, y);
-                doc.text(formatNumber(item.harga), 50, y);
-                doc.text(formatNumber(item.harga * item.jumlah), 75, y, {
-                    align: "right",
+                const namaLines = doc.splitTextToSize(item.nama, 32);
+
+                namaLines.forEach((line, index) => {
+                    doc.text(line, paddingX, y);
+
+                    if (index === 0) {
+                        doc.text(String(item.jumlah), paddingX + 34, y, {
+                            align: "center",
+                        });
+                        doc.text(format(item.harga), paddingX + 52, y, {
+                            align: "right",
+                        });
+                        doc.text(format(item.harga * item.jumlah), rightX, y, {
+                            align: "right",
+                        });
+                    }
+
+                    y += lineHeight;
                 });
+            });
+
+            doc.line(paddingX, y, rightX, y);
+            y += lineHeight;
+
+            // =====================
+            // TOTAL
+            // =====================
+            const summary = [
+                ["Subtotal", d.total],
+                ["Bayar", d.bayar],
+                ["Kembalian", d.kembalian],
+            ];
+
+            summary.forEach(([label, value], i) => {
+                if (i === 2) doc.setFont(undefined, "bold");
+
+                doc.text(label, paddingX, y);
+                doc.text(format(value), rightX, y, { align: "right" });
                 y += lineHeight;
             });
 
-            doc.line(5, y, 75, y);
+            doc.setFont(undefined, "normal");
+
+            doc.line(paddingX, y, rightX, y);
             y += lineHeight;
 
-            const rightX = 75; // posisi angka paling kanan
-            const labelX = 5;
-            const labelWidth = 35;
-
-            // Ringkasan pembayaran
-            function writeLabelValue(label, value) {
-                doc.text(label, labelX + labelWidth, y, { align: "left" });
-                doc.text(formatNumber(value), rightX, y, { align: "right" });
-                y += lineHeight;
-            }
-
-            writeLabelValue("Total         :", d.total);
-            writeLabelValue("Bayar        :", d.bayar);
-            writeLabelValue("Kembalian :", d.kembalian);
-
-            doc.line(5, y, 75, y);
-            y += lineHeight;
-
-            // Catatan
+            // =====================
+            // FOOTER
+            // =====================
             doc.setFontSize(7);
-            doc.text("Catatan:", 5, y);
-            y += lineHeight;
+
+            // maksimal lebar = pageWidth - 2 * paddingX
+            const maxWidth = pageWidth - 2 * paddingX;
+
             noteLines.forEach((line) => {
-                doc.text(line, 5, y);
-                y += lineHeight;
+                // split teks agar tidak melewati kiri-kanan
+                const lines = doc.splitTextToSize(line, maxWidth);
+
+                lines.forEach((l) => {
+                    // center setiap baris di tengah kertas
+                    doc.text(l, pageWidth / 2, y, { align: "center" });
+                    y += lineHeight;
+                });
             });
 
-            // Margin bawah tambahan supaya catatan tidak menempel di batas kertas
-            y += extraBottomMargin;
-
-            // doc.save(`Invoice_${d.id_penjualan}.pdf`);
-
-            // langsung tampilkan dialog print
-            doc.autoPrint();
-
-            // buka PDF di tab baru
-            const blobUrl = doc.output("bloburl");
-            window.open(blobUrl, "_blank");
+            doc.save(`Invoice_${d.id_penjualan}.pdf`);
         },
     },
 };
