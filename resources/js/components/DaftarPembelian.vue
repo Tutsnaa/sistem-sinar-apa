@@ -89,11 +89,11 @@
 
         <!-- BLOK BAWAH (NEMPEL BAWAH) -->
         <div
-            class="flex flex-col md:flex-row justify-between gap-4 mt-auto pt-4"
+            class="flex flex-col md:flex-row justify-between gap-2 mt-auto pt-4"
         >
             <!-- Total -->
             <div class="flex items-center gap-2">
-                <span class="font-bold">Total:</span>
+                <span class="font-bold">Subtotal:</span>
                 <span
                     class="flex items-center text-xl border px-2 py-1 rounded w-60 h-20"
                 >

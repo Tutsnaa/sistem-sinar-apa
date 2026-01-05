@@ -145,7 +145,7 @@
         <div class="bg-white shadow-lg flex">
             <!-- INVOICE -->
             <div class="p-4">
-                <div class="w-[280px] border text-black font-mono">
+                <div class="w-[290px] border text-black font-mono p-3">
                     <!-- HEADER -->
                     <div class="text-center p-5">
                         <div class="font-bold text-sm">TOKO SINAR APA</div>
@@ -156,8 +156,11 @@
                             Telp: (0361) 123456 | 0812-3456-789
                         </div>
                     </div>
+                    <hr class="border-black border-dashed w-[95%] mx-auto" />
 
-                    <hr class="border-black w-[95%] mx-auto" />
+                    <hr
+                        class="border-black border-dashed my-1 w-[95%] mx-auto"
+                    />
 
                     <!-- INFO -->
                     <div class="text-[11px] p-2 space-y-0.5">
@@ -179,7 +182,7 @@
                         </div>
                     </div>
 
-                    <hr class="border-black w-[95%] mx-auto" />
+                    <hr class="border-black border-dashed w-[95%] mx-auto" />
 
                     <!-- ITEM HEADER -->
                     <div class="text-[11px] p-2">
@@ -228,7 +231,9 @@
                         </div>
                     </div>
 
-                    <hr class="border-black my-1 w-[95%] mx-auto" />
+                    <hr
+                        class="border-black border-dashed my-1 w-[95%] mx-auto"
+                    />
 
                     <!-- TOTAL -->
                     <div class="text-[11px] p-2 space-y-0.5">
@@ -261,7 +266,7 @@
                         </div>
                     </div>
 
-                    <hr class="border-black w-[95%] mx-auto" />
+                    <hr class="border-black border-dashed w-[95%] mx-auto" />
 
                     <!-- FOOTER -->
                     <div class="text-center text-[10px] p-2 space-y-1">
@@ -422,7 +427,7 @@ export default {
             // =====================
             // POSISI ATAS
             // =====================
-            let y = 10; // 🔥 ATUR ATAS DI SINI
+            let y = 10;
 
             // =====================
             // FONT (MONO)
@@ -430,11 +435,17 @@ export default {
             doc.setFont("courier");
 
             // =====================
+            // GARIS PUTUS-PUTUS
+            // =====================
+            doc.setLineDash([0.7, 0.4]);
+
+            // =====================
             // HEADER
             // =====================
             doc.setFontSize(10);
             doc.setFont(undefined, "bold");
             doc.text("TOKO SINAR APA", pageWidth / 2, y, { align: "center" });
+
             y += lineHeight;
 
             doc.setFontSize(8);
@@ -448,7 +459,12 @@ export default {
             });
             y += lineHeight;
 
+            const lineGap = 1;
             doc.line(paddingX, y, rightX, y);
+            y += lineGap;
+            doc.line(paddingX, y, rightX, y);
+            y += lineGap;
+
             y += lineHeight;
 
             // =====================
@@ -480,6 +496,13 @@ export default {
             doc.text("Jumlah", paddingX + 34, y, { align: "center" });
             doc.text("Harga", paddingX + 52, y, { align: "right" });
             doc.text("Total", rightX, y, { align: "right" });
+
+            const textOffset = 3; // jarak kecil dari garis ke teks
+
+            y += textOffset;
+
+            doc.line(paddingX, y, rightX, y);
+            y += lineGap;
             y += lineHeight;
 
             doc.setFont(undefined, "normal");
@@ -534,6 +557,10 @@ export default {
             doc.setFont(undefined, "normal");
 
             doc.line(paddingX, y, rightX, y);
+            y += lineGap;
+            doc.line(paddingX, y, rightX, y);
+            y += lineGap;
+
             y += lineHeight;
 
             // =====================

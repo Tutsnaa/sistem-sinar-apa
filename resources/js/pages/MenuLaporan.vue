@@ -26,25 +26,24 @@
             </div>
         </nav>
 
-        <!-- Filter Bulan -->
-        <div class="bg-white p-4 rounded shadow mb-6 max-w-md">
-            <label class="block mb-2 font-semibold text-gray-700">
-                Pilih Bulan
-            </label>
-            <input
-                type="month"
-                v-model="periode"
-                @change="ambilLaporan"
-                class="border px-3 py-2 rounded w-full"
-            />
-        </div>
-
         <!-- Grafik Barang Terlaris -->
         <div class="bg-white p-4 rounded shadow mb-6">
+            <!-- Filter Bulan -->
+            <div class="mb-6">
+                <label class="block text-lg font-semibold mb-3">
+                    Pilih Bulan
+                </label>
+                <input
+                    type="month"
+                    v-model="periode"
+                    @change="ambilLaporan"
+                    class="border px-8 py-2 rounded max-w-md"
+                />
+            </div>
             <h2 class="text-lg font-semibold mb-3">Grafik Barang Terlaris</h2>
 
             <!-- Bungkus canvas -->
-            <div class="relative h-80">
+            <div class="relative h-80 w-full">
                 <canvas ref="chartBarang"></canvas>
             </div>
         </div>

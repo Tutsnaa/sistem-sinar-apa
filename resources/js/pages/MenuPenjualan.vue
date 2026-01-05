@@ -73,7 +73,7 @@
         <div class="bg-white shadow-lg flex">
             <!-- INVOICE -->
             <div class="p-4">
-                <div class="w-[280px] border text-black font-mono">
+                <div class="w-[290px] border text-black font-mono p-3">
                     <!-- HEADER -->
                     <div class="text-center p-5">
                         <div class="font-bold text-sm">TOKO SINAR APA</div>
@@ -85,7 +85,11 @@
                         </div>
                     </div>
 
-                    <hr class="border-black w-[95%] mx-auto" />
+                    <hr class="border-black border-dashed w-[95%] mx-auto" />
+
+                    <hr
+                        class="border-black border-dashed my-1 w-[95%] mx-auto"
+                    />
 
                     <!-- INFO -->
                     <div class="text-[11px] p-2 space-y-0.5">
@@ -107,7 +111,7 @@
                         </div>
                     </div>
 
-                    <hr class="border-black w-[95%] mx-auto" />
+                    <hr class="border-black border-dashed w-[95%] mx-auto" />
 
                     <!-- ITEM HEADER -->
                     <div class="text-[11px] p-2">
@@ -156,7 +160,9 @@
                         </div>
                     </div>
 
-                    <hr class="border-black my-1 w-[95%] mx-auto" />
+                    <hr
+                        class="border-black border-dashed my-1 w-[95%] mx-auto"
+                    />
 
                     <!-- TOTAL -->
                     <div class="text-[11px] p-2 space-y-0.5">
@@ -189,7 +195,7 @@
                         </div>
                     </div>
 
-                    <hr class="border-black w-[95%] mx-auto" />
+                    <hr class="border-black border-dashed w-[95%] mx-auto" />
 
                     <!-- FOOTER -->
                     <div class="text-center text-[10px] p-2 space-y-1">
