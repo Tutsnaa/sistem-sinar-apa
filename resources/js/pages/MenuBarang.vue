@@ -100,7 +100,7 @@
                                 <td class="border px-4 py-2">
                                     {{ barang.nama_barang }}
                                 </td>
-                                <td class="border px-4 py-2">
+                                <td class="border px-4 py-2 text-center">
                                     {{ barang.satuan }}
                                 </td>
                                 <td class="border px-4 py-2">
@@ -215,7 +215,7 @@ export default {
                 );
             }
 
-            // 🔼 sorting: status HABIS di atas
+            //sorting: status HABIS di atas
             return data.sort((a, b) => {
                 if (a.status === "habis" && b.status !== "habis") return -1;
                 if (a.status !== "habis" && b.status === "habis") return 1;

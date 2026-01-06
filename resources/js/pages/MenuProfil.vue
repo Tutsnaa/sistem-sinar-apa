@@ -123,8 +123,50 @@
                 </div>
             </div>
         </div>
+        <!-- NOTIFICATION -->
+        <div
+            v-if="toast"
+            class="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-green-500 text-white px-6 py-3 rounded-2xl shadow-2xl animate-slide-down"
+        >
+            <!-- Icon -->
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z"
+                />
+            </svg>
+
+            <span class="font-medium text-sm">
+                {{ toast }}
+            </span>
+        </div>
     </div>
 </template>
+
+<style>
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -20px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+.animate-slide-down {
+    animation: slideDown 0.35s ease-out;
+}
+</style>
 
 <script>
 import axios from "axios";
@@ -143,6 +185,7 @@ export default {
                 nama_pengguna: "",
                 kata_sandi: "",
             },
+            toast: "",
         };
     },
 
@@ -163,6 +206,12 @@ export default {
     },
 
     methods: {
+        showToast(pesan) {
+            this.toast = pesan;
+            setTimeout(() => {
+                this.toast = "";
+            }, 3000);
+        },
         goBack() {
             const role = localStorage.getItem("role");
 
@@ -186,7 +235,7 @@ export default {
                 this.form.no_telepon = user.no_telepon;
                 this.form.nama_pengguna = user.nama_pengguna;
             } catch (error) {
-                alert("Gagal mengambil data profil");
+                this.showToast("Gagal mengambil data profil");
             }
         },
 
@@ -233,7 +282,7 @@ export default {
                 // update tampilan profil
                 this.form.foto = user.foto;
 
-                alert("Data berhasil diperbarui");
+                this.showToast("Data berhasil diperbarui");
                 this.getProfil();
             } catch (error) {
                 if (error.response?.status === 422) {

@@ -75,9 +75,53 @@
                     </template>
                 </MenuBeranda>
             </div>
+            <!-- TOAST SUCCESS -->
+            <div
+                v-if="toast"
+                class="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-green-500 text-white px-6 py-3 rounded-2xl shadow-2xl animate-slide-down"
+            >
+                <!-- ICON CHECK -->
+                <div class="bg-white/20 rounded-full p-1">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-5 h-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M5 13l4 4L19 7"
+                        />
+                    </svg>
+                </div>
+                <!-- NOTIFICATION -->
+                <span class="font-semibold text-sm">
+                    {{ toast }}
+                </span>
+            </div>
         </div>
     </div>
 </template>
+
+<style>
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -20px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+.animate-slide-down {
+    animation: slideDown 0.4s ease-out;
+}
+</style>
 
 <script>
 import MenuBeranda from "../components/MenuBeranda.vue";
@@ -89,6 +133,7 @@ export default {
         return {
             nama: "",
             foto: "",
+            toast: "",
         };
     },
 
@@ -96,6 +141,17 @@ export default {
         const nama = localStorage.getItem("nama");
         const role = localStorage.getItem("role");
         const foto = localStorage.getItem("foto");
+
+        //TOAST
+        const pesan = sessionStorage.getItem("toast_success");
+        if (pesan) {
+            this.toast = pesan;
+            sessionStorage.removeItem("toast_success");
+
+            setTimeout(() => {
+                this.toast = "";
+            }, 3000);
+        }
 
         if (!nama || !role) {
             this.$router.push("/login");

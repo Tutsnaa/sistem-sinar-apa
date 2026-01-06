@@ -19,6 +19,10 @@
                 </span>
             </span>
         </div>
+        <!-- PESAN ERROR -->
+        <p v-if="error" class="text-red-500 text-sm mt-1">
+            {{ error }}
+        </p>
     </div>
 </template>
 
@@ -39,6 +43,10 @@ export default {
             default: "Kata Sandi",
         },
         placeholder: {
+            type: String,
+            default: "",
+        },
+        error: {
             type: String,
             default: "",
         },

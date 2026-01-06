@@ -45,6 +45,9 @@
                 class="w-80 rounded-10px"
                 label="Pelanggan"
                 v-model="namapelanggan"
+                placeholder="Masukkan Nama Pelanggan"
+                @update:modelValue="errorNama = ''"
+                :error="errorNama"
             />
         </div>
 
@@ -267,6 +270,7 @@ export default {
             resetKey: 0,
             showInvoice: false,
             invoiceData: null,
+            errorNama: "",
         };
     },
 
@@ -347,6 +351,14 @@ export default {
         },
 
         async simpanPenjualan(payloadChild) {
+            //ERROR
+            this.errorNama = "";
+
+            if (!this.namapelanggan) {
+                this.errorNama = "Nama pengguna wajib diisi";
+                return;
+            }
+
             const idPengguna = localStorage.getItem("id_pengguna");
 
             if (!idPengguna) {
