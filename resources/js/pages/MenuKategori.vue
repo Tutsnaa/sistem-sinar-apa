@@ -39,6 +39,7 @@
                         @update-kategori="updateKategori"
                         @batal-edit="batalEdit"
                         class="flex-1 max-w-sm"
+                        :error="errorNama"
                     />
 
                     <!-- Input Pencarian -->
@@ -58,6 +59,13 @@
                 />
             </div>
         </div>
+        <!-- PESAN ERROR -->
+        <p
+            v-if="error"
+            class="absolute left-0 top-full mt-0.5 text-[15px] text-red-500 z-50"
+        >
+            {{ error }}
+        </p>
     </div>
 </template>
 
@@ -77,6 +85,7 @@ export default {
             cari: "",
             isEdit: false,
             kategoriEdit: null,
+            errorNama: "",
         };
     },
     computed: {
@@ -114,17 +123,24 @@ export default {
             }
         },
         async tambahKategoriKeDaftar(kategoriBaru) {
+            this.errorNama = "";
+
             try {
                 const response = await axios.post("api/kategori", kategoriBaru);
-                if (response.data.success)
-                    this.daftarKategori.push(response.data.data);
-                console.log(response.data);
+
+                if (response.data.success) {
+                    // tampilkan kategori baru di atas
+                    this.daftarKategori.unshift(response.data.data);
+
+                    this.showToast("Kategori berhasil ditambahkan", "success");
+                }
             } catch (error) {
-                const pesan = error.response?.data?.errors?.nama_kategori
-                    ? error.response.data.errors.nama_kategori[0]
-                    : error.response?.data?.message ||
-                      "Gagal menambahkan kategori!";
-                alert(pesan);
+                const pesan =
+                    error.response?.data?.errors?.nama_kategori?.[0] ||
+                    error.response?.data?.message ||
+                    "Gagal menambahkan kategori!";
+
+                this.showToast(pesan, "error");
             }
         },
 

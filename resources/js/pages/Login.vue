@@ -29,6 +29,7 @@
                         v-model="namapengguna"
                         @update:modelValue="errorNama = ''"
                         :error="errorNama"
+                        @focus="errorNama = ''"
                     />
                     <FormInputPassword
                         id="password"
@@ -36,6 +37,7 @@
                         label="Kata Sandi"
                         placeholder="Masukkan Kata Sandi"
                         :error="errorSandi"
+                        @input="errorSandi = ''"
                     />
 
                     <ButtonPrimary type="submit" :disabled="loading">

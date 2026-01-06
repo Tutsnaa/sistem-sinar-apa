@@ -5,35 +5,41 @@
             {{ isEdit ? "Ubah Kategori" : "Tambah Kategori" }}
         </h2>
 
-        <!-- Input & Tombol -->
-        <div class="flex items-center gap-2">
-            <input
-                type="text"
-                v-model="form.nama_kategori"
-                placeholder="Nama kategori"
-                class="border border-gray-300 rounded px-3 py-2 w-64"
-            />
+        <div class="mb-4 relative">
+            <!-- Input -->
+            <div class="flex items-center gap-2">
+                <input
+                    type="text"
+                    v-model="form.nama_kategori"
+                    placeholder="Nama kategori"
+                    class="border rounded px-3 py-2 w-64"
+                    :class="errorNama ? 'border-red-500' : 'border-gray-300'"
+                    @focus="errorNama = ''"
+                />
 
-            <button
-                @click="submit"
-                class="px-4 py-2 rounded text-white"
-                :class="
-                    isEdit
-                        ? 'bg-[#3674B5] hover:bg-[#2C5F9E]'
-                        : 'bg-[#3674B5] hover:bg-[#2C5F9E]'
-                "
-            >
-                {{ isEdit ? "Simpan" : "Simpan" }}
-            </button>
+                <button
+                    @click="submit"
+                    class="px-4 py-2 rounded text-white bg-[#3674B5] hover:bg-[#2C5F9E]"
+                >
+                    Simpan
+                </button>
 
-            <!-- Tombol batal saat edit -->
-            <button
-                v-if="isEdit"
-                @click="batal"
-                class="bg-gray-400 text-white hover:bg-gray-500 px-4 py-2 rounded"
+                <button
+                    v-if="isEdit"
+                    @click="batal"
+                    class="bg-gray-400 text-white hover:bg-gray-500 px-4 py-2 rounded"
+                >
+                    Batal
+                </button>
+            </div>
+
+            <!-- PESAN ERROR -->
+            <p
+                v-if="errorNama"
+                class="absolute left-0 top-full mt-0.5 text-[15px] text-red-500 z-50"
             >
-                Batal
-            </button>
+                {{ errorNama }}
+            </p>
         </div>
     </div>
 </template>
@@ -51,6 +57,10 @@ export default {
             type: Object,
             default: null,
         },
+        error: {
+            type: String,
+            default: "",
+        },
     },
 
     data() {
@@ -59,6 +69,8 @@ export default {
                 id: null,
                 nama_kategori: "",
             },
+            toast: "",
+            errorNama: "",
         };
     },
 
@@ -76,17 +88,23 @@ export default {
     },
 
     methods: {
+        showToast(pesan) {
+            this.toast = pesan;
+            setTimeout(() => {
+                this.toast = "";
+            }, 3000);
+        },
         submit() {
+            this.errorNama = "";
+
             if (!this.form.nama_kategori) {
-                alert("Nama kategori wajib diisi!");
+                this.errorNama = "Nama kategori wajib diisi";
                 return;
             }
 
             if (this.isEdit) {
-                // emit update
                 this.$emit("update-kategori", this.form);
             } else {
-                // emit tambah
                 this.$emit("tambah-kategori", {
                     nama_kategori: this.form.nama_kategori,
                 });

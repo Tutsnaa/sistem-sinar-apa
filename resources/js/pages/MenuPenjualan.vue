@@ -217,9 +217,11 @@
                 class="w-[200px] p-4 flex flex-col justify-between bg-gray-50 border-l"
             >
                 <div>
-                    <h3 class="font-semibold text-sm mb-2">Aksi Invoice</h3>
+                    <h3 class="font-semibold text-sm mb-2">
+                        Penjualan berhasil disimpan.
+                    </h3>
                     <p class="text-xs text-gray-500">
-                        Pilih tindakan untuk invoice ini
+                        Silakan pilih tindakan invoice.
                     </p>
                 </div>
 

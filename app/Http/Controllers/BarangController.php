@@ -10,12 +10,14 @@ class BarangController extends Controller
     /**
      * Tampilkan semua barang
      */
-    public function view()
-    {
-        return response()->json([
-            'data' => Barang::with('kategori')->get()]
-        );
-    }
+   public function view()
+{
+    return response()->json([
+        'data' => Barang::with('kategori')
+            ->orderBy('created_at', 'desc')
+            ->get()
+    ]);
+}
 
     /**
      * Simpan barang baru

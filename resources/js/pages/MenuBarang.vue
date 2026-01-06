@@ -179,8 +179,75 @@
                 @success="getBarang"
             />
         </div>
+        <!-- NOTIFICATION -->
+        <div
+            v-if="toast"
+            class="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-red-500 text-white px-6 py-3 rounded-xl shadow-xl flex items-center gap-3 animate-slide-down"
+        >
+            <!-- Icon -->
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z"
+                />
+            </svg>
+
+            <span class="font-medium text-sm">
+                {{ toast }}
+            </span>
+        </div>
+
+        <!-- CONFIRM DELETE -->
+        <div
+            v-if="confirmDelete.show"
+            class="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-white px-6 py-4 rounded-xl shadow-xl w-[320px] animate-slide-down"
+        >
+            <p class="text-sm font-medium text-gray-800 mb-4 text-center">
+                Yakin ingin menghapus barang ini?
+            </p>
+
+            <div class="flex justify-center gap-3">
+                <button
+                    @click="confirmDelete.show = false"
+                    class="px-4 py-2 text-sm rounded bg-gray-300 hover:bg-gray-400"
+                >
+                    Batal
+                </button>
+                <button
+                    @click="confirmHapus"
+                    class="px-4 py-2 text-sm rounded bg-red-500 text-white hover:bg-red-600"
+                >
+                    Hapus
+                </button>
+            </div>
+        </div>
     </div>
 </template>
+
+<style>
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -20px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+.animate-slide-down {
+    animation: slideDown 0.35s ease-out;
+}
+</style>
 
 <script>
 import axios from "axios";
@@ -199,6 +266,12 @@ export default {
             kategori: [],
             showEdit: false,
             barangDipilih: null,
+            toast: "",
+
+            confirmDelete: {
+                show: false,
+                id: null,
+            },
         };
     },
 
@@ -241,22 +314,53 @@ export default {
     },
 
     methods: {
-        async hapusBarang(id) {
-            if (!confirm("Yakin ingin menghapus barang ini?")) return;
+        showToast(pesan) {
+            this.toast = pesan;
+            setTimeout(() => {
+                this.toast = "";
+            }, 3000);
+        },
 
+        hapusBarang(id) {
+            this.confirmDelete = {
+                show: true,
+                id,
+            };
+        },
+
+        async confirmHapus() {
             try {
-                await axios.delete(`/api/barang/${id}`);
+                await axios.delete(`/api/barang/${this.confirmDelete.id}`);
 
                 this.daftarBarang = this.daftarBarang.filter(
-                    (barang) => barang.id !== id
+                    (barang) => barang.id !== this.confirmDelete.id
                 );
 
-                alert("Barang berhasil dihapus");
+                this.showToast("Barang berhasil dihapus", "success");
             } catch (error) {
-                console.error(error);
-                alert("Gagal menghapus barang");
+                this.showToast("Gagal menghapus barang", "error");
+            } finally {
+                this.confirmDelete.show = false;
+                this.confirmDelete.id = null;
             }
         },
+
+        // async hapusBarang(id) {
+        //     if (!confirm("Yakin ingin menghapus barang ini?")) return;
+
+        //     try {
+        //         await axios.delete(`/api/barang/${id}`);
+
+        //         this.daftarBarang = this.daftarBarang.filter(
+        //             (barang) => barang.id !== id
+        //         );
+
+        //         this.showToast("Barang berhasil dihapus");
+        //     } catch (error) {
+        //         console.error(error);
+        //         this.showToast("Gagal menghapus barang");
+        //     }
+        // },
 
         goBack() {
             const role = localStorage.getItem("role");
