@@ -239,7 +239,7 @@
                     <input
                         :type="showPassword ? 'text' : 'password'"
                         v-model="karyawanEdit.kata_sandi"
-                        placeholder="Kosongkan jika tidak mengganti password"
+                        placeholder="Kosongkan jika tidak mengganti"
                         class="border px-3 py-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
                     />
                     <span

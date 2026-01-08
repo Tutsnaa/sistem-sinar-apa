@@ -44,7 +44,7 @@
                 <MenuBeranda title="Barang Masuk" fontsize="text-3xl">
                     <template #icon>
                         <span class="material-icons" style="font-size: 60px">
-                            inventory_2
+                            archive
                         </span>
                     </template>
                 </MenuBeranda>
@@ -57,7 +57,7 @@
                 <MenuBeranda title="Barang" fontsize="text-3xl">
                     <template #icon>
                         <span class="material-icons" style="font-size: 60px">
-                            view_list
+                            inventory_2
                         </span>
                     </template>
                 </MenuBeranda>
