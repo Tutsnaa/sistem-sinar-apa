@@ -37,7 +37,8 @@
                         label="Kata Sandi"
                         placeholder="Masukkan Kata Sandi"
                         :error="errorSandi"
-                        @input="errorSandi = ''"
+                        @update:modelValue="errorSandi = ''"
+                        @focus="errorSandi = ''"
                     />
 
                     <ButtonPrimary type="submit" :disabled="loading">
@@ -124,6 +125,12 @@ export default {
             this.errorNama = "";
             this.errorSandi = "";
 
+            if (!this.namapengguna && !this.katasandi) {
+                this.errorNama = "Nama pengguna wajib diisi";
+                this.errorSandi = "Kata sandi wajib diisi";
+                return;
+            }
+
             if (!this.namapengguna) {
                 this.errorNama = "Nama pengguna wajib diisi";
                 return;
@@ -166,16 +173,28 @@ export default {
                 } else if (user.role === "karyawan") {
                     this.$router.replace("/beranda-karyawan");
                 } else {
-                    alert("Role tidak dikenali");
-                    localStorage.clear();
+                    sessionStorage.clear();
+                    this.toast =
+                        "Role pengguna tidak dikenali. Silakan login kembali.";
+                    this.$router.replace("/login");
                 }
             } catch (error) {
-                if (error.response) {
-                    // Pesan dari Laravel
-                    this.showToast(error.response.data.message);
+                if (error.response && error.response.data.message) {
+                    const msg = error.response.data.message;
+                    // backend mengirim pesan
+                    if (msg.toLowerCase().includes("nonaktif")) {
+                        this.toast = msg; // tampil di notifikasi
+                    } else if (
+                        msg.toLowerCase().includes("pengguna tidak ditemukan")
+                    ) {
+                        this.errorNama = msg;
+                    } else if (msg.toLowerCase().includes("kata sandi salah")) {
+                        this.errorSandi = msg;
+                    } else {
+                        this.toast = msg;
+                    }
                 } else {
-                    // Error jaringan / server mati
-                    this.showToast("Terjadi kesalahan server");
+                    this.toast = "Terjadi kesalahan server";
                 }
             } finally {
                 this.loading = false;

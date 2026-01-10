@@ -8,7 +8,14 @@
                 :placeholder="placeholder"
                 :value="modelValue"
                 @input="$emit('update:modelValue', $event.target.value)"
-                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                @focus="$emit('focus')"
+                @blur="$emit('blur')"
+                :class="[
+                    'w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2',
+                    error
+                        ? 'border-red-500 focus:ring-red-300'
+                        : 'border-gray-300 focus:ring-blue-400',
+                ]"
             />
             <span
                 class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
@@ -20,7 +27,10 @@
             </span>
         </div>
         <!-- PESAN ERROR -->
-        <p v-if="error" class="text-red-500 text-sm mt-1">
+        <p
+            v-if="error"
+            class="left-0 top-full mt-0.5 text-[15px] text-red-500 z-50"
+        >
             {{ error }}
         </p>
     </div>
