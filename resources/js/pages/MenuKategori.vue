@@ -249,10 +249,12 @@ export default {
                     this.showToast("Gagal menghapus kategori", "error");
                 }
             } catch (error) {
-                this.showToast(
-                    error.response?.data?.message || "Gagal menghapus kategori",
-                    "error"
-                );
+                console.error("Error delete kategori:", error);
+                const pesan =
+                    error.response?.data?.message ||
+                    error.response?.data?.errors?.nama_kategori?.[0] ||
+                    "Gagal menghapus kategori";
+                this.showToast(pesan, "error");
             } finally {
                 this.confirmDelete.show = false;
                 this.confirmDelete.id = null;

@@ -141,13 +141,76 @@
                 </button>
             </div>
         </div>
+
+        <!-- NOTIFICATION -->
+        <div
+            v-if="toast.show"
+            class="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-xl shadow-xl flex items-center gap-3 animate-slide-down text-white"
+            :class="toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'"
+        >
+            <!-- ICON -->
+            <!-- SUCCESS -->
+            <svg
+                v-if="toast.type === 'success'"
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                />
+            </svg>
+
+            <!-- ERROR -->
+            <svg
+                v-else
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z"
+                />
+            </svg>
+
+            <span class="font-medium text-sm">
+                {{ toast.message }}
+            </span>
+        </div>
     </div>
 </template>
 
+<style>
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -20px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+.animate-slide-down {
+    animation: slideDown 0.35s ease-out;
+}
+</style>
+
 <script>
 export default {
-    emits: ["simpan-penjualan", "edit"],
     name: "DaftarPembelian",
+    emits: ["simpan-penjualan", "edit"],
     props: {
         daftarPembelian: {
             type: Array,
@@ -159,8 +222,14 @@ export default {
         return {
             bayar: 0,
             editIndex: null,
+            toast: {
+                show: false,
+                message: "",
+                type: "success", // success | error
+            },
         };
     },
+
     computed: {
         totalHarga() {
             return this.daftarPembelian.reduce(
@@ -173,64 +242,81 @@ export default {
             return this.bayar - this.totalHarga;
         },
     },
+
     methods: {
+        // Menampilkan notifikasi toast
+        showToast(message, type = "success") {
+            this.toast = {
+                show: true,
+                message,
+                type,
+            };
+
+            setTimeout(() => {
+                this.toast.show = false;
+            }, 2000);
+        },
+
+        // Membatasi input hanya angka
         onlyNumber(e) {
-            // izinkan: angka, backspace, delete, panah
             if (
                 !/[0-9]/.test(e.key) &&
-                ![
-                    "Backspace",
-                    "Delete",
-                    "ArrowLeft",
-                    "ArrowRight",
-                    "Tab",
-                ].includes(e.key)
+                !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key)
             ) {
-                e.preventDefault(); //BLOKIR HURUF
+                e.preventDefault();
             }
         },
+
+        // Selesai edit item
         selesaiEdit() {
             this.editIndex = null;
-            this.bayar = 0; // ⬅️ WAJIB RESET
+            this.bayar = 0; // Reset input bayar
             console.log(this.daftarPembelian);
         },
+
+        // Emit perubahan item
         ubahItem(item) {
             this.$emit("edit", item);
             console.log(item);
         },
+
+        // Hapus item dari daftar pembelian
         hapusItem(index) {
             this.daftarPembelian.splice(index, 1);
         },
+
+        // Membatalkan transaksi, mengosongkan daftar dan input bayar
         batal() {
             this.daftarPembelian.splice(0);
             this.bayar = 0;
         },
 
+        // Simpan transaksi penjualan
         simpan() {
             if (this.bayar < this.totalHarga) {
-                alert("Jumlah bayar kurang!");
+                this.showToast("Jumlah bayar kurang!", "error");
                 return;
             }
 
             this.$emit("simpan-penjualan", {
                 bayar: this.bayar,
             });
-        },
-        /*************  ✨ Windsurf Command ⭐  *************/
-        /**
-         * Konversi string "Rp 15.000" ke number 15000
-         * @param {string} hargaStr
-         * @returns {number}
-         */
-        /*******  e05a46b6-637c-4360-93aa-b733c3a0bcc3  *******/
 
+            // Tampilkan notifikasi sukses
+            // this.showToast("Transaksi berhasil disimpan!", "success");
+
+            // Reset form
+            this.daftarPembelian.splice(0);
+            this.bayar = 0;
+        },
+
+        // Ambil input bayar dan konversi ke number
         onInputBayar(e) {
-            // Ambil angka saja (hapus Rp, titik, spasi)
             const raw = e.target.value.replace(/[^0-9]/g, "");
             this.bayar = raw ? Number(raw) : 0;
         },
 
-        // ✅ FORMAT SESUAI PERMINTAAN
+        // Format angka menjadi rupiah
         formatRupiah(number) {
             if (!number) return "Rp 0";
             return "Rp " + Number(number).toLocaleString("id-ID");
@@ -238,3 +324,4 @@ export default {
     },
 };
 </script>
+

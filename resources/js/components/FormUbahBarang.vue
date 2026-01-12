@@ -244,7 +244,7 @@ export default {
 
             setTimeout(() => {
                 this.toast.show = false;
-            }, 3000);
+            }, 2000);
         },
 
         async updateBarang() {
@@ -255,7 +255,7 @@ export default {
                 this.$emit("success");
                 setTimeout(() => {
                     this.$emit("close");
-                }, 3000); // tunggu toast selesai
+                }, 2000); // tunggu toast selesai
             } catch (e) {
                 this.showToast("Gagal mengubah barang", "error");
             }
