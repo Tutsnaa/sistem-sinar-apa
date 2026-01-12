@@ -54,6 +54,7 @@
                         class="border border-gray-300 rounded px-3 py-2 w-full md:max-w-xs"
                     />
                 </div>
+                <!-- <h2 class="text-lg font-bold mb-4">Daftar Barang Masuk</h2> -->
 
                 <!-- Tabel Barang -->
                 <div class="max-h-[500px] overflow-y-auto border rounded">
@@ -103,7 +104,7 @@
                                 <td class="border px-4 py-2 text-center">
                                     {{ barang.satuan }}
                                 </td>
-                                <td class="border px-4 py-2">
+                                <td class="border px-4 py-2 text-center">
                                     {{ barang.kategori?.nama_kategori }}
                                 </td>
                                 <td class="border px-4 py-2 text-right">

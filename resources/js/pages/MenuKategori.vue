@@ -27,7 +27,6 @@
         <!-- Konten -->
         <div class="p-6 pt-28">
             <div class="bg-white rounded-lg shadow-md p-4">
-                <!-- Form Tambah & Pencarian dalam satu baris -->
                 <div
                     class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4"
                 >
@@ -41,7 +40,6 @@
                         class="flex-1 max-w-sm"
                         :error="errorNama"
                     />
-
                     <!-- Input Pencarian -->
                     <input
                         type="text"
@@ -59,13 +57,74 @@
                 />
             </div>
         </div>
-        <!-- PESAN ERROR -->
-        <p
-            v-if="error"
-            class="absolute left-0 top-full mt-0.5 text-[15px] text-red-500 z-50"
+
+        <!-- CONFIRM DELETE -->
+        <div
+            v-if="confirmDelete.show"
+            class="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-white px-6 py-4 rounded-xl shadow-xl w-[320px] animate-slide-down"
         >
-            {{ error }}
-        </p>
+            <p class="text-sm font-medium text-gray-800 mb-4 text-center">
+                Yakin ingin menghapus kategori ini?
+            </p>
+            <div class="flex justify-center gap-3">
+                <button
+                    @click="confirmDelete.show = false"
+                    class="px-4 py-2 text-sm rounded bg-gray-300 hover:bg-gray-400"
+                >
+                    Batal
+                </button>
+                <button
+                    @click="confirmHapus"
+                    class="px-4 py-2 text-sm rounded bg-red-500 text-white hover:bg-red-600"
+                >
+                    Hapus
+                </button>
+            </div>
+        </div>
+
+        <!-- NOTIFICATION -->
+        <div
+            v-if="toast"
+            class="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-xl shadow-xl flex items-center gap-3 animate-slide-down"
+            :class="
+                toastType === 'success'
+                    ? 'bg-green-500 text-white'
+                    : 'bg-red-500 text-white'
+            "
+        >
+            <!-- Icon -->
+            <svg
+                v-if="toastType === 'success'"
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                />
+            </svg>
+            <svg
+                v-else
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z"
+                />
+            </svg>
+            <span class="font-medium text-sm">{{ toast }}</span>
+        </div>
     </div>
 </template>
 
@@ -86,6 +145,9 @@ export default {
             isEdit: false,
             kategoriEdit: null,
             errorNama: "",
+            toast: "",
+            toastType: "success",
+            confirmDelete: { show: false, id: null },
         };
     },
     computed: {
@@ -106,6 +168,14 @@ export default {
         this.getKategori();
     },
     methods: {
+        showToast(pesan, type = "success") {
+            this.toast = pesan;
+            this.toastType = type;
+            setTimeout(() => {
+                this.toast = "";
+                this.toastType = "success";
+            }, 3000);
+        },
         goBack() {
             const role = localStorage.getItem("role");
             if (role === "pemilik_toko") this.$router.push("/beranda-pemilik");
@@ -113,25 +183,23 @@ export default {
                 this.$router.push("/beranda-karyawan");
             else this.$router.push("/login");
         },
-
         async getKategori() {
             try {
                 const response = await axios.get("api/kategori");
-                this.daftarKategori = response.data.data;
+                // urutkan data terbaru paling atas (dari id terbesar ke terkecil)
+                this.daftarKategori = response.data.data.sort(
+                    (a, b) => b.id - a.id
+                );
             } catch (error) {
                 console.error("Gagal mengambil data kategori:", error);
             }
         },
         async tambahKategoriKeDaftar(kategoriBaru) {
             this.errorNama = "";
-
             try {
                 const response = await axios.post("api/kategori", kategoriBaru);
-
                 if (response.data.success) {
-                    // tampilkan kategori baru di atas
-                    this.daftarKategori.unshift(response.data.data);
-
+                    await this.getKategori(); // refresh daftar
                     this.showToast("Kategori berhasil ditambahkan", "success");
                 }
             } catch (error) {
@@ -139,64 +207,57 @@ export default {
                     error.response?.data?.errors?.nama_kategori?.[0] ||
                     error.response?.data?.message ||
                     "Gagal menambahkan kategori!";
-
                 this.showToast(pesan, "error");
             }
         },
-
-        // klik tombol Ubah
         setEditKategori(kategori) {
             this.isEdit = true;
             this.kategoriEdit = { ...kategori };
         },
-
-        // update kategori (PUT)
         async updateKategori(data) {
             try {
                 const response = await axios.put(`api/kategori/${data.id}`, {
                     nama_kategori: data.nama_kategori,
                 });
-
                 if (response.data.success) {
-                    const index = this.daftarKategori.findIndex(
-                        (k) => k.id === data.id
-                    );
-                    this.daftarKategori[index] = response.data.data;
                     this.batalEdit();
+                    await this.getKategori(); // refresh daftar terbaru di atas
+                    this.showToast("Kategori berhasil diubah", "success");
                 }
-                console.log(response.data);
             } catch (error) {
-                alert(
-                    error.response?.data?.message || "Gagal mengubah kategori!"
-                );
+                const pesan =
+                    error.response?.data?.message || "Gagal mengubah kategori!";
+                this.showToast(pesan, "error");
             }
         },
-
         batalEdit() {
             this.isEdit = false;
             this.kategoriEdit = null;
         },
-
-        async hapusKategori(id) {
-            if (!confirm("Apakah yakin ingin menghapus kategori ini?")) return;
+        hapusKategori(id) {
+            this.confirmDelete = { show: true, id };
+        },
+        async confirmHapus() {
             try {
-                const response = await axios.delete(`api/kategori/${id}`);
-                if (response.data.success)
-                    this.daftarKategori = this.daftarKategori.filter(
-                        (k) => k.id !== id
-                    );
-
-                console.log(response.data);
-            } catch (error) {
-                alert(
-                    error.response?.data?.message || "Gagal menghapus kategori!"
+                const response = await axios.delete(
+                    `api/kategori/${this.confirmDelete.id}`
                 );
+                if (response.data.success) {
+                    await this.getKategori(); // refresh daftar terbaru
+                    this.showToast("Kategori berhasil dihapus", "success");
+                } else {
+                    this.showToast("Gagal menghapus kategori", "error");
+                }
+            } catch (error) {
+                this.showToast(
+                    error.response?.data?.message || "Gagal menghapus kategori",
+                    "error"
+                );
+            } finally {
+                this.confirmDelete.show = false;
+                this.confirmDelete.id = null;
             }
         },
     },
 };
 </script>
-
-<style scoped>
-/* opsional styling tambahan */
-</style>

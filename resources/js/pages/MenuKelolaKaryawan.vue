@@ -46,7 +46,9 @@
             @close="showTambahModal = false"
             @refresh="fetchKaryawan"
         />
+
         <div class="bg-white p-4 rounded shadow mt-8 mb-6">
+            <h2 class="text-lg font-bold mb-4">Daftar Karyawan</h2>
             <div class="max-h-[500px] overflow-y-auto border rounded">
                 <table
                     class="w-full bg-white border border-gray-300 rounded-lg"

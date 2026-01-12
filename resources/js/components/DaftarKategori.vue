@@ -1,9 +1,6 @@
 <template>
     <div>
-        <!-- Judul Daftar Kategori -->
         <h2 class="text-xl font-bold mb-4 mt-2">Daftar Kategori</h2>
-
-        <!-- Tabel Daftar Kategori -->
         <div
             class="max-h-[400px] overflow-y-auto border border-gray-300 rounded"
         >
@@ -16,12 +13,11 @@
                         <th class="border px-4 py-2 border-b text-center">
                             Nama Kategori
                         </th>
-                        <th class="borderpx-20 py-2 border-b text-center">
+                        <th class="border px-4 py-2 border-b text-center">
                             Aksi
                         </th>
                     </tr>
                 </thead>
-
                 <tbody>
                     <tr
                         v-for="(kategori, index) in kategoriList"
@@ -42,7 +38,6 @@
                                 >
                                     Ubah
                                 </button>
-
                                 <button
                                     @click="$emit('hapus', kategori.id)"
                                     class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
@@ -52,7 +47,6 @@
                             </div>
                         </td>
                     </tr>
-
                     <tr v-if="kategoriList.length === 0">
                         <td class="px-4 py-2 text-center" colspan="3">
                             Belum ada kategori
