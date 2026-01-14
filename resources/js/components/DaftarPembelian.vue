@@ -287,7 +287,6 @@ export default {
 
         // Membatalkan transaksi, mengosongkan daftar dan input bayar
         batal() {
-            this.daftarPembelian.splice(0);
             this.bayar = 0;
         },
 
@@ -306,7 +305,7 @@ export default {
             // this.showToast("Transaksi berhasil disimpan!", "success");
 
             // Reset form
-            this.daftarPembelian.splice(0);
+            
             this.bayar = 0;
         },
 

@@ -45,6 +45,8 @@
             v-show="showTambahModal"
             @close="showTambahModal = false"
             @refresh="fetchKaryawan"
+            @success="onTambahSuccess"
+            @error="onTambahError"
         />
 
         <div class="bg-white p-4 rounded shadow mt-8 mb-6">
@@ -99,52 +101,52 @@
                                 {{ karyawan.nama_pengguna }}
                             </td>
                             <td class="border px-6 py-2 text-center">
-                                <div
-                                    class="flex justify-center items-center gap-2"
+                                <label
+                                    class="inline-flex items-center cursor-pointer"
                                 >
-                                    <label
-                                        class="inline-flex items-center cursor-pointer"
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            class="sr-only"
-                                            :checked="
-                                                karyawan.status === 'aktif'
-                                            "
-                                            @change="toggleStatus(karyawan)"
-                                        />
+                                    <input
+                                        type="checkbox"
+                                        class="sr-only"
+                                        :checked="karyawan.status === 'aktif'"
+                                        @change="toggleStatus(karyawan)"
+                                    />
 
-                                        <!-- Switch -->
-                                        <div
-                                            class="w-10 h-5 rounded-full transition relative"
-                                            :class="
-                                                karyawan.status === 'aktif'
-                                                    ? 'bg-green-500'
-                                                    : 'bg-gray-300'
-                                            "
-                                        >
-                                            <div
-                                                class="w-4 h-4 bg-white rounded-full shadow absolute top-0.5 transition"
-                                                :class="
-                                                    karyawan.status === 'aktif'
-                                                        ? 'translate-x-5'
-                                                        : 'translate-x-0.5'
-                                                "
-                                            ></div>
-                                        </div>
-                                    </label>
-
-                                    <span
-                                        class="text-sm font-semibold w-[72px] text-center inline-block"
+                                    <!-- SWITCH -->
+                                    <div
+                                        class="relative w-20 h-6 rounded-full transition"
                                         :class="
                                             karyawan.status === 'aktif'
-                                                ? 'text-green-600'
-                                                : 'text-red-600'
+                                                ? 'bg-green-500'
+                                                : 'bg-red-500'
                                         "
                                     >
-                                        {{ karyawan.status }}
-                                    </span>
-                                </div>
+                                        <!-- TEXT -->
+                                        <span
+                                            class="absolute text-xs font-semibold text-white top-1/2 -translate-y-1/2 transition"
+                                            :class="
+                                                karyawan.status === 'aktif'
+                                                    ? 'left-2'
+                                                    : 'right-2'
+                                            "
+                                        >
+                                            {{
+                                                karyawan.status === "aktif"
+                                                    ? "Aktif"
+                                                    : "Nonaktif"
+                                            }}
+                                        </span>
+
+                                        <!-- KNOB -->
+                                        <div
+                                            class="absolute w-5 h-5 bg-white rounded-full shadow top-0.5 transition"
+                                            :class="
+                                                karyawan.status === 'aktif'
+                                                    ? 'translate-x-14'
+                                                    : 'translate-x-0.5'
+                                            "
+                                        ></div>
+                                    </div>
+                                </label>
                             </td>
 
                             <td class="border px-4 py-2">
@@ -272,7 +274,75 @@
             </div>
         </div>
     </div>
+    <!-- NOTIFICATION -->
+    <div
+        v-if="toast"
+        class="fixed top-6 left-1/2 -translate-x-1/2 z-50 text-white px-6 py-3 rounded-xl shadow-xl flex items-center gap-3 animate-slide-down"
+        :class="toastType === 'success' ? 'bg-green-500' : 'bg-red-500'"
+    >
+        <!-- Icon -->
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+        >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z"
+            />
+        </svg>
+
+        <span class="font-medium text-sm">
+            {{ toastMessage }}
+        </span>
+    </div>
+
+    <!-- CONFIRM DELETE -->
+    <div
+        v-if="confirmDelete.show"
+        class="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-white px-6 py-4 rounded-xl shadow-xl w-[320px] animate-slide-down"
+    >
+        <p class="text-sm font-medium text-gray-800 mb-4 text-center">
+            Yakin ingin menghapus barang ini?
+        </p>
+
+        <div class="flex justify-center gap-3">
+            <button
+                @click="confirmDelete.show = false"
+                class="px-4 py-2 text-sm rounded bg-gray-300 hover:bg-gray-400"
+            >
+                Batal
+            </button>
+            <button
+                @click="confirmHapus"
+                class="px-4 py-2 text-sm rounded bg-red-500 text-white hover:bg-red-600"
+            >
+                Hapus
+            </button>
+        </div>
+    </div>
 </template>
+
+<style>
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -20px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+.animate-slide-down {
+    animation: slideDown 0.35s ease-out;
+}
+</style>
 
 <script>
 import axios from "axios";
@@ -292,6 +362,10 @@ export default {
             showEditModal: false,
             showPassword: false,
             showTambahModal: false,
+            toast: false, // untuk toggle tampil/tidak
+            toastMessage: "", // pesan yang ditampilkan
+            toastType: "success", // 'success' atau 'error'
+            confirmDelete: { show: false },
         };
     },
     mounted() {
@@ -307,6 +381,24 @@ export default {
         this.fetchKaryawan();
     },
     methods: {
+        onTambahSuccess(pesan) {
+            this.showTambahModal = false;
+            this.fetchKaryawan();
+            this.showToast(pesan, "success");
+        },
+        onTambahError(pesan) {
+            this.showToast(pesan, "error");
+        },
+        showToast(message, type = "success") {
+            this.toastMessage = message;
+            this.toastType = type;
+            this.toast = true;
+
+            setTimeout(() => {
+                this.toast = false;
+            }, 3000); // toast otomatis hilang setelah 3 detik
+        },
+
         async toggleStatus(karyawan) {
             if (!karyawan || !karyawan.status) return;
 
@@ -354,16 +446,57 @@ export default {
         tambahKaryawan() {
             this.$router.push("/tambah-karyawan"); // bisa diarahkan ke halaman tambah karyawan
         },
+
         hapusKaryawan(id) {
-            if (confirm("Apakah yakin ingin menghapus karyawan ini?")) {
-                axios
-                    .delete(`/api/karyawan/${id}`)
-                    .then(() => {
-                        this.fetchKaryawan();
-                    })
-                    .catch((err) => console.error(err));
+            this.confirmDelete = {
+                show: true,
+                id,
+            };
+        },
+        async confirmHapus() {
+            try {
+                await axios.delete(`/api/karyawan/${this.confirmDelete.id}`);
+                console.log("Data karyawan berhasil dihapus");
+
+                // Refresh data karyawan
+                this.fetchKaryawan();
+
+                // Toast sukses
+                this.showToast("Data karyawan berhasil dihapus", "success");
+            } catch (error) {
+                console.error(error);
+
+                // Toast gagal
+                this.showToast("Gagal menghapus data karyawan", "error");
+            } finally {
+                // Tutup modal & reset state
+                this.confirmDelete.show = false;
+                this.confirmDelete.id = null;
             }
         },
+
+        // hapusKaryawan(id) {
+        //     if (
+        //         confirm("Apakah yakin ingin menghapus karyawan ini?", "success")
+        //     ) {
+        //         axios
+        //             .delete(`/api/karyawan/${id}`)
+        //             .then(() => {
+        //                 this.fetchKaryawan();
+        //                 this.showToast(
+        //                     "Data karyawan berhasil dihapus",
+        //                     "success"
+        //                 );
+        //             })
+        //             .catch((err) => {
+        //                 console.error(err);
+        //                 this.showToast(
+        //                     "Gagal menghapus data karyawan",
+        //                     "error"
+        //                 );
+        //             });
+        //     }
+        // },
 
         editKaryawan(karyawan) {
             this.karyawanEdit = {
@@ -389,11 +522,18 @@ export default {
             axios
                 .put(`/api/karyawan/${payload.id}`, payload)
                 .then((res) => {
+                    console.log(res);
                     this.showEditModal = false;
                     this.karyawanEdit = null;
                     this.fetchKaryawan();
+
+                    this.showToast("Data karyawan berhasil diubah", "success");
                 })
-                .catch((err) => console.error(err));
+                .catch((err) => {
+                    console.error(err);
+
+                    this.showToast("Gagal mengubah data karyawan", "error");
+                });
         },
 
         goBack() {
