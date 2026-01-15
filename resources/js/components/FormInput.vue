@@ -23,7 +23,7 @@
         <!-- PESAN ERROR -->
         <p
             v-if="error"
-            class="left-0 top-full mt-0.5 text-[15px] text-red-500 z-50"
+            class="absolute left-0 top-full mt-0.5 text-[15px] text-red-500 z-50"
         >
             {{ error }}
         </p>

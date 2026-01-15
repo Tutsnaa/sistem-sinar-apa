@@ -80,6 +80,7 @@
                             </label>
                             <input
                                 type="text"
+                                @keydown="onlyNumber"
                                 v-model="form.no_telepon"
                                 class="input w-full"
                                 placeholder="Masukkan nomor telepon"
@@ -115,9 +116,14 @@
                         <!-- Tombol -->
                         <button
                             type="submit"
-                            class="w-full bg-[#1E5AA8] text-white hover:bg-[#164B8A] py-3 rounded transition"
+                            :disabled="!isChanged"
+                            class="w-full py-3 rounded transition bg-[#1E5AA8] text-white hover:bg-[#164B8A] disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:bg-gray-400"
                         >
-                            Simpan Perubahan
+                            {{
+                                isChanged
+                                    ? "Simpan Perubahan"
+                                    : "Belum ada perubahan"
+                            }}
                         </button>
                     </form>
                 </div>
@@ -126,10 +132,29 @@
         <!-- NOTIFICATION -->
         <div
             v-if="toast"
-            class="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-green-500 text-white px-6 py-3 rounded-2xl shadow-2xl animate-slide-down"
+            class="fixed top-6 left-1/2 -translate-x-1/2 z-50 text-white px-6 py-3 rounded-xl shadow-xl flex items-center gap-3 animate-slide-down"
+            :class="toastType === 'success' ? 'bg-green-500' : 'bg-red-500'"
         >
-            <!-- Icon -->
+            <!-- ICON SUCCESS -->
             <svg
+                v-if="toastType === 'success'"
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                />
+            </svg>
+
+            <!-- ICON ERROR -->
+            <svg
+                v-else
                 xmlns="http://www.w3.org/2000/svg"
                 class="w-5 h-5"
                 fill="none"
@@ -185,7 +210,16 @@ export default {
                 nama_pengguna: "",
                 kata_sandi: "",
             },
+            errors: {
+                nama_lengkap: "",
+                email: "",
+                no_telepon: "",
+                nama_pengguna: "",
+                kata_sandi: "",
+            },
+            originalForm: {},
             toast: "",
+            toastType: "success",
         };
     },
 
@@ -205,13 +239,113 @@ export default {
         this.getProfil();
     },
 
+    // computed: {
+    //     isChanged() {
+    //         const formCopy = { ...this.form };
+    //         delete formCopy.kata_sandi; // password opsional
+
+    //         const originalCopy = { ...this.originalForm };
+    //         delete originalCopy.kata_sandi;
+
+    //         return (
+    //             JSON.stringify(formCopy) !== JSON.stringify(originalCopy) ||
+    //             this.fotoBaru !== null
+    //         );
+    //     },
+    // },
+    computed: {
+        isChanged() {
+            if (!this.originalForm) return false;
+
+            return (
+                this.form.nama_lengkap !== this.originalForm.nama_lengkap ||
+                this.form.email !== this.originalForm.email ||
+                this.form.no_telepon !== this.originalForm.no_telepon ||
+                this.form.nama_pengguna !== this.originalForm.nama_pengguna ||
+                this.form.kata_sandi !== "" ||
+                this.fotoBaru !== null
+            );
+        },
+    },
+
     methods: {
-        showToast(pesan) {
-            this.toast = pesan;
+        //ERROR VALIDATE
+        validateNamaLengkap() {
+            this.errors.nama_lengkap = this.form.nama_lengkap
+                ? ""
+                : "Nama lengkap wajib diisi";
+        },
+
+        validateEmail() {
+            if (!this.form.email) {
+                this.errors.email = "Email wajib diisi";
+            } else if (!/\S+@\S+\.\S+/.test(this.form.email)) {
+                this.errors.email = "Format email tidak valid";
+            } else {
+                this.errors.email = "";
+            }
+        },
+
+        validateNoTelepon() {
+            if (!this.form.no_telepon) {
+                this.errors.no_telepon = "No telepon wajib diisi";
+            } else if (!/^[0-9]{10,15}$/.test(this.form.no_telepon)) {
+                this.errors.no_telepon = "No telepon harus angka (10–15 digit)";
+            } else {
+                this.errors.no_telepon = "";
+            }
+        },
+
+        validateNamaPengguna() {
+            this.errors.nama_pengguna = this.form.nama_pengguna
+                ? ""
+                : "Nama pengguna wajib diisi";
+        },
+
+        validateKataSandi() {
+            if (!this.form.kata_sandi) {
+                this.errors.kata_sandi = "";
+            } else if (this.form.kata_sandi.length < 6) {
+                this.errors.kata_sandi = "Kata sandi minimal 6 karakter";
+            } else {
+                this.errors.kata_sandi = "";
+            }
+        },
+
+        validateForm() {
+            this.validateNamaLengkap();
+            this.validateEmail();
+            this.validateNoTelepon();
+            this.validateNamaPengguna();
+            this.validateKataSandi();
+
+            return !Object.values(this.errors).some((e) => e);
+        },
+
+        showToast(message, type = "success") {
+            this.toast = message;
+            this.toastType = type;
+
             setTimeout(() => {
                 this.toast = "";
             }, 3000);
         },
+        onlyNumber(e) {
+            // izinkan: angka, backspace, delete, panah
+            if (
+                !/[0-9]/.test(e.key) &&
+                ![
+                    "Backspace",
+                    "Delete",
+                    "ArrowLeft",
+                    "ArrowRight",
+                    "Tab",
+                ].includes(e.key)
+            ) {
+                e.preventDefault(); //BLOKIR HURUF
+            }
+        },
+
         goBack() {
             const role = localStorage.getItem("role");
 
@@ -234,8 +368,12 @@ export default {
                 this.form.email = user.email;
                 this.form.no_telepon = user.no_telepon;
                 this.form.nama_pengguna = user.nama_pengguna;
+                this.form.kata_sandi = "";
+
+                // 🔥 SIMPAN DATA AWAL
+                this.originalForm = JSON.parse(JSON.stringify(this.form));
             } catch (error) {
-                this.showToast("Gagal mengambil data profil");
+                this.showToast("Gagal mengambil data profil", "error");
             }
         },
 
@@ -282,7 +420,14 @@ export default {
                 // update tampilan profil
                 this.form.foto = user.foto;
 
-                this.showToast("Data berhasil diperbarui");
+                this.showToast("Data berhasil diperbarui", "success");
+                this.originalForm = JSON.parse(
+                    JSON.stringify({
+                        ...this.form,
+                        kata_sandi: "",
+                    })
+                );
+                this.fotoBaru = null;
                 this.getProfil();
             } catch (error) {
                 if (error.response?.status === 422) {
@@ -291,9 +436,9 @@ export default {
                     for (const key in errors) {
                         pesan += errors[key][0] + "\n";
                     }
-                    alert(pesan);
+                    this.showToast(pesan);
                 } else {
-                    alert("Gagal memperbarui profil");
+                    this.showToast("Gagal memperbarui profil", "error");
                 }
             }
         },

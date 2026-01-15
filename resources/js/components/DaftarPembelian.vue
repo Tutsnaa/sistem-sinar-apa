@@ -272,6 +272,16 @@ export default {
             this.editIndex = null;
             this.bayar = 0; // Reset input bayar
             console.log(this.daftarPembelian);
+             this.errorNama = '';
+
+        // VALIDASI
+        if (!this.namapelanggan || this.namapelanggan.trim() === '') {
+            this.errorNama = 'Nama pelanggan wajib diisi';
+            return; // hentikan proses simpan
+        }
+
+        // ✔️ LANJUT SIMPAN DATA
+        console.log('Data disimpan:', this.namapelanggan);
         },
 
         // Emit perubahan item
@@ -287,6 +297,7 @@ export default {
 
         // Membatalkan transaksi, mengosongkan daftar dan input bayar
         batal() {
+        window.location.reload();
             this.bayar = 0;
         },
 

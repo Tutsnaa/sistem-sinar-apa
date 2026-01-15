@@ -51,7 +51,7 @@
             />
         </div>
 
-        <div class="px-8 mt-6 flex flex-row gap-4 items-start">
+        <div class="px-8 mt-5 flex flex-row gap-4 items-start">
             <!-- Tambah Pembelian -->
             <FormTambahPembelian
                 :barang="barang"
