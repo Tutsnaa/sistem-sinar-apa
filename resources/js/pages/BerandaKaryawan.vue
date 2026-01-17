@@ -64,6 +64,19 @@
             </div>
 
             <div
+                @click="$router.push('/menu-riwayat')"
+                class="w-full sm:w-[48%] lg:w-[32%] p-4 rounded box-border"
+            >
+                <MenuBeranda title="Riwayat" fontsize="text-3xl">
+                    <template #icon>
+                        <span class="material-icons" style="font-size: 60px">
+                            history
+                        </span>
+                    </template>
+                </MenuBeranda>
+            </div>
+
+            <div
                 @click="$router.push('/menu-profil')"
                 class="w-full sm:w-[48%] lg:w-[32%] p-4 rounded box-border"
             >

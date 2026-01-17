@@ -49,7 +49,18 @@
         </div>
         <!-- Tabel Barang Terlaris -->
         <div class="bg-white p-4 rounded shadow">
-            <h2 class="text-lg font-semibold mb-3">Daftar Barang Terlaris</h2>
+            <div class="flex justify-between mb-3">
+                <h2 class="text-lg font-semibold mb-3">
+                    Daftar Barang Terlaris
+                </h2>
+                <button
+                    @click="downloadExcelLaporan"
+                    class="bg-[#3674B5] hover:bg-[#2C5F9E] text-white px-4 py-2 rounded shadow"
+                >
+                    Unduh Excel
+                </button>
+            </div>
+
             <div class="max-h-[500px] overflow-y-auto border rounded">
                 <table class="min-w-full border bg-white">
                     <thead class="bg-gray-100 sticky top-0 z-20">
@@ -59,11 +70,16 @@
                                 Id Barang
                             </th> -->
                             <th class="px-4 py-2 border">Nama Barang</th>
+                            <th class="px-4 py-2 border">Nama Harga Beli</th>
+                            <th class="px-4 py-2 border">Nama Harga Jual</th>
                             <th class="px-4 py-2 border text-center">
                                 Total Terjual
                             </th>
                             <th class="px-4 py-2 border text-center">
                                 Total Pendapatan
+                            </th>
+                            <th class="px-4 py-2 border text-center">
+                                Keuntungan
                             </th>
                         </tr>
                     </thead>
@@ -84,6 +100,12 @@
                             <td class="px-4 py-2 border">
                                 {{ item.nama_barang }}
                             </td>
+                            <td class="px-4 py-2 border text-right">
+                                Rp {{ formatRupiah(item.harga_beli) }}
+                            </td>
+                            <td class="px-4 py-2 border text-right">
+                                Rp {{ formatRupiah(item.harga_jual) }}
+                            </td>
 
                             <td class="px-4 py-2 border text-center">
                                 {{ item.total_terjual }}
@@ -91,6 +113,10 @@
 
                             <td class="px-4 py-2 border text-right">
                                 Rp {{ formatRupiah(item.total_pendapatan) }}
+                            </td>
+
+                            <td class="px-4 py-2 border text-right">
+                                Rp {{ formatRupiah(item.total_keuntungan) }}
                             </td>
                         </tr>
 
@@ -109,6 +135,9 @@
     </div>
 </template>
 <script>
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+
 import axios from "axios";
 import {
     Chart,
@@ -166,6 +195,89 @@ export default {
     },
 
     methods: {
+        downloadExcelLaporan() {
+            if (this.laporan.length === 0) {
+                alert("Tidak ada data untuk diunduh");
+                return;
+            }
+
+            const periode = this.periode || "Semua Periode";
+
+            const data = [
+                ["LAPORAN BARANG TERLARIS"],
+                ["TOKO SINAR APA"],
+                [`Periode : ${periode}`],
+                [],
+                [
+                    "No",
+                    "Nama Barang",
+                    "Harga Beli",
+                    "Harga Jual",
+                    "Total Terjual",
+                    "Total Pendapatan",
+                    "Keuntungan",
+                ],
+            ];
+
+            this.laporan.forEach((item, index) => {
+                data.push([
+                    index + 1,
+                    item.nama_barang,
+                    this.formatRupiahExcel(item.harga_beli),
+                    this.formatRupiahExcel(item.harga_jual),
+                    item.total_terjual,
+                    this.formatRupiahExcel(item.total_pendapatan),
+                    this.formatRupiahExcel(item.total_keuntungan),
+                ]);
+            });
+
+            const totalPendapatan = this.laporan.reduce(
+                (sum, i) => sum + Number(i.total_pendapatan || 0),
+                0
+            );
+
+            const totalKeuntungan = this.laporan.reduce(
+                (sum, i) => sum + Number(i.total_keuntungan || 0),
+                0
+            );
+
+            data.push([]);
+            data.push([
+                "",
+                "",
+                "",
+                "TOTAL",
+                "",
+                this.formatRupiahExcel(totalPendapatan),
+                this.formatRupiahExcel(totalKeuntungan),
+            ]);
+
+            const worksheet = XLSX.utils.aoa_to_sheet(data);
+
+            worksheet["!cols"] = [
+                { wch: 5 },
+                { wch: 30 },
+                { wch: 15 },
+                { wch: 15 },
+                { wch: 15 },
+                { wch: 20 },
+                { wch: 20 },
+            ];
+
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(
+                workbook,
+                worksheet,
+                "Barang Terlaris"
+            );
+
+            XLSX.writeFile(workbook, `Laporan_Barang_Terlaris_${periode}.xlsx`);
+        },
+
+        formatRupiahExcel(angka) {
+            return new Intl.NumberFormat("id-ID").format(angka);
+        },
+
         goBack() {
             const role = localStorage.getItem("role");
 

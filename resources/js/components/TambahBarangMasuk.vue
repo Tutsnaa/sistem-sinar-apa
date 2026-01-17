@@ -102,13 +102,19 @@
             </div>
 
             <!-- Tombol Simpan -->
-            <div>
+            <div class="flex justify-between gap-5">
                 <button
                     @click="submit"
                     :disabled="!form.id_barang || isLocked"
                     class="w-full bg-[#3674B5] text-white hover:bg-[#2C5F9E] px-4 py-2 rounded disabled:opacity-50 transition-colors"
                 >
                     {{ isLocked ? "Terkunci" : "Simpan" }}
+                </button>
+                <button
+                    @click="batal"
+                    class="bg-gray-400 text-white hover:bg-gray-500 px-4 py-2 rounded"
+                >
+                    Batal
                 </button>
             </div>
         </div>
@@ -199,6 +205,25 @@ export default {
     },
 
     methods: {
+        resetForm() {
+            this.form = {
+                id_barang: null,
+                jumlah: 0,
+                harga_beli: 0,
+                harga_jual: 0,
+            };
+
+            this.searchBarang = "";
+            this.showDropdown = false;
+            this.isLocked = false;
+            this.bayar = 0;
+        },
+
+        batal() {
+            this.resetForm();
+            this.$emit("resetEdit");
+        },
+
         getBarang() {
             axios.get("/api/barang").then((res) => {
                 this.listBarang = res.data.data ?? [];

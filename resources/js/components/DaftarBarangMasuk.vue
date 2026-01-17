@@ -125,10 +125,11 @@
                                     <button
                                         v-if="item.status !== 'Diterima'"
                                         @click="$emit('delete', item)"
-                                        class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-colors"
+                                        class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                                     >
                                         Hapus
                                     </button>
+
                                     <span
                                         v-if="item.status === 'Diterima'"
                                         class="text-gray-500 italic"

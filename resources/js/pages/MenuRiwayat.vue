@@ -14,7 +14,7 @@
                 Kembali
             </h1>
 
-            <h1 class="text-xl font-semibold">RIWAYAT</h1>
+            <h1 class="text-xl font-semibold">RIWAYAT PENJUALAN</h1>
 
             <div class="flex items-center gap-4">
                 <img
@@ -28,47 +28,49 @@
 
         <!-- Content -->
         <div class="pt-28 px-6">
-            <!-- Filter -->
-            <div class="bg-white rounded shadow p-4 mb-6 flex flex-wrap gap-4">
-                <div>
-                    <label class="block text-sm font-semibold mb-1">
-                        Periode Awal
-                    </label>
-                    <input
-                        type="date"
-                        v-model="periodeAwal"
-                        class="border rounded px-3 py-2"
-                    />
-                </div>
+            <!-- Tabel -->
+            <div class="bg-white rounded shadow p-4">
+                <h2 class="text-lg font-bold mb-4">Daftar Riwayat Penjualan</h2>
+                <!-- Filter -->
+                <div class="mb-6 flex gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">
+                            Periode Awal
+                        </label>
+                        <input
+                            type="date"
+                            v-model="periodeAwal"
+                            class="border rounded px-3 py-2"
+                        />
+                    </div>
 
-                <div>
-                    <label class="block text-sm font-semibold mb-1">
-                        Periode Akhir
-                    </label>
-                    <input
-                        type="date"
-                        v-model="periodeAkhir"
-                        class="border rounded px-3 py-2"
-                    />
-                </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">
+                            Periode Akhir
+                        </label>
+                        <input
+                            type="date"
+                            v-model="periodeAkhir"
+                            class="border rounded px-3 py-2"
+                        />
+                    </div>
 
-                <button
+                    <!-- <button
                     @click="downloadExcel"
                     class="bg-[#3674B5] text-white hover:bg-[#2C5F9E] px-4 py-2 rounded"
                 >
                     Unduh Excel
-                </button>
-            </div>
-
-            <!-- Tabel -->
-            <div class="bg-white rounded shadow p-4">
-                <h2 class="text-lg font-bold mb-4">Daftar Riwayat Penjualan</h2>
+                </button> -->
+                </div>
 
                 <div class="max-h-[500px] overflow-y-auto border rounded">
                     <table class="min-w-full border border-gray-200">
                         <thead class="bg-gray-100 sticky top-0 z-20">
                             <tr>
                                 <th class="border px-3 py-2 text-center">No</th>
+                                <th class="border px-3 py-2 text-center">
+                                    Id Penjualan
+                                </th>
                                 <th class="border px-3 py-2 text-center">
                                     Tanggal
                                 </th>
@@ -78,9 +80,9 @@
                                 <th class="border px-3 py-2 text-center">
                                     Total Penjualan
                                 </th>
-                                <th class="border px-3 py-2 text-center">
+                                <!-- <th class="border px-3 py-2 text-center">
                                     Keuntungan
-                                </th>
+                                </th> -->
                                 <th class="border px-3 py-2 text-center">
                                     Aksi
                                 </th>
@@ -96,6 +98,9 @@
                                     {{ index + 1 }}
                                 </td>
                                 <td class="border px-3 py-2 text-center">
+                                    {{ item.id }}
+                                </td>
+                                <td class="border px-3 py-2 text-center">
                                     {{ formatTanggal(item.created_at) }}
                                 </td>
 
@@ -108,11 +113,11 @@
                                 >
                                     {{ formatRupiah(item.total) }}
                                 </td>
-                                <td
+                                <!-- <td
                                     class="border px-3 py-2 text-right font-semibold"
                                 >
                                     {{ formatRupiah(item.keuntungan) }}
-                                </td>
+                                </td> -->
                                 <td class="border px-3 py-2 text-center">
                                     <button
                                         @click="lihatInvoice(item.id)"
@@ -268,6 +273,10 @@
 
                     <hr class="border-black border-dashed w-[95%] mx-auto" />
 
+                    <hr
+                        class="border-black border-dashed my-1 w-[95%] mx-auto"
+                    />
+
                     <!-- FOOTER -->
                     <div class="text-center text-[10px] p-2 space-y-1">
                         <div>
@@ -312,8 +321,8 @@
 </template>
 
 <script>
-import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
+// import * as XLSX from "xlsx";
+// import { saveAs } from "file-saver";
 import { jsPDF } from "jspdf";
 
 import axios from "axios";
@@ -416,8 +425,9 @@ export default {
                 "Terima kasih telah berbelanja di Toko Sinar Apa!",
             ];
 
+            //jarak antar baris
             const pageHeight =
-                (10 + d.items.length * 1.5 + 12) * lineHeight + 20;
+                (10 + d.items.length * 1.5 + 12) * lineHeight + 5;
 
             const doc = new jsPDF({
                 unit: "mm",
@@ -585,120 +595,120 @@ export default {
             doc.save(`Invoice_${d.id_penjualan}.pdf`);
         },
 
-        downloadExcel() {
-            if (this.riwayatFiltered.length === 0) {
-                alert("Tidak ada data untuk diunduh");
-                return;
-            }
+        // downloadExcel() {
+        //     if (this.riwayatFiltered.length === 0) {
+        //         alert("Tidak ada data untuk diunduh");
+        //         return;
+        //     }
 
-            // 🔹 Format periode
-            const periode =
-                this.periodeAwal && this.periodeAkhir
-                    ? `${this.formatTanggal(
-                          this.periodeAwal
-                      )} s/d ${this.formatTanggal(this.periodeAkhir)}`
-                    : "Semua Periode";
+        //     // 🔹 Format periode
+        //     const periode =
+        //         this.periodeAwal && this.periodeAkhir
+        //             ? `${this.formatTanggal(
+        //                   this.periodeAwal
+        //               )} s/d ${this.formatTanggal(this.periodeAkhir)}`
+        //             : "Semua Periode";
 
-            // 🔹 Header laporan
-            const headerInfo = [
-                ["LAPORAN PENJUALAN TOKO SINAR APA"],
-                [`Periode : ${periode}`],
-                [],
-            ];
+        //     // 🔹 Header laporan
+        //     const headerInfo = [
+        //         ["LAPORAN PENJUALAN TOKO SINAR APA"],
+        //         [`Periode : ${periode}`],
+        //         [],
+        //     ];
 
-            // 🔹 Header tabel
-            const tableHeader = [
-                ["No", "Tanggal", "Pengguna", "Total Penjualan", "Keuntungan"],
-            ];
+        //     // 🔹 Header tabel
+        //     const tableHeader = [
+        //         ["No", "Tanggal", "Pengguna", "Total Penjualan", "Keuntungan"],
+        //     ];
 
-            // 🔹 Data tabel
-            const tableBody = this.riwayatFiltered.map((item, index) => [
-                index + 1,
-                this.formatTanggal(item.created_at),
-                item.pengguna?.nama_lengkap || "-",
-                Number(item.total || 0),
-                Number(item.keuntungan || 0),
-            ]);
+        //     // 🔹 Data tabel
+        //     const tableBody = this.riwayatFiltered.map((item, index) => [
+        //         index + 1,
+        //         this.formatTanggal(item.created_at),
+        //         item.pengguna?.nama_lengkap || "-",
+        //         Number(item.total || 0),
+        //         Number(item.keuntungan || 0),
+        //     ]);
 
-            // 🔹 Hitung TOTAL
-            const totalPenjualan = this.riwayatFiltered.reduce(
-                (sum, item) => sum + Number(item.total || 0),
-                0
-            );
+        //     // 🔹 Hitung TOTAL
+        //     const totalPenjualan = this.riwayatFiltered.reduce(
+        //         (sum, item) => sum + Number(item.total || 0),
+        //         0
+        //     );
 
-            const totalKeuntungan = this.riwayatFiltered.reduce(
-                (sum, item) => sum + Number(item.keuntungan || 0),
-                0
-            );
+        //     const totalKeuntungan = this.riwayatFiltered.reduce(
+        //         (sum, item) => sum + Number(item.keuntungan || 0),
+        //         0
+        //     );
 
-            // 🔹 Baris TOTAL
-            const totalRow = ["", "", "TOTAL", totalPenjualan, totalKeuntungan];
+        //     // 🔹 Baris TOTAL
+        //     const totalRow = ["", "", "TOTAL", totalPenjualan, totalKeuntungan];
 
-            // 🔹 Gabungkan semua data
-            const worksheet = XLSX.utils.aoa_to_sheet([
-                ...headerInfo,
-                ...tableHeader,
-                ...tableBody,
-                [], // baris kosong
-                totalRow,
-            ]);
+        //     // 🔹 Gabungkan semua data
+        //     const worksheet = XLSX.utils.aoa_to_sheet([
+        //         ...headerInfo,
+        //         ...tableHeader,
+        //         ...tableBody,
+        //         [], // baris kosong
+        //         totalRow,
+        //     ]);
 
-            // 🔹 Lebar kolom
-            worksheet["!cols"] = [
-                { wch: 5 },
-                { wch: 15 },
-                { wch: 25 },
-                { wch: 20 },
-                { wch: 20 },
-            ];
+        //     // 🔹 Lebar kolom
+        //     worksheet["!cols"] = [
+        //         { wch: 5 },
+        //         { wch: 15 },
+        //         { wch: 25 },
+        //         { wch: 20 },
+        //         { wch: 20 },
+        //     ];
 
-            // 🔹 Bold header tabel
-            const range = XLSX.utils.decode_range(worksheet["!ref"]);
-            for (let C = range.s.c; C <= range.e.c; ++C) {
-                const cellRef = XLSX.utils.encode_cell({ r: 3, c: C });
-                if (worksheet[cellRef]) {
-                    worksheet[cellRef].s = { font: { bold: true } };
-                }
-            }
+        //     // 🔹 Bold header tabel
+        //     const range = XLSX.utils.decode_range(worksheet["!ref"]);
+        //     for (let C = range.s.c; C <= range.e.c; ++C) {
+        //         const cellRef = XLSX.utils.encode_cell({ r: 3, c: C });
+        //         if (worksheet[cellRef]) {
+        //             worksheet[cellRef].s = { font: { bold: true } };
+        //         }
+        //     }
 
-            // 🔹 Format Rupiah kolom D & E
-            const startRow = headerInfo.length + tableHeader.length + 1;
-            const endRow = startRow + tableBody.length;
+        //     // 🔹 Format Rupiah kolom D & E
+        //     const startRow = headerInfo.length + tableHeader.length + 1;
+        //     const endRow = startRow + tableBody.length;
 
-            ["D", "E"].forEach((col) => {
-                for (let i = startRow; i <= endRow + 1; i++) {
-                    const cell = worksheet[`${col}${i}`];
-                    if (cell) {
-                        cell.z = "#,##0";
-                        cell.t = "n";
-                    }
-                }
-            });
+        //     ["D", "E"].forEach((col) => {
+        //         for (let i = startRow; i <= endRow + 1; i++) {
+        //             const cell = worksheet[`${col}${i}`];
+        //             if (cell) {
+        //                 cell.z = "#,##0";
+        //                 cell.t = "n";
+        //             }
+        //         }
+        //     });
 
-            // 🔹 Bold baris TOTAL
-            const totalRowIndex = endRow + 2;
-            ["C", "D", "E"].forEach((col) => {
-                const cell = worksheet[`${col}${totalRowIndex}`];
-                if (cell) {
-                    cell.s = { font: { bold: true } };
-                }
-            });
+        //     // 🔹 Bold baris TOTAL
+        //     const totalRowIndex = endRow + 2;
+        //     ["C", "D", "E"].forEach((col) => {
+        //         const cell = worksheet[`${col}${totalRowIndex}`];
+        //         if (cell) {
+        //             cell.s = { font: { bold: true } };
+        //         }
+        //     });
 
-            // 🔹 Buat file Excel
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Riwayat");
+        //     // 🔹 Buat file Excel
+        //     const workbook = XLSX.utils.book_new();
+        //     XLSX.utils.book_append_sheet(workbook, worksheet, "Riwayat");
 
-            const buffer = XLSX.write(workbook, {
-                bookType: "xlsx",
-                type: "array",
-            });
+        //     const buffer = XLSX.write(workbook, {
+        //         bookType: "xlsx",
+        //         type: "array",
+        //     });
 
-            const blob = new Blob([buffer], {
-                type: "application/octet-stream",
-            });
+        //     const blob = new Blob([buffer], {
+        //         type: "application/octet-stream",
+        //     });
 
-            saveAs(blob, "Laporan_Riwayat_Penjualan.xlsx");
-        },
+        //     saveAs(blob, "Laporan_Riwayat_Penjualan.xlsx");
+        // },
 
         getRiwayat() {
             axios
