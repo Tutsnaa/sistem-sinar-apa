@@ -130,7 +130,7 @@
 
                             <tr v-if="riwayatFiltered.length === 0">
                                 <td
-                                    colspan="4"
+                                    colspan="8"
                                     class="text-center py-4 text-gray-500"
                                 >
                                     Tidak ada data
@@ -229,7 +229,7 @@
                             <div class="text-right font-medium">
                                 {{
                                     (item.harga * item.jumlah).toLocaleString(
-                                        "id-ID"
+                                        "id-ID",
                                     )
                                 }}
                             </div>
@@ -264,7 +264,7 @@
                             <span class="ml-auto text-right w-[70px]">
                                 {{
                                     invoiceData.kembalian.toLocaleString(
-                                        "id-ID"
+                                        "id-ID",
                                     )
                                 }}
                             </span>

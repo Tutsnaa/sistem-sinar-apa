@@ -1,7 +1,10 @@
 <template>
     <div class="bg-white rounded shadow p-4 mt-6">
         <!-- Judul -->
-        <h2 class="text-lg font-bold mb-4">Daftar Barang Masuk</h2>
+        <h2 class="text-lg font-bold mb-4">
+            {{ isEdit ? "Ubah Barang Masuk" : "Daftar Barang Masuk" }}
+        </h2>
+
         <div class="flex items-end justify-between gap-4 mb-4 flex-wrap">
             <!-- Filter Status -->
             <div class="flex items-center gap-3">
@@ -97,10 +100,10 @@
                                     item.status === 'Diterima'
                                         ? 'bg-green-100 text-green-700'
                                         : item.status === 'Ditolak'
-                                        ? 'bg-red-100 text-red-700'
-                                        : item.status === 'Menunggu'
-                                        ? 'bg-yellow-100 text-yellow-700'
-                                        : 'bg-gray-100 text-gray-700'
+                                          ? 'bg-red-100 text-red-700'
+                                          : item.status === 'Menunggu'
+                                            ? 'bg-yellow-100 text-yellow-700'
+                                            : 'bg-gray-100 text-gray-700'
                                 "
                             >
                                 {{ item.status }}
@@ -116,12 +119,12 @@
                                 <!-- Untuk karyawan -->
                                 <template v-if="role === 'karyawan'">
                                     <button
-                                        v-if="item.status !== 'Diterima'"
                                         @click="$emit('edit', item)"
-                                        class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition-colors"
+                                        class="bg-yellow-500 text-white px-3 py-1 rounded"
                                     >
                                         Ubah
                                     </button>
+
                                     <button
                                         v-if="item.status !== 'Diterima'"
                                         @click="$emit('delete', item)"
@@ -197,6 +200,10 @@ export default {
             type: String,
             required: true,
         },
+        isEdit: {
+            type: Boolean,
+            default: false,
+        },
     },
 
     data() {
@@ -204,6 +211,7 @@ export default {
             filterStatus: "Semua",
             periodeAwal: "",
             periodeAkhir: "",
+            isEdit: false,
         };
     },
 
@@ -212,6 +220,60 @@ export default {
     },
 
     methods: {
+        formatRupiah(value) {
+            if (value === null || value === undefined || value === "")
+                return "";
+
+            return Number(value).toLocaleString("id-ID");
+        },
+        onlyNumber(e) {
+            // izinkan: angka, backspace, delete, panah
+            if (
+                !/[0-9]/.test(e.key) &&
+                ![
+                    "Backspace",
+                    "Delete",
+                    "ArrowLeft",
+                    "ArrowRight",
+                    "Tab",
+                ].includes(e.key)
+            ) {
+                e.preventDefault(); //BLOKIR HURUF
+            }
+        },
+
+        simpanEdit() {
+            if (
+                this.selectedItem.jumlah <= 0 ||
+                this.selectedItem.harga_beli < 0 ||
+                this.selectedItem.harga_jual < 0
+            ) {
+                this.$emit("toast", "Data tidak valid", "error");
+                return;
+            }
+
+            this.$emit("edit", {
+                id: this.selectedItem.id,
+                jumlah: this.selectedItem.jumlah,
+                harga_beli: this.selectedItem.harga_beli,
+                harga_jual: this.selectedItem.harga_jual,
+            });
+
+            this.closeEditModal();
+        },
+
+        formatRupiah(angka) {
+            return "Rp " + Number(angka || 0).toLocaleString("id-ID");
+        },
+
+        formatTanggal(tanggal) {
+            return new Date(tanggal).toLocaleDateString("id-ID", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+            });
+        },
+
         formatRupiah(angka) {
             return "Rp " + Number(angka || 0).toLocaleString("id-ID");
         },

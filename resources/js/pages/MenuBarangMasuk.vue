@@ -28,13 +28,15 @@
                 :editData="editItem"
                 @refresh="refreshBarangMasuk"
                 @resetEdit="editItem = null"
+                @toast="showToast"
             />
 
             <DaftarBarangMasuk
                 :barangMasuk="barangMasukBulanIniFiltered"
-                @edit="onEditBarang"
-                @delete="hapusBarang"
                 :role="role"
+                :isEdit="isEdit"
+                @edit="handleEdit"
+                @delete="hapusBarang"
                 @update-status="updateStatusBarang"
             />
         </div>
@@ -46,12 +48,31 @@
         >
             <!-- Icon -->
             <svg
+                v-if="toastType === 'success'"
                 xmlns="http://www.w3.org/2000/svg"
                 class="w-5 h-5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
             >
+                <!-- CHECK ICON -->
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                />
+            </svg>
+
+            <svg
+                v-else
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+            >
+                <!-- WARNING ICON -->
                 <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -156,7 +177,19 @@ export default {
         this.role = role;
         this.getBarangMasuk();
     },
+
+    computed: {
+        isEdit() {
+            return !!this.editItem;
+        },
+    },
+
     methods: {
+        handleEdit(item) {
+            this.editItem = item;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        },
+
         showToast(message, type = "success") {
             this.toastMessage = message;
             this.toastType = type;
@@ -189,7 +222,7 @@ export default {
 
         refreshBarangMasuk(dataBaru) {
             const index = this.barangMasuk.findIndex(
-                (item) => item.id === dataBaru.id
+                (item) => item.id === dataBaru.id,
             );
 
             if (index !== -1) {
@@ -235,7 +268,7 @@ export default {
         async confirmHapus() {
             try {
                 await axios.delete(
-                    `/api/barang-masuk/${this.confirmDelete.id}`
+                    `/api/barang-masuk/${this.confirmDelete.id}`,
                 );
 
                 this.showToast("Barang masuk berhasil dihapus", "success");
@@ -258,7 +291,7 @@ export default {
                     const updated = res.data.data;
 
                     const index = this.barangMasuk.findIndex(
-                        (b) => b.id === updated.id
+                        (b) => b.id === updated.id,
                     );
 
                     if (index !== -1) {

@@ -1,6 +1,8 @@
 <template>
     <div class="bg-white rounded shadow p-6 mt-6">
-        <h2 class="text-xl font-bold mb-4">Tambah Barang Masuk</h2>
+        <h2 class="text-xl font-bold mb-4">
+            {{ editData ? "Ubah Barang Masuk" : "Tambah Barang Masuk" }}
+        </h2>
 
         <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
             <!-- Cari Barang -->
@@ -135,7 +137,7 @@ export default {
     components: {
         FormTambahBarang,
     },
-    emits: ["refresh", "resetEdit"],
+    emits: ["refresh", "resetEdit", "toast"],
     props: {
         editData: {
             type: Object,
@@ -167,7 +169,7 @@ export default {
         filteredBarang() {
             const key = this.searchBarang.toLowerCase();
             return this.listBarang.filter((b) =>
-                b.nama_barang.toLowerCase().includes(key)
+                b.nama_barang.toLowerCase().includes(key),
             );
         },
         totalPembelian() {
@@ -241,10 +243,11 @@ export default {
             this.showDropdown = false;
         },
 
-        handleBarangAdded(pesan) {
+        handleBarangAdded() {
             this.showForm = false;
             this.getBarang();
-            alert(pesan || "Barang berhasil ditambahkan");
+
+            this.$emit("toast", "Data Barang Berhasil", "success");
         },
 
         pilihBarang(barang) {
@@ -267,7 +270,7 @@ export default {
 
             const idPengguna = Number(localStorage.getItem("id_pengguna"));
             if (!idPengguna || !this.form.id_barang) {
-                alert("Barang harus dipilih");
+                this.$emit("toast", "Barang harus dipilih", "error");
                 return;
             }
 
@@ -279,41 +282,48 @@ export default {
                 jumlah: this.form.jumlah,
                 harga_beli: this.form.harga_beli,
                 harga_jual: this.form.harga_jual,
+                status: "Menunggu",
             };
 
             // ==========================
-            // ✏️ MODE EDIT (PUT)
+            // ✏️ MODE EDIT
             // ==========================
             if (this.editData && this.editData.id) {
                 axios
-                    .put(`/api/barang-masuk/${this.editData.id}`, {
-                        ...payload,
-                        status: "Menunggu", // ⬅️ otomatis reset
-                    })
+                    .put(`/api/barang-masuk/${this.editData.id}`, payload)
                     .then((res) => {
                         this.$emit("refresh", res.data.data);
                         this.$emit("resetEdit");
-                        alert("Data berhasil diperbarui");
+                        this.$emit(
+                            "toast",
+                            "Data berhasil diperbarui",
+                            "success",
+                        );
                         this.reset();
                     })
-                    .catch(() => alert("Gagal mengedit data"))
+                    .catch(() => {
+                        this.$emit("toast", "Gagal mengedit data", "error");
+                    })
                     .finally(() => (this.isSubmitting = false));
 
                 // ==========================
-                // ➕ MODE TAMBAH (POST)
+                // ➕ MODE TAMBAH
                 // ==========================
             } else {
                 axios
-                    .post("/api/barang-masuk", {
-                        ...payload,
-                        status: "Menunggu",
-                    })
+                    .post("/api/barang-masuk", payload)
                     .then((res) => {
                         this.$emit("refresh", res.data.data);
-                        alert("Barang masuk berhasil ditambahkan");
+                        this.$emit(
+                            "toast",
+                            "Barang masuk berhasil ditambahkan",
+                            "success",
+                        );
                         this.reset();
                     })
-                    .catch(() => alert("Gagal menyimpan"))
+                    .catch(() => {
+                        this.$emit("toast", "Gagal menambah data", "error");
+                    })
                     .finally(() => (this.isSubmitting = false));
             }
         },
