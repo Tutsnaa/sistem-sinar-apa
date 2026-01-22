@@ -68,7 +68,7 @@
                             :value="formatRupiah(form.harga_beli)"
                             @input="
                                 form.harga_beli = unformatRupiah(
-                                    $event.target.value
+                                    $event.target.value,
                                 )
                             "
                             class="w-full border rounded px-3 py-2"
@@ -84,7 +84,7 @@
                             :value="formatRupiah(form.harga_jual)"
                             @input="
                                 form.harga_jual = unformatRupiah(
-                                    $event.target.value
+                                    $event.target.value,
                                 )
                             "
                             class="w-full border rounded px-3 py-2"
@@ -97,11 +97,18 @@
                 <div>
                     <label class="block font-medium mb-1">Jumlah</label>
                     <input
+                        ref="jumlah"
+                        v-model="form.jumlah"
+                        type="number"
+                        readonly
+                        class="w-full border rounded px-3 py-2 bg-gray-100 cursor-not-allowed"
+                    />
+                    <!-- <input
                         v-model="form.jumlah"
                         type="number"
                         class="w-full border rounded px-3 py-2"
                         required
-                    />
+                    /> -->
                 </div>
 
                 <!-- Tombol -->

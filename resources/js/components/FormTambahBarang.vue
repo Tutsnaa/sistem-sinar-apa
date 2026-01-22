@@ -104,7 +104,7 @@
                             :value="formatRupiah(form.harga_beli)"
                             @input="
                                 form.harga_beli = unformatRupiah(
-                                    $event.target.value
+                                    $event.target.value,
                                 );
                                 validateHargaBeli();
                             "
@@ -133,7 +133,7 @@
                             :value="formatRupiah(form.harga_jual)"
                             @input="
                                 form.harga_jual = unformatRupiah(
-                                    $event.target.value
+                                    $event.target.value,
                                 );
                                 validateHargaJual();
                             "
@@ -160,6 +160,13 @@
                     <input
                         ref="jumlah"
                         v-model="form.jumlah"
+                        type="number"
+                        readonly
+                        class="w-full border rounded px-3 py-2 bg-gray-100 cursor-not-allowed"
+                    />
+                    <!-- <input
+                        ref="jumlah"
+                        v-model="form.jumlah"
                         @keydown.enter.prevent="focusNext('simpan')"
                         @blur="validateJumlah"
                         type="number"
@@ -169,7 +176,7 @@
                                 ? 'border-red-500 focus:ring-1 focus:ring-red-500'
                                 : 'border-gray-300 focus:ring-1'
                         "
-                    />
+                    /> -->
                     <p v-if="errors.jumlah" class="text-red-500 text-sm mt-1">
                         {{ errors.jumlah }}
                     </p>
@@ -213,7 +220,7 @@ export default {
                 id_kategori: "",
                 harga_beli: "",
                 harga_jual: "",
-                jumlah: "",
+                jumlah: 0,
             },
             barang: {
                 nama_barang: "",
@@ -281,12 +288,12 @@ export default {
                     : "Harga jual wajib diisi";
         },
 
-        validateJumlah() {
-            this.errors.jumlah =
-                this.form.jumlah && this.form.jumlah > 0
-                    ? ""
-                    : "Jumlah wajib diisi";
-        },
+        // validateJumlah() {
+        //     this.errors.jumlah =
+        //         this.form.jumlah && this.form.jumlah > 0
+        //             ? ""
+        //             : "Jumlah wajib diisi";
+        // },
 
         validateForm() {
             this.validateNamaBarang();
@@ -294,7 +301,7 @@ export default {
             this.validateKategori();
             this.validateHargaBeli();
             this.validateHargaJual();
-            this.validateJumlah();
+            // this.validateJumlah();
 
             return !Object.values(this.errors).some((e) => e);
         },
@@ -347,11 +354,11 @@ export default {
             try {
                 await axios.post("/api/barang", this.form);
 
-                this.$emit("toast", "Berhasil menyimpan barang");
-                this.$emit("success");
+                this.$emit("refresh");
+                this.$emit("toast", "Berhasil menyimpan barang", "success");
                 this.$emit("close");
             } catch (e) {
-                this.$emit("toast", "Gagal menyimpan barang");
+                this.$emit("toast", "Barang sudah ada", "error");
             }
         },
 

@@ -45,6 +45,7 @@
                         @close="showForm = false"
                         @success="getBarang"
                         @toast="showToast"
+                        @refresh="getBarang"
                     />
 
                     <!-- Pencarian -->
@@ -112,7 +113,7 @@
                                     Rp
                                     {{
                                         Number(
-                                            barang.harga_beli
+                                            barang.harga_beli,
                                         ).toLocaleString("id-ID")
                                     }}
                                 </td>
@@ -120,7 +121,7 @@
                                     Rp
                                     {{
                                         Number(
-                                            barang.harga_jual
+                                            barang.harga_jual,
                                         ).toLocaleString("id-ID")
                                     }}
                                 </td>
@@ -307,7 +308,7 @@ export default {
                 data = data.filter((b) =>
                     b.nama_barang
                         .toLowerCase()
-                        .includes(this.cari.toLowerCase())
+                        .includes(this.cari.toLowerCase()),
                 );
             }
 
@@ -358,7 +359,7 @@ export default {
                 await axios.delete(`/api/barang/${this.confirmDelete.id}`);
 
                 this.daftarBarang = this.daftarBarang.filter(
-                    (barang) => barang.id !== this.confirmDelete.id
+                    (barang) => barang.id !== this.confirmDelete.id,
                 );
 
                 this.showToast("Barang berhasil dihapus", "success");

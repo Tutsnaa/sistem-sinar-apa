@@ -280,8 +280,26 @@
         class="fixed top-6 left-1/2 -translate-x-1/2 z-50 text-white px-6 py-3 rounded-xl shadow-xl flex items-center gap-3 animate-slide-down"
         :class="toastType === 'success' ? 'bg-green-500' : 'bg-red-500'"
     >
-        <!-- Icon -->
+        <!-- ICON SUCCESS -->
         <svg
+            v-if="toastType === 'success'"
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+        >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 13l4 4L19 7"
+            />
+        </svg>
+
+        <!-- ICON ERROR -->
+        <svg
+            v-else
             xmlns="http://www.w3.org/2000/svg"
             class="w-5 h-5"
             fill="none"
@@ -404,7 +422,7 @@ export default {
 
             // Cegah nonaktif pemilik toko
             if (karyawan.role === "pemilik_toko") {
-                alert("Pemilik toko tidak bisa dinonaktifkan");
+                this.showToast("Pemilik toko tidak bisa dinonaktifkan");
                 return;
             }
 

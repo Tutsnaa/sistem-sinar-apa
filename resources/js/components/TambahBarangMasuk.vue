@@ -16,6 +16,7 @@
                     placeholder="Cari barang..."
                     class="border border-gray-300 rounded px-3 py-2 w-full focus:ring-2 focus:ring-blue-300"
                     @focus="showDropdown = true"
+                    @refresh="getBarang"
                 />
 
                 <ul
@@ -126,6 +127,7 @@
         :kategori="kategori"
         @close="showForm = false"
         @success="handleBarangAdded"
+        @refresh="getBarang"
     />
 </template>
 
@@ -255,7 +257,7 @@ export default {
             this.searchBarang = barang.nama_barang;
             this.form.harga_beli = barang.harga_beli ?? 0;
             this.form.harga_jual = barang.harga_jual ?? 0;
-            this.form.jumlah = 1;
+            this.form.jumlah = barang.jumlah ?? 0;
             this.showDropdown = false;
         },
 
