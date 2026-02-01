@@ -156,7 +156,7 @@
                             <div class="text-right font-medium">
                                 {{
                                     (item.harga * item.jumlah).toLocaleString(
-                                        "id-ID"
+                                        "id-ID",
                                     )
                                 }}
                             </div>
@@ -191,7 +191,7 @@
                             <span class="ml-auto text-right w-[70px]">
                                 {{
                                     invoiceData.kembalian.toLocaleString(
-                                        "id-ID"
+                                        "id-ID",
                                     )
                                 }}
                             </span>
@@ -280,7 +280,7 @@ export default {
         totalHarga() {
             return this.daftarPembelian.reduce(
                 (sum, item) => sum + item.harga * item.jumlah,
-                0
+                0,
             );
         },
     },
@@ -334,7 +334,7 @@ export default {
 
         tambahBarang(data) {
             const index = this.daftarPembelian.findIndex(
-                (item) => item.nama === data.nama
+                (item) => item.nama === data.nama,
             );
 
             if (index !== -1) {

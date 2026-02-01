@@ -62,7 +62,69 @@
             Tambah
         </button>
     </div>
+    <!-- NOTIFICATION -->
+    <div
+        v-if="toast.show"
+        class="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-xl shadow-xl flex items-center gap-3 animate-slide-down text-white"
+        :class="toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'"
+    >
+        <!-- ICON -->
+        <!-- SUCCESS -->
+        <svg
+            v-if="toast.type === 'success'"
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+        >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 13l4 4L19 7"
+            />
+        </svg>
+
+        <!-- ERROR -->
+        <svg
+            v-else
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+        >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z"
+            />
+        </svg>
+
+        <span class="font-medium text-sm">
+            {{ toast.message }}
+        </span>
+    </div>
 </template>
+
+<style>
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -20px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+.animate-slide-down {
+    animation: slideDown 0.35s ease-out;
+}
+</style>
 
 <script>
 import FormInput from "../components/FormInput.vue";
@@ -92,6 +154,11 @@ export default {
             jumlahBarang: 0,
             jumlah: null,
             showSuggestions: false,
+            toast: {
+                show: false,
+                message: "",
+                type: "success", // success | error
+            },
         };
     },
 
@@ -107,12 +174,24 @@ export default {
                 (b) =>
                     b.nama_barang &&
                     b.status === "tersedia" &&
-                    b.nama_barang.toLowerCase().includes(keyword)
+                    b.nama_barang.toLowerCase().includes(keyword),
             );
         },
     },
 
     methods: {
+        showToast(message, type = "success") {
+            this.toast = {
+                show: true,
+                message,
+                type,
+            };
+
+            setTimeout(() => {
+                this.toast.show = false;
+            }, 2000);
+        },
+
         selectBarang(b) {
             this.idBarang = b.id;
             this.cariBarang = b.nama_barang;
@@ -131,12 +210,12 @@ export default {
 
         tambahPembelian() {
             if (!this.namaBarang || !this.jumlah || this.jumlah <= 0) {
-                alert("Lengkapi data barang dan jumlah!");
+                this.showToast("Lengkapi data barang dan jumlah!", "error");
                 return;
             }
 
             if (this.jumlah > this.jumlahBarang) {
-                alert("Stok tidak mencukupi!");
+                this.showToast("Stok tidak mencukupi!", "error");
                 return;
             }
 
@@ -147,7 +226,9 @@ export default {
                 jumlah: this.jumlah,
             });
 
-            // reset
+            this.$emit("toast", "Barang berhasil ditambahkan", "success");
+
+            // reset form
             this.cariBarang = "";
             this.namaBarang = "";
             this.hargaBarang = "";
