@@ -1,7 +1,11 @@
-import "./bootstrap";
 import { createApp } from "vue";
-import ExampleComponent from "./components/ExampleComponent.vue";
+import App from "./App.vue";
+import router from "./router";
 
-const app = createApp({});
-app.component("example-component", ExampleComponent);
-app.mount("#app");
+const app = createApp(App);
+
+// ambil nama dari session blade
+const el = document.getElementById("app");
+app.config.globalProperties.$nama = el.dataset.nama ?? "";
+
+app.use(router).mount("#app");
